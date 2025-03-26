@@ -1,0 +1,14 @@
+200X1024X200: 1093
+512X1024X128: 1712
+machines are : ['Carl_Zeiss_Meditec']
+
+data split
+80 percent train
+20 percent test
+
+resolution of data: 512X1024X128
+the number of valid volumes are: 1644
+number of volumes in train set are : 754
+number of volumes in test set are : 196
+
+Datasplit was done such no more than 10 scans for each patient are selected if the scan is of wet amd

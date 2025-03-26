@@ -1,0 +1,477 @@
+[
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20170203"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20170621"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20171115"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20180801"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20181219"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20190412"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20200115"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20210303"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20210409"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20210709"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20210813"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20211029"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20220325"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20220527"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20220729"
+    },
+    {
+        "patient_id": "075416083",
+        "laterality": "R",
+        "scan_date": "20221209"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20180814"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20181114"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20190201"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20190220"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20190522"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20190822"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20191204"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20200304"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20200604"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20200909"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20201209"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20210311"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20210616"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20211013"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20220223"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20220713"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20221116"
+    },
+    {
+        "patient_id": "075890207",
+        "laterality": "L",
+        "scan_date": "20230315"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20170711"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20171103"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20171222"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20180329"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20180621"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20180927"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20190108"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20190423"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20190820"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20191001"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20191231"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20200310"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20200602"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20201006"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20210208"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20210426"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20220111"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20220524"
+    },
+    {
+        "patient_id": "737256483",
+        "laterality": "R",
+        "scan_date": "20220927"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20110719"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20120724"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20130423"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20140114"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20140318"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20140617"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20140826"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20141216"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20150310"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20150505"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20150616"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20150804"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20150922"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20151117"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20160112"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20160223"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20160405"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20160517"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20160628"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20160913"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20161025"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20161227"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20170601"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20170706"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20170815"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20171010"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20180116"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20180515"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20180717"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20180906"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20181101"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20181218"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20190528"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20191119"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20200604"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20200915"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20201215"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20210401"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20210603"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20210819"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20220804"
+    },
+    {
+        "patient_id": "737820927",
+        "laterality": "L",
+        "scan_date": "20221201"
+    }
+]
