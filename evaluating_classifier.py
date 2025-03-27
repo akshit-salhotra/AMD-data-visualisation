@@ -11,39 +11,39 @@ import seaborn as sns
 import numpy as np
 from typing import Union
 import os
+from tqdm import tqdm 
 
-
-def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path:str,transform: Union[transforms.Transform,transforms.Compose],batch_size:int,num_workers:int,timeout:int,save_path:str)->None:
+def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path:str,transform,batch_size:int,num_workers:int,timeout:int,save_path:str,data:str)->None:
     with open(json_path,'r') as file:
         paths=json.load(file)
         
-    model=Resnet18_3D(num_classes=6,device=device)
+    model=Resnet18_3D(num_classes=6).to(device)
     if torch.cuda.device_count()>1:
         model=nn.DataParallel(model)
         
     model.load_state_dict(torch.load(model_path,map_location=device))
-    dataset=OCTDataset(paths['test_path'],excel_path,transform)
+    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform)
     dataloader=DataLoader(dataset,batch_size,shuffle=False,num_workers=num_workers,timeout=timeout)
 
     labels=[]
     preds=[]
     model.eval()
     with torch.no_grad():
-        for image,label in dataloader:
+        for image,label in tqdm(dataloader):
             image=image.to(device)
             label=label.to(device)
             logits=model(image)
             pred=torch.argmax(logits,dim=-1)
             labels.append(label)
             preds.append(pred)
-    labels=torch.stack(labels,dim=0).cpu().numpy()
-    preds=torch.stack(preds,dim=0).cpu().numpy()
-
+    labels=torch.concat(labels,dim=0).cpu().numpy()
+    preds=torch.concat(preds,dim=0).cpu().numpy()
+    classes=["early","inter","ga","wet","scar","notamd"]
     c_matrix=confusion_matrix(labels,preds)
 
     plt.figure(figsize=(6, 4))
-    sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues')
-    plt.title('Confusion Matrix')
+    sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
+    plt.title(f'Confusion Matrix,acc:{np.mean(labels==preds):.4f}')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
 
@@ -53,16 +53,18 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     print('the accuarcy of model is:',np.mean(labels==preds))
     
 if __name__=="__main__":
-    model_path=None
+    model_path="model_parameter_Resnet3D\\15\\fold4_epoch49_val_0.1960_train_0.0854"
     device='cuda' if torch.cuda.is_available() else 'cpu'
     json_path="jsons\\train_test_val_split.json"
     excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
-    batch_size=16
-    num_workers=8
+    batch_size=32
+    num_workers=12
     timeout=600
     results_dir="results"
+    data='test'#can either be train or test
+    assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
-    save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+'confusion_matrix_test_set.png'
+    save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set.png'
     
-    evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file)
+    evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data)
