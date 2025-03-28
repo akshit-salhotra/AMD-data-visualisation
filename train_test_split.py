@@ -14,7 +14,7 @@ print(df.iloc[0])
 valid_volumes=[]
 for volume in volumes_path:
     # print(volume.split("\\")[-3])
-    if volume.split("\\")[-3]=='512X1024X128':
+    # if volume.split("\\")[-3]=='512X1024X128':
         scan_info=volume.split("\\")[3:6]
         # print(scan_info)
         if len(df[df['research_id']==int(scan_info[0])][df['laterality']==scan_info[1]]):
@@ -30,6 +30,8 @@ for volume in tqdm(valid_volumes):
     info=[sections[3],sections[4],sections[5]]
     amd_type=get_amdtype(info,df)
     patient_id=volume.split("\\")[3]
+    if amd_type=='scar':
+        continue
     if amd_type=='wet':
         try:
             if Counter(patient_ids)[patient_id]>10:
@@ -50,7 +52,7 @@ paths={
     'train_path':train_volumes,
     'test_path':test_volumes}
 
-save_path='train_test_val_split.json'
+save_path='train_test_val_split_without_scar_with_both_res.json'
 os.makedirs('jsons',exist_ok=True)
 with open('jsons'+os.sep+save_path,'w') as f:
     json.dump(paths,f,indent=4)
