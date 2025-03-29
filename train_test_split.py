@@ -24,6 +24,8 @@ train_volumes=[]
 test_volumes=[]
 patient_ids=[]
 random.seed(20)
+scar_scans=0
+discarded_wet_scans=0
 for volume in tqdm(valid_volumes):
     num=random.random()
     sections=volume.split("\\")
@@ -31,11 +33,14 @@ for volume in tqdm(valid_volumes):
     amd_type=get_amdtype(info,df)
     patient_id=volume.split("\\")[3]
     if amd_type=='scar':
+        scar_scans+=1
         continue
     if amd_type=='wet':
         try:
             if Counter(patient_ids)[patient_id]>10:
+                discarded_wet_scans+=1
                 continue
+                
         except IndexError:
             pass
 
@@ -47,7 +52,8 @@ for volume in tqdm(valid_volumes):
 
 for value in ['train','test']:
     print(f'number of volumes in {value} set are :',len(globals()[f'{value}_volumes']))
-
+print('the number of scans labelled with scars:',scar_scans)
+print('the number of scans of wet amd discarded:',discarded_wet_scans)
 paths={
     'train_path':train_volumes,
     'test_path':test_volumes}

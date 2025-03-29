@@ -92,25 +92,28 @@ if __name__=="__main__":
 
         parser.add_argument("--lr", type=float, default=0.0001, help="learning rate")
         parser.add_argument('--batch',type=float,default=16,help='batch size')
-        parser.add_argument('--epoch',type=int,default=50,help='number of epoch')
-        parser.add_argument('--json',type=str,default='jsons/train_test_val_split.json',help="path of json file containing path of volumes")
+        parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
+        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar_with_both_res.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet3D')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
         parser.add_argument('--log-dir',type=str,default='logs',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
-        parser.add_argument('--model-path',type=str,default="model_parameter_Resnet3D//14//fold0_epoch49_val_2.9850_train_0.1494",help='path of model parameters to be loaded')
+        parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
+        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.125,0.11,0.09,0.11,1]),help='weights for weighted cross entropy')
+        parser.add_argument('--num_classes',type=int,default=5,help="number of classes of the classifier")
+
         args = parser.parse_args()
         
         param_dir=intialise_logger_nd_create_folders(args)
         
-        model=Resnet18_3D(num_classes=6).to(args.device)
+        model=Resnet18_3D(num_classes=args.num_classes).to(args.device)
         model=nn.DataParallel(model)
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
-        criteron=CrossEntropyLoss(weight=torch.tensor([0.25,0.25,0.125,0.167,0.143,1],device=args.device))##make sure to add weight factor
+        criteron=CrossEntropyLoss(weight=args.weight_matrix.to(args.device))##make sure to add weight factor
         #early,inter,ga,wet,scar,notamd
         optimizer=optim.Adam(model.parameters(),args.lr)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
@@ -123,7 +126,7 @@ if __name__=="__main__":
         train_paths=paths['train_path']
 
         transform=transforms.Compose([transforms.ToTensor(),transforms.RandomHorizontalFlip(),transforms.Resize((256,256))])
-        dataset=OCTDataset(train_paths,args.excel_path,transform)
+        dataset=OCTDataset(train_paths,args.excel_path,transform,undersample=True,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 

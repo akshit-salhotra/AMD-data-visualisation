@@ -50,15 +50,15 @@ class OCTDataset(Dataset):
         sections=scans_dir.split("\\")
         pt_info=[sections[3],sections[4],sections[5]]
         amdtype=get_amdtype(pt_info,self.df)
-        scan_list=os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0])
+        scan_list=sorted(os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0]))
         if self.undersample:
             scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0],len(scan_list))]
-        for bscan in sorted(scan_list):
+        for bscan in scan_list:
             img=cv2.imread(scans_dir+os.sep+bscan,0)
 
             #histogram equalization
             img = self.clahe.apply(img)
-            assert img.shape==(1024,512),f' the shape of b scan must be [1024,512] but was found to be {img.shape}'
+            assert img.shape==(1024,512) or img.shape==(1024,200),f' the shape of b scan must be [1024,512] or [1024,200] but was found to be {img.shape} the scan dir is :{scans_dir}'
             if self.transforms:
                 img=self.transforms(img)
             volume.append(img.squeeze(dim=0))

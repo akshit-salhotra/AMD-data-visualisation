@@ -9,7 +9,7 @@ import json
 warnings.filterwarnings('ignore', category=UserWarning)
 scans_without_annotations=[]
 csv_path="d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
-json_path="jsons/train_test_val_split.json"
+json_path="jsons/train_test_val_split_without_scar_with_both_res.json"
 def patient_info(data_dir):
     scans_info=[]
     for pt_id in os.listdir(data_dir):
@@ -31,7 +31,7 @@ def patient_info_from_path(paths):
 
 
 dataframe=pd.read_excel(csv_path,sheet_name='annotations')
-scans_info=patient_info_from_path(paths_dict['test_path'])
+scans_info=patient_info_from_path(paths_dict['train_path'])
 AMD_type=[]
 count=0
 
@@ -77,7 +77,7 @@ if __name__=='__main__':
     plt.title('String Frequency Histogram')
     plt.xticks(rotation=45)  # Rotate labels for better visibility
     plt.tight_layout()
-    plt.savefig('images/plots/test_data_freq_histogram.png')
+    plt.savefig('images/plots/train_data_freq__both_res_histogram.png')
     plt.show()
 
     # save_json='scans_without_annotations.json'
