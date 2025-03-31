@@ -12,3 +12,7 @@ number of volumes in train set are : 754
 number of volumes in test set are : 196
 
 Datasplit was done such no more than 10 scans for each patient are selected if the scan is of wet amd
+
+
+// "d:\\cleaning_GUI_annotated_data\\Cirrus_OCT_Imaging_Data\\737650964\\R\\20170413\\140118\\OPT\\Carl_Zeiss_Meditec\\200X1024X200\\Original\\B-Scans",
+This volume has a few scans that are not right
