@@ -35,7 +35,7 @@ class OCTDataset(Dataset):
         if 'volume_shape' in kwargs:
             self.volume_shape=kwargs['volume_shape']
         else:
-            self.volume_shape=[128,256,256]
+            self.volume_shape=[[128,256,256],[200,256,256]]
         
         if 'undersample' in kwargs:
             self.undersample=kwargs['undersample']
@@ -63,7 +63,7 @@ class OCTDataset(Dataset):
                 img=self.transforms(img)
             volume.append(img.squeeze(dim=0))
         volume=torch.stack(volume,dim=0)
-        assert list(volume.shape)==self.volume_shape,f'the shape of scan should be {self.volume_shape} but it was found to be {volume.shape}'
+        assert any(list(volume.shape)==vol for vol in self.volume_shape),f'the shape of scan should be {self.volume_shape} but it was found to be {volume.shape}'
 
         label=self.classes[amdtype]
         return volume.unsqueeze(dim=0),label
