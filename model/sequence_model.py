@@ -17,9 +17,9 @@ class Seq_Model(nn.Module):
         
         self.classification_head=nn.Linear(embed_dim,num_classes)
     
-    def forward(self,x:torch.Tensor)->torch.Tensor:
+    def forward(self,x:torch.Tensor,src_key_padding_mask:torch.Tensor)->torch.Tensor:
         # x.shape=(batch,n_scans,channels,height,width)
-        
+        x=torch.permute(x,(0,2,1,3,4))
         b,num_scan,c,h,w=x.shape
         
         x=x.view(-1,c,h,w)
@@ -29,8 +29,8 @@ class Seq_Model(nn.Module):
         features=torch.concat([self.cls_token.unsqueeze(0).expand(b,-1,-1),features],dim=1)
         assert features.shape[0:2]==(b,num_scan+1),'the logic implemented is not right'
         
-        # print(features.shape)
-        output=self.aggregation_head(features)
+
+        output=self.aggregation_head(features,src_key_padding_mask=src_key_padding_mask)
         # print(output.shape)
         
         

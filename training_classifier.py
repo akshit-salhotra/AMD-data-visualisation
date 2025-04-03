@@ -4,9 +4,10 @@ import torch
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader,Subset
 from torch.nn import CrossEntropyLoss
-from dataloader import OCTDataset
+from dataloader import OCTDataset,collate_fn
 import torch.optim as optim
 from model.resnet_3d import Resnet18_3D
+# from model.sequence_model import Seq_Model
 import os
 from tqdm import tqdm
 import logging
@@ -59,11 +60,11 @@ def load_model(args):
     print('loaded model parameters from ',args.model_path)
     logging.info(f'loaded model parameters from {args.model_path}')
 
-def train_step(args,iter,image,label,epoch_loss,optimizer,model,criteron,dataset,num_folds):
-    image=image.to(args.device)
+def train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds):
+    data=[d.to(args.device) for d in data]
     label=label.to(args.device)
     # print(image.shape)
-    logits=model(image)
+    logits=model(*data)
     # print(logits.device,label.device)
     loss=criteron(logits,label)
     epoch_loss+=loss
@@ -74,10 +75,10 @@ def train_step(args,iter,image,label,epoch_loss,optimizer,model,criteron,dataset
     optimizer.zero_grad()
     return epoch_loss
 
-def val_step(args,image,label,val_loss,model,criteron):
-    image=image.to(args.device)
+def val_step(args,data,label,val_loss,model,criteron):
+    data=[d.to(args.device) for d in data]
     label=label.to(args.device)
-    logits=model(image)
+    logits=model(*data)
     loss=criteron(logits,label)
     val_loss+=loss
     preds=torch.argmax(logits,dim=-1)
@@ -93,11 +94,11 @@ if __name__=="__main__":
         parser.add_argument("--lr", type=float, default=0.0001, help="learning rate")
         parser.add_argument('--batch',type=float,default=16,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
-        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar_with_both_res.json',help="path of json file containing path of volumes")
+        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
-        parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet3D')
+        parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
-        parser.add_argument('--log-dir',type=str,default='logs',help='the directory in which training logs are to be saved')
+        parser.add_argument('--log-dir',type=str,default='logs/Resnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
         parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
@@ -110,6 +111,7 @@ if __name__=="__main__":
         param_dir=intialise_logger_nd_create_folders(args)
         
         model=Resnet18_3D(num_classes=args.num_classes).to(args.device)
+        # model=Seq_Model(num_classes=args.num_classes,device=args.device).to(args.device)
         model=nn.DataParallel(model)
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
@@ -125,8 +127,10 @@ if __name__=="__main__":
             paths= json.load(file) 
         train_paths=paths['train_path']
 
-        transform=transforms.Compose([transforms.ToTensor(),transforms.RandomHorizontalFlip(),transforms.Resize((256,256))])
-        dataset=OCTDataset(train_paths,args.excel_path,transform,undersample=True,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
+        transform=transforms.Compose([transforms.ToTensor(),
+                                      transforms.RandomHorizontalFlip(),
+                                      transforms.Resize((256,256))])
+        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=False,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
@@ -135,8 +139,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset, train_idx), batch_size=args.batch, shuffle=True,num_workers=8,timeout=600)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=8,timeout=600)
+            train_loader = DataLoader(Subset(dataset, train_idx), batch_size=args.batch, shuffle=True,num_workers=4,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=4,timeout=600,collate_fn=collate_fn)
             if args.model_path:
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
@@ -152,9 +156,10 @@ if __name__=="__main__":
             for i in pbar:
                     epoch_loss=0
                     model.train()
-                    for iter,(image,label) in tqdm(enumerate(train_loader)):
+                    for iter,(data,label) in tqdm(enumerate(train_loader)):
                         # print(image.shape)
-                        epoch_loss=train_step(args,iter,image,label,epoch_loss,optimizer,model,criteron,dataset,num_folds)
+                        # print(label)
+                        epoch_loss=train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds)
                         
                     epoch_loss/=((len(dataset)*(num_folds-1))//(num_folds*args.batch)+1)
                     logging.info(f'Epoch:{i}/{args.epoch} Loss is :{epoch_loss:.4f}')
@@ -166,8 +171,9 @@ if __name__=="__main__":
                         correct_pred=0
                         model.eval()
                         with torch.no_grad():
-                            for image,label in test_loader:
-                                val_loss,preds,label=val_step(args,image,label,val_loss,model,criteron)
+                            for (data,label) in test_loader:
+                                # print(data,label)
+                                val_loss,preds,label=val_step(args,data,label,val_loss,model,criteron)
                                 # print(preds.device,label.device)
                                 correct_pred+=(label==preds).sum().item()
 

@@ -6,6 +6,15 @@ import pandas as pd
 from utils.histogram import get_amdtype
 import torch
 
+def collate_fn(batch):
+    lists=len(batch[0])-1
+    data=[]
+    for i in range(lists):
+        d=torch.stack([val[i] for val in batch],dim=0)
+        data.append(d)
+    
+    return data,torch.concat([val[-1] for val in batch],dim=0)
+
 def undersampler(needed_samples:int,total_samples:int)->list:
     assert needed_samples>=total_samples//2,"this sampler is unfit for sampling if 2*need_samples<total_samples"
     sel_indexes=[i for i in range(0,total_samples,2)]
@@ -32,6 +41,7 @@ class OCTDataset(Dataset):
             self.transforms=transforms
         else:
             self.transforms=None
+            
         if 'volume_shape' in kwargs:
             self.volume_shape=kwargs['volume_shape']
         else:
@@ -39,9 +49,15 @@ class OCTDataset(Dataset):
         
         if 'undersample' in kwargs:
             self.undersample=kwargs['undersample']
-
         else:
             self.undersample=False
+
+        if 'attn' in kwargs:
+            self.attn=kwargs['attn']
+            self.context_length=max([row[0] for row in self.volume_shape])
+            
+        else:
+            self.attn=False
 
     def __getitem__(self, index):
         self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
@@ -65,7 +81,22 @@ class OCTDataset(Dataset):
         volume=torch.stack(volume,dim=0)
         assert any(list(volume.shape)==vol for vol in self.volume_shape),f'the shape of scan should be {self.volume_shape} but it was found to be {volume.shape}'
 
-        label=self.classes[amdtype]
+        label=torch.tensor([self.classes[amdtype]])
+        if self.attn:
+            if volume.shape[0]<self.context_length:
+                attn_mask=torch.tensor([ i>=volume.shape[0]+1 for i in range(self.context_length+1)],dtype=torch.float32)
+
+                volume=torch.concat([volume,torch.ones(self.context_length-volume.shape[0],*self.volume_shape[0][1:])],dim=0)
+                # print(torch.unique(attn_mask))
+                # print(attn_mask)
+            else:
+                attn_mask=torch.zeros(self.context_length+1)
+                # print(torch.unique(attn_mask))
+                # print('context window:',self.context_length)
+            assert list(attn_mask.shape)==[self.context_length+1],f'the shape of attn mask is not right:{attn_mask.shape}'
+            assert any(int(torch.sum(attn_mask).item())==self.context_length-n for n in list(np.array(self.volume_shape)[:,0])),f'the attention mask is not right:{torch.sum(attn_mask)} scans dir :{scans_dir}'
+            return volume.unsqueeze(dim=0),attn_mask,label
+
         return volume.unsqueeze(dim=0),label
             
     def __len__(self):
