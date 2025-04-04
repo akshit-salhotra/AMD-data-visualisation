@@ -44,6 +44,7 @@ class OCTDataset(Dataset):
             
         if 'volume_shape' in kwargs:
             self.volume_shape=kwargs['volume_shape']
+            assert isinstance(self.volume_shape,list) and all(isinstance(shape,list) for shape in self.volume_shape) and all(len(shape)==3 for shape in self.volume_shape),'invalid volume'
         else:
             self.volume_shape=[[128,256,256],[200,256,256]]
         
@@ -58,11 +59,18 @@ class OCTDataset(Dataset):
             
         else:
             self.attn=False
+        
+        if 'get_raw_scans' in kwargs:
+            self.raw_scans=kwargs['get_raw_scans']
+        else:
+            self.raw_scans=False
 
     def __getitem__(self, index):
         self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
         scans_dir=self.image_paths[index]
         volume=[]
+        if self.raw_scans:
+            raw_volume=[]   
         sections=scans_dir.split("\\")
         pt_info=[sections[3],sections[4],sections[5]]
         amdtype=get_amdtype(pt_info,self.df)
@@ -71,14 +79,21 @@ class OCTDataset(Dataset):
             scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0],len(scan_list))]
         for bscan in scan_list:
             img=cv2.imread(scans_dir+os.sep+bscan,0)
-
+            if self.raw_scans:
+                raw_volume.append(img)
+                
             #histogram equalization
             img = self.clahe.apply(img)
             assert img.shape==(1024,512) or img.shape==(1024,200),f' the shape of b scan must be [1024,512] or [1024,200] but was found to be {img.shape} the scan dir is :{scans_dir}'
             if self.transforms:
                 img=self.transforms(img)
             volume.append(img.squeeze(dim=0))
+            
+
         volume=torch.stack(volume,dim=0)
+        if self.raw_scans:
+            raw_volume=torch.stack(raw_volume,dim=0)
+        
         assert any(list(volume.shape)==vol for vol in self.volume_shape),f'the shape of scan should be {self.volume_shape} but it was found to be {volume.shape}'
 
         label=torch.tensor([self.classes[amdtype]])
@@ -87,16 +102,22 @@ class OCTDataset(Dataset):
                 attn_mask=torch.tensor([ i>=volume.shape[0]+1 for i in range(self.context_length+1)],dtype=torch.float32)
 
                 volume=torch.concat([volume,torch.ones(self.context_length-volume.shape[0],*self.volume_shape[0][1:])],dim=0)
-                # print(torch.unique(attn_mask))
-                # print(attn_mask)
+                if self.raw_scans:
+                    raw_volume=torch.concat([raw_volume,torch.ones(self.context_length-volume.shape[0],*self.volume_shape[0][1:])],dim=0)
+
+
             else:
                 attn_mask=torch.zeros(self.context_length+1)
-                # print(torch.unique(attn_mask))
-                # print('context window:',self.context_length)
+
             assert list(attn_mask.shape)==[self.context_length+1],f'the shape of attn mask is not right:{attn_mask.shape}'
             assert any(int(torch.sum(attn_mask).item())==self.context_length-n for n in list(np.array(self.volume_shape)[:,0])),f'the attention mask is not right:{torch.sum(attn_mask)} scans dir :{scans_dir}'
+            
+            if self.raw_scans:
+                return volume.unsqueeze(dim=0),raw_volume.unsqueeze(dim=0),attn_mask,label
             return volume.unsqueeze(dim=0),attn_mask,label
 
+        if self.raw_scans:
+            return volume.unsqueeze(dim=0),raw_volume.unsqueeze(dim=0),label
         return volume.unsqueeze(dim=0),label
             
     def __len__(self):

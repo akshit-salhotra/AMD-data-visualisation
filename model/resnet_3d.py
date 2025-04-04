@@ -73,3 +73,4 @@ if __name__=='__main__':
     Device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model=Resnet18_3D(6).to(Device)
     summary(model,(1,128,256,256),1)
+    # print(list(model.children()))
