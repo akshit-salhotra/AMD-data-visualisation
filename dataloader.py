@@ -80,7 +80,7 @@ class OCTDataset(Dataset):
         for bscan in scan_list:
             img=cv2.imread(scans_dir+os.sep+bscan,0)
             if self.raw_scans:
-                raw_volume.append(img)
+                raw_volume.append(torch.from_numpy(img))
                 
             #histogram equalization
             img = self.clahe.apply(img)
