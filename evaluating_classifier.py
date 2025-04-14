@@ -17,12 +17,12 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     with open(json_path,'r') as file:
         paths=json.load(file)
         
-    model=Resnet18_3D(num_classes=6).to(device)
+    model=Resnet18_3D(num_classes=5).to(device)
     if torch.cuda.device_count()>1:
         model=nn.DataParallel(model)
         
     model.load_state_dict(torch.load(model_path,map_location=device))
-    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform)
+    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
     dataloader=DataLoader(dataset,batch_size,shuffle=False,num_workers=num_workers,timeout=timeout)
 
     labels=[]
@@ -38,7 +38,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
             preds.append(pred)
     labels=torch.concat(labels,dim=0).cpu().numpy()
     preds=torch.concat(preds,dim=0).cpu().numpy()
-    classes=["early","inter","ga","wet","scar","notamd"]
+    classes=["early","inter","ga","wet","notamd"]
     c_matrix=confusion_matrix(labels,preds)
 
     plt.figure(figsize=(6, 4))
@@ -53,18 +53,18 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     print('the accuarcy of model is:',np.mean(labels==preds))
     
 if __name__=="__main__":
-    model_path="model_parameter_Resnet3D\\15\\fold4_epoch49_val_0.1960_train_0.0854"
+    model_path="model_parameter_Resnet\\2\\fold0_epoch15_val_10.2388_train_0.6629"
     device='cuda' if torch.cuda.is_available() else 'cpu'
-    json_path="jsons\\train_test_val_split.json"
+    json_path="jsons\\train_test_val_split_without_scar.json"
     excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
     batch_size=32
     num_workers=12
     timeout=600
     results_dir="results"
-    data='test'#can either be train or test
+    data='train'#can either be train or test
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
-    save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set.png'
+    save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
     
     evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data)

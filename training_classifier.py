@@ -103,7 +103,8 @@ if __name__=="__main__":
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
         parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
-        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.125,0.11,0.09,0.11,1]),help='weights for weighted cross entropy')
+        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.25,0.25,0.125,0.16,1]),help='weights for weighted cross entropy')
+        parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--num_classes',type=int,default=5,help="number of classes of the classifier")
 
         args = parser.parse_args()
@@ -128,9 +129,9 @@ if __name__=="__main__":
         train_paths=paths['train_path']
 
         transform=transforms.Compose([transforms.ToTensor(),
-                                      transforms.RandomHorizontalFlip(),
+                                    #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
-        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=False,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
+        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict)
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
@@ -139,8 +140,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset, train_idx), batch_size=args.batch, shuffle=True,num_workers=4,timeout=600,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=4,timeout=600,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset, train_idx), batch_size=args.batch, shuffle=True,num_workers=8,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=8,timeout=600,collate_fn=collate_fn)
             if args.model_path:
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
