@@ -1,6 +1,6 @@
 import torch
 from model.resnet_3d import Resnet18_3D
-from dataloader import OCTDataset
+from dataloader import OCTDataset,collate_fn
 import json
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -27,16 +27,17 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
 
     for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):   
         model.load_state_dict(torch.load(model_path,map_location=device))
-        dataloader=DataLoader(Subset(dataset,train_idx),batch_size,shuffle=False,num_workers=num_workers,timeout=timeout)
+        dataloader=DataLoader(Subset(dataset,train_idx),batch_size,shuffle=False,num_workers=num_workers,timeout=timeout,collate_fn=collate_fn)
 
         labels=[]
         preds=[]
         model.eval()
         with torch.no_grad():
-            for image,label in tqdm(dataloader):
-                image=image.to(device)
+            for data,label in tqdm(dataloader):
+                # print(len(data))
+                data=[d.to(device) for d in data]
                 label=label.to(device)
-                logits=model(image)
+                logits=model(*data)
                 print(logits,label)
                 pred=torch.argmax(logits,dim=-1)
                 labels.append(label)
