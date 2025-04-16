@@ -23,7 +23,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         model=nn.DataParallel(model)
     num_folds=5
     kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
-    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
+    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,undersample=False,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
 
     for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):   
         model.load_state_dict(torch.load(model_path,map_location=device))
