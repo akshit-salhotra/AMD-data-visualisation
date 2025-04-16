@@ -16,6 +16,10 @@ from sklearn.model_selection import KFold
 import torch.nn as nn
 import sys
 import re
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 
 def intialise_logger_nd_create_folders(args):
     # if args.model_path:
@@ -68,12 +72,15 @@ def train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,
     # print(logits.device,label.device)
     loss=criteron(logits,label)
     epoch_loss+=loss
-    if iter%5==0:
-        logging.info(f'epoch:{i}/{args.epoch} iteration:{iter}/{(len(dataset)*(num_folds-1))//(num_folds*args.batch)+1} batch loss is :{loss:.4f}')
+    with torch.no_grad():
+        if iter%5==0:
+            # print(logits,label)
+            logging.info(f'epoch:{i}/{args.epoch} iteration:{iter}/{(len(dataset)*(num_folds-1))//(num_folds*args.batch)+1} batch loss is :{loss:.4f}')
+            logging.info(f'the acc is :{torch.mean((torch.argmax(logits,dim=-1)==label).to(torch.float32)).detach().cpu()}')
     loss.backward()
     optimizer.step()
     optimizer.zero_grad()
-    return epoch_loss
+    return epoch_loss,torch.argmax(logits,dim=-1)
 
 def val_step(args,data,label,val_loss,model,criteron):
     data=[d.to(args.device) for d in data]
@@ -97,7 +104,7 @@ if __name__=="__main__":
         parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet')
-        parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
+        parser.add_argument('--save-freq',type=int,default=2,help='after how many epochs are the parameters saved')
         parser.add_argument('--log-dir',type=str,default='logs/Resnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
@@ -132,16 +139,17 @@ if __name__=="__main__":
                                     #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
         dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict)
-        num_folds=5
+        num_folds=2
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
-        for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):
+        # for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):
+        for fold in range(1):
 
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset, train_idx), batch_size=args.batch, shuffle=True,num_workers=8,timeout=600,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=8,timeout=600,collate_fn=collate_fn)
+            train_loader = DataLoader(dataset, batch_size=args.batch, shuffle=True,num_workers=8,timeout=600,collate_fn=collate_fn)
+            # test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=8,timeout=600,collate_fn=collate_fn)
             if args.model_path:
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
@@ -157,35 +165,59 @@ if __name__=="__main__":
             for i in pbar:
                     epoch_loss=0
                     model.train()
+                    preds=[]
+                    labels=[]
                     for iter,(data,label) in tqdm(enumerate(train_loader)):
                         # print(image.shape)
                         # print(label)
-                        epoch_loss=train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds)
+                        epoch_loss,pred=train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds)
+                        preds.extend(pred.detach().cpu().tolist())
+                        labels.extend(label.detach().cpu().tolist())
                         
                     epoch_loss/=((len(dataset)*(num_folds-1))//(num_folds*args.batch)+1)
+                    cm=confusion_matrix(labels,preds)
+                    classes=["early","inter","ga","wet","notamd"]
+
+                    plt.figure(figsize=(6, 4))
+                    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
+                    plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
+                    plt.xlabel('Predicted')
+                    plt.ylabel('Actual')
+
+                    # Save as image
+                    plt.savefig(f"{param_dir+os.sep}confusion_matrix_fold_{fold}_epoch_{i}", dpi=300)
                     logging.info(f'Epoch:{i}/{args.epoch} Loss is :{epoch_loss:.4f}')
                     pbar.set_postfix({'average epoch loss':f'{epoch_loss:.4f}'})
                     scheduler.step()
                     
                     if i%args.save_freq==0 or args.epoch==i+1:
-                        val_loss=0
-                        correct_pred=0
-                        model.eval()
-                        with torch.no_grad():
-                            for (data,label) in test_loader:
-                                # print(data,label)
-                                val_loss,preds,label=val_step(args,data,label,val_loss,model,criteron)
-                                # print(preds.device,label.device)
-                                correct_pred+=(label==preds).sum().item()
+    #                     val_loss=0
+    #                     correct_pred=0
+    #                     model.eval()
+    #                     val_labels=[]
+    #                     val_preds=[]
+    #                     with torch.no_grad():
+    #                         for (data,label) in test_loader:
+    #                             # print(data,label)
+    #                             val_loss,preds,label=val_step(args,data,label,val_loss,model,criteron)
+    #                             # print(preds.device,label.device)
+    #                             correct_pred+=(label==preds).sum().item()
+    #                             val_labels.extend(label.detach().cpu().tolist())
+    #                             val_preds.extend(preds.detach().cpu().tolist())
 
-                            logging.info(f'val accuarcy is : {correct_pred/(len(dataset)/num_folds):.4f}')
-                            val_loss/=(len(dataset)//(num_folds*args.batch)+1)
-                            logging.info(f'VAL loss :{val_loss:.4f}')
-            
-                            torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')
+    #                         logging.info(f'val accuarcy is : {correct_pred/(len(dataset)/num_folds):.4f}')
+    #                         val_loss/=(len(dataset)//(num_folds*args.batch)+1)
+    #                         logging.info(f'VAL loss :{val_loss:.4f}')
+    #                         cm=confusion_matrix(val_labels,val_preds)
+    #                         sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
+    #                         plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
+    #                         plt.xlabel('Predicted')
+    #                         plt.ylabel('Actual')
+    #                         plt.savefig(f'{param_dir+os.sep}confusion_matrix_val_fold_{fold}_epoch_{i}.png')
+                            torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{epoch_loss:.4f}_train_{epoch_loss:.4f}')
                 
-        print('training completed !!')
-        logging.info('training complete!!!')
+    #     print('training completed !!')
+    #     logging.info('training complete!!!')
     
     except Exception as e:
         print(e)
