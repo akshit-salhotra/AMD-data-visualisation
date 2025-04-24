@@ -1,0 +1,157 @@
+2025-04-21 13:12:41 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-21 13:12:41 - INFO - starting new training !!!!
+2025-04-21 13:12:41 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-21 13:12:41 - INFO - Namespace(batch=24, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=25, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', log_dir='logs/Resnet', lr=0.0001, model_path=None, num_classes=5, save_dir='model_parameter_Resnet', save_freq=2, step_size=10, weight_matrix=tensor([0.2500, 0.2500, 0.1250, 0.1600, 1.0000]))
+2025-04-21 13:12:41 - INFO - parameters are being saved at :model_parameter_Resnet\56
+2025-04-21 13:12:42 - INFO - found 4 gpus!
+2025-04-21 13:12:42 - INFO - DataParallel(
+  (module): Resnet18_3D(
+    (conv1): Sequential(
+      (0): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3))
+      (1): GroupNorm(16, 64, eps=1e-05, affine=True)
+      (2): ReLU()
+    )
+    (maxpool): MaxPool3d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (conv2): BasicConvBlock(
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+      )
+    )
+    (conv3): BasicConvBlock(
+      (conv1x1): Conv3d(64, 128, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+      )
+    )
+    (conv4): BasicConvBlock(
+      (conv1x1): Conv3d(128, 256, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+      )
+    )
+    (conv5): BasicConvBlock(
+      (conv1x1): Conv3d(256, 512, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(256, 512, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): ReLU()
+        )
+      )
+    )
+    (avgPool): AdaptiveAvgPool3d(output_size=1)
+    (linear): Linear(in_features=512, out_features=5, bias=True)
+  )
+)
+2025-04-21 13:12:42 - INFO - fold number:0
+2025-04-21 13:15:17 - INFO - epoch:0/25 iteration:0/13 batch loss is :1.6341
+2025-04-21 13:15:17 - INFO - the acc is :0.1666666716337204
+2025-04-21 13:15:27 - INFO - epoch:0/25 iteration:5/13 batch loss is :1.6258
+2025-04-21 13:15:27 - INFO - the acc is :0.2916666865348816
+2025-04-21 13:15:38 - INFO - epoch:0/25 iteration:10/13 batch loss is :1.6045
+2025-04-21 13:15:38 - INFO - the acc is :0.4166666865348816
+2025-04-21 13:16:36 - INFO - epoch:0/25 iteration:15/13 batch loss is :1.6138
+2025-04-21 13:16:36 - INFO - the acc is :0.25
+2025-04-21 13:16:45 - INFO - epoch:0/25 iteration:20/13 batch loss is :1.6110
+2025-04-21 13:16:45 - INFO - the acc is :0.2083333432674408
+2025-04-21 13:16:54 - INFO - Epoch:0/25 Loss is :3.1321
+2025-04-21 13:18:59 - INFO - epoch:1/25 iteration:0/13 batch loss is :1.6083
+2025-04-21 13:18:59 - INFO - the acc is :0.4166666865348816
+2025-04-21 13:19:11 - INFO - epoch:1/25 iteration:5/13 batch loss is :1.6109
+2025-04-21 13:19:11 - INFO - the acc is :0.3333333432674408
+2025-04-21 13:19:24 - INFO - epoch:1/25 iteration:10/13 batch loss is :1.6141
+2025-04-21 13:19:24 - INFO - the acc is :0.1666666716337204
+2025-04-21 13:19:52 - INFO - epoch:1/25 iteration:15/13 batch loss is :1.6149
+2025-04-21 13:19:52 - INFO - the acc is :0.25
+2025-04-21 13:20:01 - INFO - epoch:1/25 iteration:20/13 batch loss is :1.6120
+2025-04-21 13:20:01 - INFO - the acc is :0.1666666716337204
+2025-04-21 13:20:09 - INFO - Epoch:1/25 Loss is :3.0966
+2025-04-21 13:22:15 - INFO - epoch:2/25 iteration:0/13 batch loss is :1.6115
+2025-04-21 13:22:15 - INFO - the acc is :0.4166666865348816
+2025-04-21 13:22:28 - INFO - epoch:2/25 iteration:5/13 batch loss is :1.6089
+2025-04-21 13:22:28 - INFO - the acc is :0.25
+2025-04-21 13:22:41 - INFO - epoch:2/25 iteration:10/13 batch loss is :1.6140
+2025-04-21 13:22:41 - INFO - the acc is :0.4166666865348816
+2025-04-21 13:23:09 - INFO - epoch:2/25 iteration:15/13 batch loss is :1.6129
+2025-04-21 13:23:09 - INFO - the acc is :0.4583333432674408
+2025-04-21 13:23:18 - INFO - epoch:2/25 iteration:20/13 batch loss is :1.6081
+2025-04-21 13:23:18 - INFO - the acc is :0.25
+2025-04-21 13:23:26 - INFO - Epoch:2/25 Loss is :3.0955
+2025-04-21 13:26:11 - INFO - epoch:3/25 iteration:0/13 batch loss is :1.6179
+2025-04-21 13:26:11 - INFO - the acc is :0.1666666716337204
+2025-04-21 13:26:20 - INFO - epoch:3/25 iteration:5/13 batch loss is :1.6031
+2025-04-21 13:26:20 - INFO - the acc is :0.2916666865348816
+2025-04-21 13:26:31 - INFO - epoch:3/25 iteration:10/13 batch loss is :1.6110
+2025-04-21 13:26:31 - INFO - the acc is :0.3333333432674408
+2025-04-21 13:27:31 - INFO - epoch:3/25 iteration:15/13 batch loss is :1.6095
+2025-04-21 13:27:31 - INFO - the acc is :0.1666666716337204
+2025-04-21 13:27:40 - INFO - epoch:3/25 iteration:20/13 batch loss is :1.6037
+2025-04-21 13:27:40 - INFO - the acc is :0.3333333432674408
+2025-04-21 13:27:49 - INFO - Epoch:3/25 Loss is :3.0929
+2025-04-21 13:29:53 - INFO - epoch:4/25 iteration:0/13 batch loss is :1.6128
+2025-04-21 13:29:53 - INFO - the acc is :0.2916666865348816
+2025-04-21 13:30:06 - INFO - epoch:4/25 iteration:5/13 batch loss is :1.6106
+2025-04-21 13:30:06 - INFO - the acc is :0.1666666716337204
+2025-04-21 13:30:19 - INFO - epoch:4/25 iteration:10/13 batch loss is :1.6196
+2025-04-21 13:30:19 - INFO - the acc is :0.125
+2025-04-21 13:30:46 - INFO - epoch:4/25 iteration:15/13 batch loss is :1.6111
+2025-04-21 13:30:46 - INFO - the acc is :0.4166666865348816
+2025-04-21 13:30:54 - INFO - epoch:4/25 iteration:20/13 batch loss is :1.6276
+2025-04-21 13:30:54 - INFO - the acc is :0.25
+2025-04-21 13:31:03 - INFO - Epoch:4/25 Loss is :3.0912

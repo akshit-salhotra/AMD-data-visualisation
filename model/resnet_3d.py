@@ -20,7 +20,9 @@ class BasicConvBlock(nn.Module):
 
     @staticmethod
     def create_conv(in_ch,out_ch,kernel,stride,padding):
-        return(nn.Sequential(nn.Conv3d(in_ch,out_ch,kernel,stride,padding),nn.BatchNorm3d(out_ch),nn.ReLU()))
+        return(nn.Sequential(nn.Conv3d(in_ch,out_ch,kernel,stride,padding),
+                             nn.BatchNorm3d(out_ch,momentum=0.25),
+                             nn.ReLU()))
     
     def forward(self,x):
         if self.downsample:
@@ -38,21 +40,24 @@ class BasicConvBlock(nn.Module):
         
 class Resnet18_3D(nn.Module):
     
-    def __init__(self,num_classes):
+    def __init__(self,num_classes,ch=[64,128,256,512]):
         super().__init__()
-        self.conv1=Resnet18_3D.create_conv(1,64,7,2,3)
+        self.conv1=Resnet18_3D.create_conv(1,ch[0],7,2,3)
         self.maxpool=nn.MaxPool3d(3,2,padding=1)
-        self.conv2=BasicConvBlock(64,64,3,downsample=False)
-        self.conv3=BasicConvBlock(64,128,3)
-        self.conv4=BasicConvBlock(128,256,3)
-        self.conv5=BasicConvBlock(256,512,3)
+        self.conv2=BasicConvBlock(ch[0],ch[0],3,downsample=False)
+        self.conv3=BasicConvBlock(ch[0],ch[1],3)
+        self.conv4=BasicConvBlock(ch[1],ch[2],3)
+        self.conv5=BasicConvBlock(ch[2],ch[3],3)
         self.avgPool=nn.AdaptiveAvgPool3d(1)
-        self.linear=nn.Linear(512,num_classes)
+        self.linear=nn.Linear(ch[3],num_classes)
         
 
     @staticmethod
     def create_conv(in_ch,out_ch,kernel,stride,padding):
-        return(nn.Sequential(nn.Conv3d(in_ch,out_ch,kernel,stride,padding),nn.BatchNorm3d(out_ch),nn.ReLU()))
+        return(nn.Sequential(nn.Conv3d(in_ch,out_ch,kernel,stride,padding),
+                             nn.BatchNorm3d(out_ch,momentum=0.25),
+                            # nn.GroupNorm(32,out_ch),
+                             nn.ReLU()))
     
     def forward(self,x):
         x=self.conv1(x)
@@ -71,6 +76,6 @@ class Resnet18_3D(nn.Module):
 if __name__=='__main__':
     from torchsummary import summary
     Device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model=Resnet18_3D(6).to(Device)
+    model=Resnet18_3D(5,[32,64,128,256]).to(Device)
     summary(model,(1,128,256,256),1)
     # print(list(model.children()))

@@ -1,0 +1,6 @@
+2025-04-24 13:52:56 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-24 13:52:56 - INFO - starting new training !!!!
+2025-04-24 13:52:56 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-24 13:52:56 - INFO - Namespace(batch=16, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=25, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar_with_both_res.json', log_dir='logs/Resnet', lr=0.0001, model_ch=[32, 64, 128, 256], model_path=None, num_classes=5, save_dir='model_parameter_Resnet', save_freq=5, step_size=10, weight_matrix=tensor([0.2500, 0.2500, 0.1250, 0.1600, 1.0000]))
+2025-04-24 13:52:56 - INFO - parameters are being saved at :model_parameter_Resnet\68
+2025-04-24 13:52:56 - ERROR - __init__() got an unexpected keyword argument 'momemtum'

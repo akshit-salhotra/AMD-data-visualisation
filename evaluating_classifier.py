@@ -38,18 +38,19 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
                 data=[d.to(device) for d in data]
                 label=label.to(device)
                 logits=model(*data)
-                print(logits,label)
+                # print(logits,label)
                 pred=torch.argmax(logits,dim=-1)
-                labels.append(label)
-                preds.append(pred)
-        labels=torch.concat(labels,dim=0).cpu().numpy()
-        preds=torch.concat(preds,dim=0).cpu().numpy()
+                labels.extend(label.detach().cpu().tolist())
+                preds.extend(pred.detach().cpu().tolist())
+        print(labels,preds)
+        # labels=torch.concat(labels,dim=0).cpu().numpy()
+        # preds=torch.concat(preds,dim=0).cpu().numpy()
         classes=["early","inter","ga","wet","notamd"]
         c_matrix=confusion_matrix(labels,preds)
 
         plt.figure(figsize=(6, 4))
         sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
-        plt.title(f'Confusion Matrix,acc:{np.mean(labels==preds):.4f}')
+        plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
 

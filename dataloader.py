@@ -76,7 +76,7 @@ class OCTDataset(Dataset):
         amdtype=get_amdtype(pt_info,self.df)
         scan_list=sorted(os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0]))
         if self.undersample:
-            scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0],len(scan_list))]
+            scan_list=[scan_list[i] for i in undersampler(self.volume_shape[1][0],len(scan_list))]
         for bscan in scan_list:
             img=cv2.imread(scans_dir+os.sep+bscan,0)
             if self.raw_scans:
