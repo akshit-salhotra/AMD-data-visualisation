@@ -52,7 +52,7 @@ class OCTDataset(Dataset):
             self.undersample=kwargs['undersample']
         else:
             self.undersample=False
-
+        
         if 'attn' in kwargs:
             self.attn=kwargs['attn']
             self.context_length=max([row[0] for row in self.volume_shape])

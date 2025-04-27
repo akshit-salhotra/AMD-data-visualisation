@@ -18,52 +18,53 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     with open(json_path,'r') as file:
         paths=json.load(file)
         
-    model=Resnet18_3D(num_classes=5).to(device)
+    model=Resnet18_3D(num_classes=6).to(device)
     if torch.cuda.device_count()>1:
         model=nn.DataParallel(model)
     num_folds=5
-    kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
-    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,undersample=False,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
+    # kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,undersample=True,classes={'early':0,'inter':1,'ga':2,'wet':3,'scar':4,'notAMD':5})
 
-    for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):   
-        model.load_state_dict(torch.load(model_path,map_location=device))
-        dataloader=DataLoader(Subset(dataset,train_idx),batch_size,shuffle=False,num_workers=num_workers,timeout=timeout,collate_fn=collate_fn)
+    # for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):   
+    model.load_state_dict(torch.load(model_path,map_location=device))
+    dataloader=DataLoader(dataset,batch_size,shuffle=False,num_workers=num_workers,timeout=timeout,collate_fn=collate_fn)
 
-        labels=[]
-        preds=[]
-        model.eval()
-        with torch.no_grad():
-            for data,label in tqdm(dataloader):
-                # print(len(data))
-                data=[d.to(device) for d in data]
-                label=label.to(device)
-                logits=model(*data)
-                # print(logits,label)
-                pred=torch.argmax(logits,dim=-1)
-                labels.extend(label.detach().cpu().tolist())
-                preds.extend(pred.detach().cpu().tolist())
-        print(labels,preds)
-        # labels=torch.concat(labels,dim=0).cpu().numpy()
-        # preds=torch.concat(preds,dim=0).cpu().numpy()
-        classes=["early","inter","ga","wet","notamd"]
-        c_matrix=confusion_matrix(labels,preds)
+    labels=[]
+    preds=[]
+    model.eval()
+    with torch.no_grad():
+        for data,label in tqdm(dataloader):
+            # print(len(data))
+            data=[d.to(device) for d in data]
+            label=label.to(device)
+            logits=model(*data)
+            # print(logits,label)
+            pred=torch.argmax(logits,dim=-1)
+            labels.extend(label.detach().cpu().tolist())
+            preds.extend(pred.detach().cpu().tolist())
+    # print(labels,preds)
+    # labels=torch.concat(labels,dim=0).cpu().numpy()
+    # preds=torch.concat(preds,dim=0).cpu().numpy()
+    classes=["early","inter","ga","wet","scar","notamd"]
+    c_matrix=confusion_matrix(labels,preds)
 
-        plt.figure(figsize=(6, 4))
-        sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
-        plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
+    plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
 
-        # Save as image
-        plt.savefig(save_path, dpi=300)
+    # Save as image
+    # plt.savefig(save_path, dpi=300)
+    plt.show()
 
-        print('the accuarcy of model is:',np.mean(labels==preds))
-        break
+    print('the accuarcy of model is:',np.mean(labels==preds))
+        
     
 if __name__=="__main__":
-    model_path="model_parameter_Resnet\\13\\fold0_epoch24_val_0.2727_train_0.2727"
+    model_path="model_parameter_Resnet3D\\15\\fold4_epoch30_val_0.1482_train_0.0672"
     device='cuda' if torch.cuda.is_available() else 'cpu'
-    json_path="jsons\\train_test_val_split_without_scar.json"
+    json_path="jsons\\train_test_val_split_without_scar_with_both_res.json"
     excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
     batch_size=32

@@ -116,3 +116,45 @@
   )
 )
 2025-04-24 13:58:32 - INFO - fold number:0
+2025-04-24 14:01:56 - INFO - epoch:0/25 iteration:0/28 batch loss is :1.5901
+2025-04-24 14:01:56 - INFO - the acc is :0.0714285746216774
+2025-04-24 14:02:22 - INFO - epoch:0/25 iteration:5/28 batch loss is :1.6055
+2025-04-24 14:02:22 - INFO - the acc is :0.2857142984867096
+2025-04-24 14:02:38 - INFO - epoch:0/25 iteration:10/28 batch loss is :1.4211
+2025-04-24 14:02:38 - INFO - the acc is :0.3571428656578064
+2025-04-24 14:02:52 - INFO - epoch:0/25 iteration:15/28 batch loss is :1.3384
+2025-04-24 14:02:52 - INFO - the acc is :0.4285714626312256
+2025-04-24 14:04:02 - INFO - epoch:0/25 iteration:20/28 batch loss is :1.4115
+2025-04-24 14:04:02 - INFO - the acc is :0.3214285969734192
+2025-04-24 14:04:13 - INFO - epoch:0/25 iteration:25/28 batch loss is :1.7045
+2025-04-24 14:04:13 - INFO - the acc is :0.25
+2025-04-24 14:04:21 - INFO - Epoch:0/25 Loss is :1.4944
+2025-04-24 14:07:56 - INFO - val accuarcy is : 0.1763
+2025-04-24 14:07:56 - INFO - VAL loss :5.3447
+2025-04-24 14:11:48 - INFO - epoch:1/25 iteration:0/28 batch loss is :1.3394
+2025-04-24 14:11:48 - INFO - the acc is :0.535714328289032
+2025-04-24 14:12:10 - INFO - epoch:1/25 iteration:5/28 batch loss is :1.2398
+2025-04-24 14:12:10 - INFO - the acc is :0.4642857313156128
+2025-04-24 14:12:25 - INFO - epoch:1/25 iteration:10/28 batch loss is :1.4569
+2025-04-24 14:12:25 - INFO - the acc is :0.4285714626312256
+2025-04-24 14:12:39 - INFO - epoch:1/25 iteration:15/28 batch loss is :0.9976
+2025-04-24 14:12:39 - INFO - the acc is :0.5714285969734192
+2025-04-24 14:13:49 - INFO - epoch:1/25 iteration:20/28 batch loss is :1.1254
+2025-04-24 14:13:49 - INFO - the acc is :0.535714328289032
+2025-04-24 14:14:00 - INFO - epoch:1/25 iteration:25/28 batch loss is :1.2782
+2025-04-24 14:14:00 - INFO - the acc is :0.5
+2025-04-24 14:14:07 - INFO - Epoch:1/25 Loss is :1.2451
+2025-04-24 14:15:47 - ERROR - Caught AttributeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\_utils\worker.py", line 308, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\_utils\fetch.py", line 49, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\dataset.py", line 419, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\dataset.py", line 419, in <listcomp>
+    return [self.dataset[self.indices[idx]] for idx in indices]
+  File "D:\AMD-data-visualisation\dataloader.py", line 97, in __getitem__
+    assert any(img.shape==b_shape for b_shape in self.b_shapes),f' the shape of b scan must be [1024,512] or [1024,200] but was found to be {img.shape} the scan dir is :{scans_dir}'
+AttributeError: 'OCTDataset' object has no attribute 'b_shapes'
+

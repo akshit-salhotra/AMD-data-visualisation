@@ -1,4 +1,6 @@
 import argparse
+import matplotlib
+matplotlib.use('Agg')
 import torchvision
 import torch
 import torchvision.transforms as transforms
@@ -20,7 +22,7 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-
+from hooks.batch_hook import create_hook,batchnorm_stats
 # torch.cuda.empty_cache()
 
 # Optionally, clear unused memory in PyTorch 1.6+
@@ -63,6 +65,53 @@ def intialise_logger_nd_create_folders(args):
     
     return save_path
 
+def get_batch_stats_plot(batchnorm_stats,save_path):
+    for name in batchnorm_stats['train'].keys():
+        fig, axs = plt.subplots(2, 2, figsize=(16, 10))
+        fig.suptitle(f'BatchNorm Stats (Train vs Val) - {name}', fontsize=20)
+
+        # Prepare
+        train_stats = batchnorm_stats['train'][name]
+        val_stats = batchnorm_stats['val'][name]
+
+        train_batch_mean = torch.stack(train_stats["batch_mean"]).numpy()
+        train_running_mean = torch.stack(train_stats["running_mean"]).numpy()
+        train_batch_std = torch.stack(train_stats["batch_std"]).numpy()
+        train_running_std = torch.stack(train_stats["running_std"]).numpy()
+
+        val_batch_mean = torch.stack(val_stats["batch_mean"]).numpy()
+        val_running_mean = torch.stack(val_stats["running_mean"]).numpy()
+        val_batch_std = torch.stack(val_stats["batch_std"]).numpy()
+        val_running_std = torch.stack(val_stats["running_std"]).numpy()
+
+        # Train mean
+        axs[0, 0].plot(train_batch_mean.mean(axis=1), label='Train Batch Mean')
+        axs[0, 0].plot(train_running_mean.mean(axis=1), label='Train Running Mean')
+        axs[0, 0].set_title('Train Mean')
+        axs[0, 0].legend()
+
+        # Train std
+        axs[0, 1].plot(train_batch_std.mean(axis=1), label='Train Batch Std')
+        axs[0, 1].plot(train_running_std.mean(axis=1), label='Train Running Std')
+        axs[0, 1].set_title('Train Std')
+        axs[0, 1].legend()
+
+        # Val mean
+        axs[1, 0].plot(val_batch_mean.mean(axis=1), label='Val Batch Mean')
+        axs[1, 0].plot(val_running_mean.mean(axis=1), label='Val Running Mean')
+        axs[1, 0].set_title('Val Mean')
+        axs[1, 0].legend()
+
+        # Val std
+        axs[1, 1].plot(val_batch_std.mean(axis=1), label='Val Batch Std')
+        axs[1, 1].plot(val_running_std.mean(axis=1), label='Val Running Std')
+        axs[1, 1].set_title('Val Std')
+        axs[1, 1].legend()
+
+        plt.tight_layout()
+        plt.savefig(save_path+name+".png")
+        plt.close()
+    
 def load_model(args):
     model.load_state_dict(torch.load(args.model_path))
     print('loaded model parameters from ',args.model_path)
@@ -105,8 +154,8 @@ if __name__=="__main__":
 
         parser.add_argument("--lr", type=float, default=0.0001, help="learning rate")
         parser.add_argument('--batch',type=float,default=28,help='batch size')
-        parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
-        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar_with_both_res.json',help="path of json file containing path of volumes")
+        parser.add_argument('--epoch',type=int,default=20,help='number of epoch')
+        parser.add_argument('--json',type=str,default='jsons/train_test_val_split.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
@@ -115,9 +164,9 @@ if __name__=="__main__":
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
         parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
-        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.25,0.25,0.125,0.16,1]),help='weights for weighted cross entropy')
-        parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
-        parser.add_argument('--num_classes',type=int,default=5,help="number of classes of the classifier")
+        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.125,0.25,0.166,0.25,0.14,1]),help='weights for weighted cross entropy')
+        parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'scar':4,'notAMD':5})
+        parser.add_argument('--num_classes',type=int,default=6,help="number of classes of the classifier")
         parser.add_argument('--model_ch',type=list,default=[32,64,128,256],help="channels in different layers of resnet")
 
         args = parser.parse_args()
@@ -125,8 +174,9 @@ if __name__=="__main__":
         param_dir=intialise_logger_nd_create_folders(args)
         
         # device_ids=[1,2,3]
+        register_hooks=True
         model=Resnet18_3D(num_classes=args.num_classes,ch=args.model_ch).to(args.device)
-        model = nn.SyncBatchNorm.convert_sync_batchnorm(model)  # Convert all BatchNorm layers
+        # model = nn.SyncBatchNorm.convert_sync_batchnorm(model)  # Convert all BatchNorm layers
         # model=Seq_Model(num_classes=args.num_classes,device=args.device).to(args.device)
         model=nn.DataParallel(model)
         logging.info(f'found {torch.cuda.device_count()} gpus!')
@@ -146,9 +196,17 @@ if __name__=="__main__":
         transform=transforms.Compose([transforms.ToTensor(),
                                     #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
-        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict)
+        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict)
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+
+        #registering hooks
+
+        if register_hooks:
+            hooks = []
+            for name, module in model.named_modules():
+                if isinstance(module, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
+                    hooks.append(module.register_forward_hook(create_hook(name)))
 
         for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):
         # for fold in range(1):
@@ -226,7 +284,10 @@ if __name__=="__main__":
 
                             plt.savefig(f'{param_dir+os.sep}confusion_matrix_val_fold_{fold}_epoch_{i}.png')
                             plt.close()
-                            torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{epoch_loss:.4f}_train_{val_loss:.4f}')
+                            torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')
+                            batch_save="images//plots//batch_statistics"
+                            os.makedirs(batch_save,exist_ok=True)
+                            get_batch_stats_plot(batchnorm_stats,f'{batch_save+os.sep}fold_{fold}_epoch_{i}')
                 
         print('training completed !!')
         logging.info('training complete!!!')

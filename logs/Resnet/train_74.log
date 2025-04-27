@@ -1,0 +1,194 @@
+2025-04-27 09:15:05 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-27 09:15:05 - INFO - starting new training !!!!
+2025-04-27 09:15:05 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-27 09:15:05 - INFO - Namespace(batch=28, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'scar': 4, 'notAMD': 5}, device=device(type='cuda'), epoch=25, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split.json', log_dir='logs/Resnet', lr=0.0001, model_ch=[32, 64, 128, 256], model_path=None, num_classes=6, save_dir='model_parameter_Resnet', save_freq=5, step_size=10, weight_matrix=tensor([0.1250, 0.2500, 0.1660, 0.2500, 0.1400, 1.0000]))
+2025-04-27 09:15:05 - INFO - parameters are being saved at :model_parameter_Resnet\74
+2025-04-27 09:15:05 - INFO - found 4 gpus!
+2025-04-27 09:15:05 - INFO - DataParallel(
+  (module): Resnet18_3D(
+    (conv1): Sequential(
+      (0): Conv3d(1, 32, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3))
+      (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+      (2): ReLU()
+    )
+    (maxpool): MaxPool3d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (conv2): BasicConvBlock(
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv3): BasicConvBlock(
+      (conv1x1): Conv3d(32, 64, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(32, 64, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv4): BasicConvBlock(
+      (conv1x1): Conv3d(64, 128, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv5): BasicConvBlock(
+      (conv1x1): Conv3d(128, 256, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (avgPool): AdaptiveAvgPool3d(output_size=1)
+    (linear): Linear(in_features=256, out_features=6, bias=True)
+  )
+)
+2025-04-27 09:15:06 - INFO - fold number:0
+2025-04-27 09:18:30 - INFO - epoch:0/25 iteration:0/22 batch loss is :1.7931
+2025-04-27 09:18:30 - INFO - the acc is :0.1785714328289032
+2025-04-27 09:18:37 - INFO - epoch:0/25 iteration:5/22 batch loss is :1.6971
+2025-04-27 09:18:37 - INFO - the acc is :0.3571428656578064
+2025-04-27 09:18:44 - INFO - epoch:0/25 iteration:10/22 batch loss is :1.7389
+2025-04-27 09:18:44 - INFO - the acc is :0.2142857313156128
+2025-04-27 09:18:51 - INFO - epoch:0/25 iteration:15/22 batch loss is :1.6192
+2025-04-27 09:18:51 - INFO - the acc is :0.2142857313156128
+2025-04-27 09:19:38 - INFO - epoch:0/25 iteration:20/22 batch loss is :1.7811
+2025-04-27 09:19:38 - INFO - the acc is :0.25
+2025-04-27 09:19:42 - INFO - Epoch:0/25 Loss is :1.7108
+2025-04-27 09:22:39 - INFO - val accuarcy is : 0.0265
+2025-04-27 09:22:39 - INFO - VAL loss :3.4688
+2025-04-27 09:26:07 - INFO - epoch:1/25 iteration:0/22 batch loss is :1.6764
+2025-04-27 09:26:07 - INFO - the acc is :0.3571428656578064
+2025-04-27 09:26:17 - INFO - epoch:1/25 iteration:5/22 batch loss is :1.6102
+2025-04-27 09:26:17 - INFO - the acc is :0.4285714626312256
+2025-04-27 09:26:28 - INFO - epoch:1/25 iteration:10/22 batch loss is :1.3861
+2025-04-27 09:26:28 - INFO - the acc is :0.4642857313156128
+2025-04-27 09:26:38 - INFO - epoch:1/25 iteration:15/22 batch loss is :1.3928
+2025-04-27 09:26:38 - INFO - the acc is :0.6071428656578064
+2025-04-27 09:27:21 - INFO - epoch:1/25 iteration:20/22 batch loss is :1.3985
+2025-04-27 09:27:21 - INFO - the acc is :0.6428571939468384
+2025-04-27 09:27:26 - INFO - Epoch:1/25 Loss is :1.4270
+2025-04-27 09:30:38 - INFO - epoch:2/25 iteration:0/22 batch loss is :1.4075
+2025-04-27 09:30:38 - INFO - the acc is :0.5714285969734192
+2025-04-27 09:31:01 - INFO - epoch:2/25 iteration:5/22 batch loss is :1.1561
+2025-04-27 09:31:01 - INFO - the acc is :0.6428571939468384
+2025-04-27 09:31:12 - INFO - epoch:2/25 iteration:10/22 batch loss is :1.3406
+2025-04-27 09:31:12 - INFO - the acc is :0.5714285969734192
+2025-04-27 09:31:22 - INFO - epoch:2/25 iteration:15/22 batch loss is :1.2240
+2025-04-27 09:31:22 - INFO - the acc is :0.5
+2025-04-27 09:31:37 - INFO - epoch:2/25 iteration:20/22 batch loss is :1.1538
+2025-04-27 09:31:37 - INFO - the acc is :0.6428571939468384
+2025-04-27 09:31:41 - INFO - Epoch:2/25 Loss is :1.2333
+2025-04-27 09:34:34 - INFO - epoch:3/25 iteration:0/22 batch loss is :1.1325
+2025-04-27 09:34:34 - INFO - the acc is :0.5
+2025-04-27 09:34:45 - INFO - epoch:3/25 iteration:5/22 batch loss is :1.3219
+2025-04-27 09:34:45 - INFO - the acc is :0.5
+2025-04-27 09:34:56 - INFO - epoch:3/25 iteration:10/22 batch loss is :1.0248
+2025-04-27 09:34:56 - INFO - the acc is :0.6785714626312256
+2025-04-27 09:35:07 - INFO - epoch:3/25 iteration:15/22 batch loss is :1.0629
+2025-04-27 09:35:07 - INFO - the acc is :0.6071428656578064
+2025-04-27 09:35:20 - INFO - epoch:3/25 iteration:20/22 batch loss is :1.0445
+2025-04-27 09:35:20 - INFO - the acc is :0.5
+2025-04-27 09:35:24 - INFO - Epoch:3/25 Loss is :1.0513
+2025-04-27 09:38:21 - INFO - epoch:4/25 iteration:0/22 batch loss is :0.8547
+2025-04-27 09:38:21 - INFO - the acc is :0.6785714626312256
+2025-04-27 09:39:33 - INFO - epoch:4/25 iteration:5/22 batch loss is :0.9739
+2025-04-27 09:39:33 - INFO - the acc is :0.5714285969734192
+2025-04-27 09:39:43 - INFO - epoch:4/25 iteration:10/22 batch loss is :0.8720
+2025-04-27 09:39:43 - INFO - the acc is :0.7142857313156128
+2025-04-27 09:39:52 - INFO - epoch:4/25 iteration:15/22 batch loss is :0.9960
+2025-04-27 09:39:52 - INFO - the acc is :0.6785714626312256
+2025-04-27 09:40:03 - INFO - epoch:4/25 iteration:20/22 batch loss is :0.9278
+2025-04-27 09:40:03 - INFO - the acc is :0.7142857313156128
+2025-04-27 09:40:07 - INFO - Epoch:4/25 Loss is :0.8889
+2025-04-27 09:43:47 - INFO - epoch:5/25 iteration:0/22 batch loss is :0.5772
+2025-04-27 09:43:47 - INFO - the acc is :0.785714328289032
+2025-04-27 09:43:57 - INFO - epoch:5/25 iteration:5/22 batch loss is :0.5016
+2025-04-27 09:43:57 - INFO - the acc is :0.8571429252624512
+2025-04-27 09:44:07 - INFO - epoch:5/25 iteration:10/22 batch loss is :0.8770
+2025-04-27 09:44:07 - INFO - the acc is :0.785714328289032
+2025-04-27 09:44:17 - INFO - epoch:5/25 iteration:15/22 batch loss is :0.6284
+2025-04-27 09:44:17 - INFO - the acc is :0.785714328289032
+2025-04-27 09:45:01 - INFO - epoch:5/25 iteration:20/22 batch loss is :0.6907
+2025-04-27 09:45:01 - INFO - the acc is :0.785714328289032
+2025-04-27 09:45:06 - INFO - Epoch:5/25 Loss is :0.7093
+2025-04-27 09:48:01 - INFO - val accuarcy is : 0.0663
+2025-04-27 09:48:01 - INFO - VAL loss :25.6704
+2025-04-27 09:51:11 - INFO - epoch:6/25 iteration:0/22 batch loss is :0.3814
+2025-04-27 09:51:11 - INFO - the acc is :1.0
+2025-04-27 09:51:22 - INFO - epoch:6/25 iteration:5/22 batch loss is :0.5726
+2025-04-27 09:51:22 - INFO - the acc is :0.8571429252624512
+2025-04-27 09:51:33 - INFO - epoch:6/25 iteration:10/22 batch loss is :0.2863
+2025-04-27 09:51:33 - INFO - the acc is :0.9285714626312256
