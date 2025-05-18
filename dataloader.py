@@ -16,6 +16,11 @@ def collate_fn(batch):
     return data,torch.concat([val[-1] for val in batch],dim=0)
 
 def undersampler(needed_samples:int,total_samples:int)->list:
+    '''
+    issues to be address:
+    1. the current implementation does not account for the fact that random may return the same index twice 
+    2.there is one more possible issue with the undersampler , it is not working correctly, it is altering the output even when there are just 128 b scans
+    '''
     assert needed_samples>=total_samples//2,"this sampler is unfit for sampling if 2*need_samples<total_samples"
     sel_indexes=[i for i in range(0,total_samples,2)]
     nums = (2*np.random.uniform(0, total_samples//2, needed_samples-len(sel_indexes)).astype(int)+1).tolist()
@@ -77,6 +82,8 @@ class OCTDataset(Dataset):
         scan_list=sorted(os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0]))
         if self.undersample:
             scan_list=[scan_list[i] for i in undersampler(self.volume_shape[1][0],len(scan_list))]
+            # assert     add an assertion here
+            
         for bscan in scan_list:
             img=cv2.imread(scans_dir+os.sep+bscan,0)
             if self.raw_scans:

@@ -1,0 +1,119 @@
+2025-04-27 13:43:22 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-27 13:43:22 - INFO - starting new training !!!!
+2025-04-27 13:43:22 - INFO - ------------------------------------------------------------------------------------------------
+2025-04-27 13:43:22 - INFO - Namespace(batch=28, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'scar': 4, 'notAMD': 5}, device=device(type='cuda'), epoch=20, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split.json', log_dir='logs/Resnet', lr=0.0001, model_ch=[32, 64, 128, 256], model_path=None, num_classes=6, save_dir='model_parameter_Resnet', save_freq=5, step_size=10, weight_matrix=tensor([0.1250, 0.2500, 0.1660, 0.2500, 0.1400, 1.0000]))
+2025-04-27 13:43:22 - INFO - parameters are being saved at :model_parameter_Resnet\78
+2025-04-27 13:43:23 - INFO - found 4 gpus!
+2025-04-27 13:43:23 - INFO - DataParallel(
+  (module): Resnet18_3D(
+    (conv1): Sequential(
+      (0): Conv3d(1, 32, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3))
+      (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+      (2): ReLU()
+    )
+    (maxpool): MaxPool3d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (conv2): BasicConvBlock(
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv3): BasicConvBlock(
+      (conv1x1): Conv3d(32, 64, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(32, 64, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv4): BasicConvBlock(
+      (conv1x1): Conv3d(64, 128, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv5): BasicConvBlock(
+      (conv1x1): Conv3d(128, 256, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.25, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (avgPool): AdaptiveAvgPool3d(output_size=1)
+    (linear): Linear(in_features=256, out_features=6, bias=True)
+  )
+)
+2025-04-27 13:43:23 - INFO - fold number:0
+2025-04-27 13:47:20 - ERROR - 0D or 1D target tensor expected, multi-target not supported

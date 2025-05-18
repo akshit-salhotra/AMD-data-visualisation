@@ -1,4 +1,6 @@
 import torch
+import matplotlib
+matplotlib.use('Agg')
 from model.resnet_3d import Resnet18_3D
 from dataloader import OCTDataset,collate_fn
 import json
@@ -13,12 +15,20 @@ from typing import Union
 import os
 from tqdm import tqdm 
 from sklearn.model_selection import KFold
+from hooks.batch_hook import create_hook,batchnorm_stats
+from utils.make_plots import get_batch_stats_plot
 
 def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path:str,transform,batch_size:int,num_workers:int,timeout:int,save_path:str,data:str)->None:
     with open(json_path,'r') as file:
         paths=json.load(file)
-        
+    
+       
     model=Resnet18_3D(num_classes=6).to(device)
+
+    # hooks = []
+    # for name, module in model.named_modules():
+    #     if isinstance(module, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
+    #         hooks.append(module.register_forward_hook(create_hook(name)))
     if torch.cuda.device_count()>1:
         model=nn.DataParallel(model)
     num_folds=5
@@ -55,25 +65,25 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     plt.ylabel('Actual')
 
     # Save as image
-    # plt.savefig(save_path, dpi=300)
-    plt.show()
-
-    print('the accuarcy of model is:',np.mean(labels==preds))
+    plt.savefig('cm.png', dpi=300)
+    # plt.show()
+    # get_batch_stats_plot(batchnorm_stats,save_path)
+    print('the accuarcy of model is:',np.mean(np.array(labels)==np.array(preds)))
         
     
 if __name__=="__main__":
     model_path="model_parameter_Resnet3D\\15\\fold4_epoch30_val_0.1482_train_0.0672"
     device='cuda' if torch.cuda.is_available() else 'cpu'
-    json_path="jsons\\train_test_val_split_without_scar_with_both_res.json"
+    json_path="jsons\\train_test_val_split.json"
     excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
-    batch_size=32
+    batch_size=16
     num_workers=12
     timeout=600
     results_dir="results"
-    data='train'#can either be train or test
+    data='test'#can either be train or test
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
-    save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
+    save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'batchnorm_stats_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}'
 
     evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data)
