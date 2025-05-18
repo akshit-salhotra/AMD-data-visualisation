@@ -10,6 +10,7 @@ from dataloader import OCTDataset,collate_fn
 import torch.optim as optim
 from model.resnet_3d import Resnet18_3D
 # from model.sequence_model import Seq_Model
+from model.resnet_medicalnet import resnet10
 import os
 from tqdm import tqdm
 import logging
@@ -113,7 +114,15 @@ def get_batch_stats_plot(batchnorm_stats,save_path):
         plt.close()
     
 def load_model(args):
-    model.load_state_dict(torch.load(args.model_path))
+    params=torch.load(args.model_path)
+
+    for key in params.keys():
+         if key.startswith('module.'):
+              params[f'module.{key}']=params.pop(key)
+        
+    missing,unexpected=model.load_state_dict(params,strict=False)
+    logging.info(f'the missing keys are : \n{missing}')
+    logging.info(f'the unexpected keys are :\n{unexpected}')
     print('loaded model parameters from ',args.model_path)
     logging.info(f'loaded model parameters from {args.model_path}')
 
@@ -155,7 +164,7 @@ if __name__=="__main__":
         parser.add_argument("--lr", type=float, default=0.0001, help="learning rate")
         parser.add_argument('--batch',type=float,default=28,help='batch size')
         parser.add_argument('--epoch',type=int,default=20,help='number of epoch')
-        parser.add_argument('--json',type=str,default='jsons/train_test_val_split.json',help="path of json file containing path of volumes")
+        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
@@ -165,8 +174,8 @@ if __name__=="__main__":
         parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.125,0.25,0.166,0.25,0.14,1]),help='weights for weighted cross entropy')
-        parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'scar':4,'notAMD':5})
-        parser.add_argument('--num_classes',type=int,default=6,help="number of classes of the classifier")
+        parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
+        parser.add_argument('--num_classes',type=int,default=5,help="number of classes of the classifier")
         parser.add_argument('--model_ch',type=list,default=[32,64,128,256],help="channels in different layers of resnet")
 
         args = parser.parse_args()
@@ -175,7 +184,8 @@ if __name__=="__main__":
         
         # device_ids=[1,2,3]
         register_hooks=True
-        model=Resnet18_3D(num_classes=args.num_classes,ch=args.model_ch).to(args.device)
+        # model=Resnet18_3D(num_classes=args.num_classes,ch=args.model_ch).to(args.device)
+        model=resnet10(num_classes=args.num_classes).to(args.device)
         # model = nn.SyncBatchNorm.convert_sync_batchnorm(model)  # Convert all BatchNorm layers
         # model=Seq_Model(num_classes=args.num_classes,device=args.device).to(args.device)
         model=nn.DataParallel(model)
@@ -216,7 +226,7 @@ if __name__=="__main__":
 
             train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=16,timeout=600,collate_fn=collate_fn)
             test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=16,timeout=600,collate_fn=collate_fn)
-            if args.model_path:
+            if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
                 elif fold==int(re.search(r'fold(\d+)',args.model_path).group(1)):

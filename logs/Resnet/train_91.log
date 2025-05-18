@@ -1,0 +1,468 @@
+2025-05-18 05:27:31 - INFO - ------------------------------------------------------------------------------------------------
+2025-05-18 05:27:31 - INFO - starting new training !!!!
+2025-05-18 05:27:31 - INFO - ------------------------------------------------------------------------------------------------
+2025-05-18 05:27:31 - INFO - Namespace(batch=32, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=20, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', log_dir='logs/Resnet', lr=0.0001, model_ch=[16, 32, 64, 128], model_path='model_parameter_Resnet\\90\\fold0_epoch15_val_3.6595_train_0.3012', num_classes=5, save_dir='model_parameter_Resnet', save_freq=5, step_size=10, weight_matrix=tensor([0.1250, 0.2500, 0.1670, 0.2500, 1.0000]))
+2025-05-18 05:27:31 - INFO - parameters are being saved at :model_parameter_Resnet\91
+2025-05-18 05:27:31 - INFO - found 4 gpus!
+2025-05-18 05:27:31 - INFO - DataParallel(
+  (module): Resnet18_3D(
+    (conv1): Sequential(
+      (0): Conv3d(1, 16, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3))
+      (1): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+    )
+    (maxpool): MaxPool3d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (conv2): BasicConvBlock(
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(16, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(16, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(16, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(16, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv3): BasicConvBlock(
+      (conv1x1): Conv3d(16, 32, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(16, 32, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv4): BasicConvBlock(
+      (conv1x1): Conv3d(32, 64, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(32, 64, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (conv5): BasicConvBlock(
+      (conv1x1): Conv3d(64, 128, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (avgPool): AdaptiveAvgPool3d(output_size=1)
+    (linear): Linear(in_features=128, out_features=5, bias=True)
+  )
+)
+2025-05-18 05:27:31 - INFO - loaded model parameters from model_parameter_Resnet\90\fold0_epoch15_val_3.6595_train_0.3012
+2025-05-18 05:27:32 - INFO - fold number:0
+2025-05-18 05:31:02 - INFO - epoch:16/20 iteration:0/15 batch loss is :0.2482
+2025-05-18 05:31:03 - INFO - the acc is :1.0
+2025-05-18 05:31:09 - INFO - epoch:16/20 iteration:5/15 batch loss is :0.4347
+2025-05-18 05:31:09 - INFO - the acc is :0.96875
+2025-05-18 05:31:16 - INFO - epoch:16/20 iteration:10/15 batch loss is :0.4489
+2025-05-18 05:31:16 - INFO - the acc is :0.90625
+2025-05-18 05:31:23 - INFO - Epoch:16/20 Loss is :0.3586
+2025-05-18 05:34:18 - INFO - epoch:17/20 iteration:0/15 batch loss is :0.2955
+2025-05-18 05:34:18 - INFO - the acc is :1.0
+2025-05-18 05:34:24 - INFO - epoch:17/20 iteration:5/15 batch loss is :0.3204
+2025-05-18 05:34:24 - INFO - the acc is :1.0
+2025-05-18 05:34:31 - INFO - epoch:17/20 iteration:10/15 batch loss is :0.2092
+2025-05-18 05:34:31 - INFO - the acc is :1.0
+2025-05-18 05:34:38 - INFO - Epoch:17/20 Loss is :0.2800
+2025-05-18 05:37:32 - INFO - epoch:18/20 iteration:0/15 batch loss is :0.2845
+2025-05-18 05:37:32 - INFO - the acc is :1.0
+2025-05-18 05:37:38 - INFO - epoch:18/20 iteration:5/15 batch loss is :0.2198
+2025-05-18 05:37:38 - INFO - the acc is :0.96875
+2025-05-18 05:37:45 - INFO - epoch:18/20 iteration:10/15 batch loss is :0.2694
+2025-05-18 05:37:45 - INFO - the acc is :0.96875
+2025-05-18 05:37:52 - INFO - Epoch:18/20 Loss is :0.2706
+2025-05-18 05:40:48 - INFO - epoch:19/20 iteration:0/15 batch loss is :0.2945
+2025-05-18 05:40:48 - INFO - the acc is :0.9375
+2025-05-18 05:40:54 - INFO - epoch:19/20 iteration:5/15 batch loss is :0.2328
+2025-05-18 05:40:54 - INFO - the acc is :0.96875
+2025-05-18 05:41:01 - INFO - epoch:19/20 iteration:10/15 batch loss is :0.1631
+2025-05-18 05:41:01 - INFO - the acc is :1.0
+2025-05-18 05:41:08 - INFO - Epoch:19/20 Loss is :0.2431
+2025-05-18 05:44:12 - INFO - val accuarcy is : 0.2564
+2025-05-18 05:44:12 - INFO - VAL loss :6.3694
+2025-05-18 05:44:24 - INFO - fold number:1
+2025-05-18 05:47:36 - INFO - epoch:0/20 iteration:0/15 batch loss is :0.6964
+2025-05-18 05:47:36 - INFO - the acc is :0.84375
+2025-05-18 05:47:53 - INFO - epoch:0/20 iteration:5/15 batch loss is :0.6155
+2025-05-18 05:47:53 - INFO - the acc is :0.875
+2025-05-18 05:48:00 - INFO - epoch:0/20 iteration:10/15 batch loss is :0.5423
+2025-05-18 05:48:00 - INFO - the acc is :0.90625
+2025-05-18 05:48:07 - INFO - Epoch:0/20 Loss is :0.4814
+2025-05-18 05:51:03 - INFO - val accuarcy is : 0.3419
+2025-05-18 05:51:03 - INFO - VAL loss :5.0287
+2025-05-18 05:54:11 - INFO - epoch:1/20 iteration:0/15 batch loss is :0.2816
+2025-05-18 05:54:11 - INFO - the acc is :1.0
+2025-05-18 05:54:17 - INFO - epoch:1/20 iteration:5/15 batch loss is :0.2775
+2025-05-18 05:54:17 - INFO - the acc is :0.9375
+2025-05-18 05:54:24 - INFO - epoch:1/20 iteration:10/15 batch loss is :0.5014
+2025-05-18 05:54:24 - INFO - the acc is :0.875
+2025-05-18 05:54:31 - INFO - Epoch:1/20 Loss is :0.3374
+2025-05-18 05:58:11 - INFO - epoch:2/20 iteration:0/15 batch loss is :0.3630
+2025-05-18 05:58:11 - INFO - the acc is :0.90625
+2025-05-18 05:58:18 - INFO - epoch:2/20 iteration:5/15 batch loss is :0.2208
+2025-05-18 05:58:18 - INFO - the acc is :1.0
+2025-05-18 05:58:25 - INFO - epoch:2/20 iteration:10/15 batch loss is :0.2061
+2025-05-18 05:58:25 - INFO - the acc is :0.9375
+2025-05-18 05:58:32 - INFO - Epoch:2/20 Loss is :0.2784
+2025-05-18 06:01:27 - INFO - epoch:3/20 iteration:0/15 batch loss is :0.1665
+2025-05-18 06:01:27 - INFO - the acc is :1.0
+2025-05-18 06:01:33 - INFO - epoch:3/20 iteration:5/15 batch loss is :0.1924
+2025-05-18 06:01:33 - INFO - the acc is :1.0
+2025-05-18 06:01:40 - INFO - epoch:3/20 iteration:10/15 batch loss is :0.1972
+2025-05-18 06:01:40 - INFO - the acc is :0.9375
+2025-05-18 06:01:47 - INFO - Epoch:3/20 Loss is :0.2025
+2025-05-18 06:04:40 - INFO - epoch:4/20 iteration:0/15 batch loss is :0.1556
+2025-05-18 06:04:40 - INFO - the acc is :0.96875
+2025-05-18 06:04:46 - INFO - epoch:4/20 iteration:5/15 batch loss is :0.1513
+2025-05-18 06:04:46 - INFO - the acc is :1.0
+2025-05-18 06:04:53 - INFO - epoch:4/20 iteration:10/15 batch loss is :0.1466
+2025-05-18 06:04:53 - INFO - the acc is :1.0
+2025-05-18 06:05:00 - INFO - Epoch:4/20 Loss is :0.1807
+2025-05-18 06:07:48 - INFO - epoch:5/20 iteration:0/15 batch loss is :0.1333
+2025-05-18 06:07:48 - INFO - the acc is :1.0
+2025-05-18 06:07:55 - INFO - epoch:5/20 iteration:5/15 batch loss is :0.1390
+2025-05-18 06:07:55 - INFO - the acc is :1.0
+2025-05-18 06:08:03 - INFO - epoch:5/20 iteration:10/15 batch loss is :0.1471
+2025-05-18 06:08:03 - INFO - the acc is :0.96875
+2025-05-18 06:08:09 - INFO - Epoch:5/20 Loss is :0.1407
+2025-05-18 06:11:02 - INFO - val accuarcy is : 0.3419
+2025-05-18 06:11:02 - INFO - VAL loss :4.4680
+2025-05-18 06:14:05 - INFO - epoch:6/20 iteration:0/15 batch loss is :0.1406
+2025-05-18 06:14:05 - INFO - the acc is :1.0
+2025-05-18 06:14:11 - INFO - epoch:6/20 iteration:5/15 batch loss is :0.1501
+2025-05-18 06:14:11 - INFO - the acc is :1.0
+2025-05-18 06:14:18 - INFO - epoch:6/20 iteration:10/15 batch loss is :0.1115
+2025-05-18 06:14:18 - INFO - the acc is :1.0
+2025-05-18 06:14:25 - INFO - Epoch:6/20 Loss is :0.1603
+2025-05-18 06:17:18 - INFO - epoch:7/20 iteration:0/15 batch loss is :0.1063
+2025-05-18 06:17:18 - INFO - the acc is :1.0
+2025-05-18 06:17:24 - INFO - epoch:7/20 iteration:5/15 batch loss is :0.1167
+2025-05-18 06:17:24 - INFO - the acc is :1.0
+2025-05-18 06:17:31 - INFO - epoch:7/20 iteration:10/15 batch loss is :0.2604
+2025-05-18 06:17:31 - INFO - the acc is :0.96875
+2025-05-18 06:17:38 - INFO - Epoch:7/20 Loss is :0.1410
+2025-05-18 06:20:30 - INFO - epoch:8/20 iteration:0/15 batch loss is :0.1029
+2025-05-18 06:20:30 - INFO - the acc is :1.0
+2025-05-18 06:20:36 - INFO - epoch:8/20 iteration:5/15 batch loss is :0.1197
+2025-05-18 06:20:36 - INFO - the acc is :1.0
+2025-05-18 06:20:43 - INFO - epoch:8/20 iteration:10/15 batch loss is :0.1059
+2025-05-18 06:20:43 - INFO - the acc is :1.0
+2025-05-18 06:20:50 - INFO - Epoch:8/20 Loss is :0.1374
+2025-05-18 06:23:41 - INFO - epoch:9/20 iteration:0/15 batch loss is :0.0772
+2025-05-18 06:23:41 - INFO - the acc is :1.0
+2025-05-18 06:23:47 - INFO - epoch:9/20 iteration:5/15 batch loss is :0.1195
+2025-05-18 06:23:47 - INFO - the acc is :1.0
+2025-05-18 06:23:54 - INFO - epoch:9/20 iteration:10/15 batch loss is :0.1223
+2025-05-18 06:23:54 - INFO - the acc is :1.0
+2025-05-18 06:24:01 - INFO - Epoch:9/20 Loss is :0.1543
+2025-05-18 06:26:51 - INFO - epoch:10/20 iteration:0/15 batch loss is :0.1310
+2025-05-18 06:26:51 - INFO - the acc is :1.0
+2025-05-18 06:26:57 - INFO - epoch:10/20 iteration:5/15 batch loss is :0.1152
+2025-05-18 06:26:57 - INFO - the acc is :1.0
+2025-05-18 06:27:04 - INFO - epoch:10/20 iteration:10/15 batch loss is :0.1259
+2025-05-18 06:27:04 - INFO - the acc is :1.0
+2025-05-18 06:27:11 - INFO - Epoch:10/20 Loss is :0.1470
+2025-05-18 06:29:29 - INFO - val accuarcy is : 0.5726
+2025-05-18 06:29:29 - INFO - VAL loss :2.0971
+2025-05-18 06:32:34 - INFO - epoch:11/20 iteration:0/15 batch loss is :0.1074
+2025-05-18 06:32:34 - INFO - the acc is :1.0
+2025-05-18 06:32:40 - INFO - epoch:11/20 iteration:5/15 batch loss is :0.2003
+2025-05-18 06:32:40 - INFO - the acc is :0.96875
+2025-05-18 06:32:47 - INFO - epoch:11/20 iteration:10/15 batch loss is :0.1674
+2025-05-18 06:32:47 - INFO - the acc is :1.0
+2025-05-18 06:32:54 - INFO - Epoch:11/20 Loss is :0.1638
+2025-05-18 06:35:45 - INFO - epoch:12/20 iteration:0/15 batch loss is :0.0821
+2025-05-18 06:35:45 - INFO - the acc is :1.0
+2025-05-18 06:35:51 - INFO - epoch:12/20 iteration:5/15 batch loss is :0.1254
+2025-05-18 06:35:51 - INFO - the acc is :1.0
+2025-05-18 06:35:58 - INFO - epoch:12/20 iteration:10/15 batch loss is :0.1053
+2025-05-18 06:35:58 - INFO - the acc is :1.0
+2025-05-18 06:36:05 - INFO - Epoch:12/20 Loss is :0.1270
+2025-05-18 06:38:58 - INFO - epoch:13/20 iteration:0/15 batch loss is :0.0850
+2025-05-18 06:38:58 - INFO - the acc is :1.0
+2025-05-18 06:39:04 - INFO - epoch:13/20 iteration:5/15 batch loss is :0.1234
+2025-05-18 06:39:04 - INFO - the acc is :1.0
+2025-05-18 06:39:11 - INFO - epoch:13/20 iteration:10/15 batch loss is :0.1255
+2025-05-18 06:39:11 - INFO - the acc is :1.0
+2025-05-18 06:39:18 - INFO - Epoch:13/20 Loss is :0.1583
+2025-05-18 06:42:39 - INFO - epoch:14/20 iteration:0/15 batch loss is :0.1159
+2025-05-18 06:42:39 - INFO - the acc is :1.0
+2025-05-18 06:42:46 - INFO - epoch:14/20 iteration:5/15 batch loss is :0.1168
+2025-05-18 06:42:46 - INFO - the acc is :1.0
+2025-05-18 06:42:53 - INFO - epoch:14/20 iteration:10/15 batch loss is :0.1323
+2025-05-18 06:42:53 - INFO - the acc is :1.0
+2025-05-18 06:43:00 - INFO - Epoch:14/20 Loss is :0.1311
+2025-05-18 06:46:16 - INFO - epoch:15/20 iteration:0/15 batch loss is :0.1720
+2025-05-18 06:46:16 - INFO - the acc is :1.0
+2025-05-18 06:46:22 - INFO - epoch:15/20 iteration:5/15 batch loss is :0.1316
+2025-05-18 06:46:22 - INFO - the acc is :1.0
+2025-05-18 06:46:29 - INFO - epoch:15/20 iteration:10/15 batch loss is :0.1321
+2025-05-18 06:46:29 - INFO - the acc is :1.0
+2025-05-18 06:46:36 - INFO - Epoch:15/20 Loss is :0.1548
+2025-05-18 06:49:29 - INFO - val accuarcy is : 0.5043
+2025-05-18 06:49:29 - INFO - VAL loss :2.5613
+2025-05-18 06:52:34 - INFO - epoch:16/20 iteration:0/15 batch loss is :0.0770
+2025-05-18 06:52:34 - INFO - the acc is :1.0
+2025-05-18 06:52:40 - INFO - epoch:16/20 iteration:5/15 batch loss is :0.1124
+2025-05-18 06:52:40 - INFO - the acc is :1.0
+2025-05-18 06:52:47 - INFO - epoch:16/20 iteration:10/15 batch loss is :0.1210
+2025-05-18 06:52:47 - INFO - the acc is :1.0
+2025-05-18 06:52:54 - INFO - Epoch:16/20 Loss is :0.1507
+2025-05-18 06:55:46 - INFO - epoch:17/20 iteration:0/15 batch loss is :0.1203
+2025-05-18 06:55:46 - INFO - the acc is :1.0
+2025-05-18 06:55:52 - INFO - epoch:17/20 iteration:5/15 batch loss is :0.1224
+2025-05-18 06:55:52 - INFO - the acc is :1.0
+2025-05-18 06:55:59 - INFO - epoch:17/20 iteration:10/15 batch loss is :0.1012
+2025-05-18 06:55:59 - INFO - the acc is :1.0
+2025-05-18 06:56:06 - INFO - Epoch:17/20 Loss is :0.1253
+2025-05-18 06:59:43 - INFO - epoch:18/20 iteration:0/15 batch loss is :0.0955
+2025-05-18 06:59:43 - INFO - the acc is :1.0
+2025-05-18 06:59:50 - INFO - epoch:18/20 iteration:5/15 batch loss is :0.1060
+2025-05-18 06:59:50 - INFO - the acc is :1.0
+2025-05-18 06:59:56 - INFO - epoch:18/20 iteration:10/15 batch loss is :0.1213
+2025-05-18 06:59:56 - INFO - the acc is :1.0
+2025-05-18 07:00:04 - INFO - Epoch:18/20 Loss is :0.1306
+2025-05-18 07:02:55 - INFO - epoch:19/20 iteration:0/15 batch loss is :0.1409
+2025-05-18 07:02:55 - INFO - the acc is :1.0
+2025-05-18 07:03:01 - INFO - epoch:19/20 iteration:5/15 batch loss is :0.0882
+2025-05-18 07:03:01 - INFO - the acc is :1.0
+2025-05-18 07:03:08 - INFO - epoch:19/20 iteration:10/15 batch loss is :0.1047
+2025-05-18 07:03:08 - INFO - the acc is :1.0
+2025-05-18 07:03:15 - INFO - Epoch:19/20 Loss is :0.1309
+2025-05-18 07:06:09 - INFO - val accuarcy is : 0.4957
+2025-05-18 07:06:09 - INFO - VAL loss :2.3401
+2025-05-18 07:06:22 - INFO - fold number:2
+2025-05-18 07:09:11 - INFO - epoch:0/20 iteration:0/15 batch loss is :0.1585
+2025-05-18 07:09:11 - INFO - the acc is :0.96875
+2025-05-18 07:09:18 - INFO - epoch:0/20 iteration:5/15 batch loss is :0.1036
+2025-05-18 07:09:18 - INFO - the acc is :1.0
+2025-05-18 07:09:25 - INFO - epoch:0/20 iteration:10/15 batch loss is :0.1005
+2025-05-18 07:09:25 - INFO - the acc is :1.0
+2025-05-18 07:09:32 - INFO - Epoch:0/20 Loss is :0.1475
+2025-05-18 07:12:13 - INFO - val accuarcy is : 0.5470
+2025-05-18 07:12:13 - INFO - VAL loss :2.0752
+2025-05-18 07:16:03 - INFO - epoch:1/20 iteration:0/15 batch loss is :0.1522
+2025-05-18 07:16:03 - INFO - the acc is :1.0
+2025-05-18 07:16:09 - INFO - epoch:1/20 iteration:5/15 batch loss is :0.1144
+2025-05-18 07:16:09 - INFO - the acc is :0.96875
+2025-05-18 07:16:16 - INFO - epoch:1/20 iteration:10/15 batch loss is :0.0985
+2025-05-18 07:16:16 - INFO - the acc is :1.0
+2025-05-18 07:16:23 - INFO - Epoch:1/20 Loss is :0.1312
+2025-05-18 07:19:14 - INFO - epoch:2/20 iteration:0/15 batch loss is :0.0817
+2025-05-18 07:19:14 - INFO - the acc is :1.0
+2025-05-18 07:19:20 - INFO - epoch:2/20 iteration:5/15 batch loss is :0.1255
+2025-05-18 07:19:20 - INFO - the acc is :1.0
+2025-05-18 07:19:27 - INFO - epoch:2/20 iteration:10/15 batch loss is :0.1152
+2025-05-18 07:19:27 - INFO - the acc is :1.0
+2025-05-18 07:19:34 - INFO - Epoch:2/20 Loss is :0.1105
+2025-05-18 07:22:27 - INFO - epoch:3/20 iteration:0/15 batch loss is :0.1109
+2025-05-18 07:22:27 - INFO - the acc is :1.0
+2025-05-18 07:22:33 - INFO - epoch:3/20 iteration:5/15 batch loss is :0.1155
+2025-05-18 07:22:33 - INFO - the acc is :1.0
+2025-05-18 07:22:40 - INFO - epoch:3/20 iteration:10/15 batch loss is :0.0882
+2025-05-18 07:22:40 - INFO - the acc is :1.0
+2025-05-18 07:22:47 - INFO - Epoch:3/20 Loss is :0.1323
+2025-05-18 07:25:35 - INFO - epoch:4/20 iteration:0/15 batch loss is :0.1182
+2025-05-18 07:25:35 - INFO - the acc is :1.0
+2025-05-18 07:25:44 - INFO - epoch:4/20 iteration:5/15 batch loss is :0.1260
+2025-05-18 07:25:44 - INFO - the acc is :1.0
+2025-05-18 07:25:50 - INFO - epoch:4/20 iteration:10/15 batch loss is :0.0960
+2025-05-18 07:25:50 - INFO - the acc is :1.0
+2025-05-18 07:25:57 - INFO - Epoch:4/20 Loss is :0.1186
+2025-05-18 07:29:34 - INFO - epoch:5/20 iteration:0/15 batch loss is :0.1121
+2025-05-18 07:29:34 - INFO - the acc is :1.0
+2025-05-18 07:29:40 - INFO - epoch:5/20 iteration:5/15 batch loss is :0.1096
+2025-05-18 07:29:40 - INFO - the acc is :1.0
+2025-05-18 07:29:47 - INFO - epoch:5/20 iteration:10/15 batch loss is :0.1411
+2025-05-18 07:29:47 - INFO - the acc is :1.0
+2025-05-18 07:29:54 - INFO - Epoch:5/20 Loss is :0.1190
+2025-05-18 07:32:46 - INFO - val accuarcy is : 0.5812
+2025-05-18 07:32:46 - INFO - VAL loss :1.9491
+2025-05-18 07:35:50 - INFO - epoch:6/20 iteration:0/15 batch loss is :0.1096
+2025-05-18 07:35:50 - INFO - the acc is :1.0
+2025-05-18 07:35:56 - INFO - epoch:6/20 iteration:5/15 batch loss is :0.0893
+2025-05-18 07:35:56 - INFO - the acc is :1.0
+2025-05-18 07:36:03 - INFO - epoch:6/20 iteration:10/15 batch loss is :0.0816
+2025-05-18 07:36:03 - INFO - the acc is :1.0
+2025-05-18 07:36:10 - INFO - Epoch:6/20 Loss is :0.1376
+2025-05-18 07:39:02 - INFO - epoch:7/20 iteration:0/15 batch loss is :0.2570
+2025-05-18 07:39:02 - INFO - the acc is :0.96875
+2025-05-18 07:39:08 - INFO - epoch:7/20 iteration:5/15 batch loss is :0.1020
+2025-05-18 07:39:08 - INFO - the acc is :1.0
+2025-05-18 07:39:15 - INFO - epoch:7/20 iteration:10/15 batch loss is :0.2327
+2025-05-18 07:39:15 - INFO - the acc is :1.0
+2025-05-18 07:39:22 - INFO - Epoch:7/20 Loss is :0.1544
+2025-05-18 07:42:32 - INFO - epoch:8/20 iteration:0/15 batch loss is :0.1269
+2025-05-18 07:42:32 - INFO - the acc is :1.0
+2025-05-18 07:42:38 - INFO - epoch:8/20 iteration:5/15 batch loss is :0.1181
+2025-05-18 07:42:38 - INFO - the acc is :1.0
+2025-05-18 07:42:45 - INFO - epoch:8/20 iteration:10/15 batch loss is :0.1391
+2025-05-18 07:42:45 - INFO - the acc is :1.0
+2025-05-18 07:42:52 - INFO - Epoch:8/20 Loss is :0.1375
+2025-05-18 07:46:12 - INFO - epoch:9/20 iteration:0/15 batch loss is :0.1446
+2025-05-18 07:46:12 - INFO - the acc is :1.0
+2025-05-18 07:46:19 - INFO - epoch:9/20 iteration:5/15 batch loss is :0.1994
+2025-05-18 07:46:19 - INFO - the acc is :0.96875
+2025-05-18 07:46:26 - INFO - epoch:9/20 iteration:10/15 batch loss is :0.1208
+2025-05-18 07:46:26 - INFO - the acc is :1.0
+2025-05-18 07:46:33 - INFO - Epoch:9/20 Loss is :0.1484
+2025-05-18 07:49:24 - INFO - epoch:10/20 iteration:0/15 batch loss is :0.0861
+2025-05-18 07:49:24 - INFO - the acc is :1.0
+2025-05-18 07:49:30 - INFO - epoch:10/20 iteration:5/15 batch loss is :0.2418
+2025-05-18 07:49:30 - INFO - the acc is :1.0
+2025-05-18 07:49:37 - INFO - epoch:10/20 iteration:10/15 batch loss is :0.1152
+2025-05-18 07:49:37 - INFO - the acc is :1.0
+2025-05-18 07:49:44 - INFO - Epoch:10/20 Loss is :0.1421
+2025-05-18 07:52:37 - INFO - val accuarcy is : 0.5812
+2025-05-18 07:52:37 - INFO - VAL loss :1.8963
+2025-05-18 07:55:40 - INFO - epoch:11/20 iteration:0/15 batch loss is :0.0997
+2025-05-18 07:55:40 - INFO - the acc is :1.0
+2025-05-18 07:55:46 - INFO - epoch:11/20 iteration:5/15 batch loss is :0.0771
+2025-05-18 07:55:46 - INFO - the acc is :1.0
+2025-05-18 07:55:53 - INFO - epoch:11/20 iteration:10/15 batch loss is :0.1627
+2025-05-18 07:55:53 - INFO - the acc is :1.0
+2025-05-18 07:56:00 - INFO - Epoch:11/20 Loss is :0.1339
+2025-05-18 07:59:35 - INFO - epoch:12/20 iteration:0/15 batch loss is :0.1399
+2025-05-18 07:59:35 - INFO - the acc is :1.0
+2025-05-18 07:59:42 - INFO - epoch:12/20 iteration:5/15 batch loss is :0.1802
+2025-05-18 07:59:42 - INFO - the acc is :1.0
+2025-05-18 07:59:49 - INFO - epoch:12/20 iteration:10/15 batch loss is :0.0968
+2025-05-18 07:59:49 - INFO - the acc is :1.0
+2025-05-18 07:59:55 - INFO - Epoch:12/20 Loss is :0.1377
+2025-05-18 08:02:45 - INFO - epoch:13/20 iteration:0/15 batch loss is :0.1201
+2025-05-18 08:02:45 - INFO - the acc is :1.0
+2025-05-18 08:02:52 - INFO - epoch:13/20 iteration:5/15 batch loss is :0.1213
+2025-05-18 08:02:52 - INFO - the acc is :0.96875
+2025-05-18 08:02:58 - INFO - epoch:13/20 iteration:10/15 batch loss is :0.1250
+2025-05-18 08:02:58 - INFO - the acc is :1.0
+2025-05-18 08:03:05 - INFO - Epoch:13/20 Loss is :0.1223
+2025-05-18 08:05:56 - INFO - epoch:14/20 iteration:0/15 batch loss is :0.0873
+2025-05-18 08:05:56 - INFO - the acc is :1.0
+2025-05-18 08:06:02 - INFO - epoch:14/20 iteration:5/15 batch loss is :0.1820
+2025-05-18 08:06:02 - INFO - the acc is :0.96875
+2025-05-18 08:06:09 - INFO - epoch:14/20 iteration:10/15 batch loss is :0.1740
+2025-05-18 08:06:09 - INFO - the acc is :1.0
+2025-05-18 08:06:16 - INFO - Epoch:14/20 Loss is :0.1424
+2025-05-18 08:09:07 - INFO - epoch:15/20 iteration:0/15 batch loss is :0.1566
+2025-05-18 08:09:07 - INFO - the acc is :1.0
+2025-05-18 08:09:14 - INFO - epoch:15/20 iteration:5/15 batch loss is :0.1008
+2025-05-18 08:09:14 - INFO - the acc is :1.0
+2025-05-18 08:09:20 - INFO - epoch:15/20 iteration:10/15 batch loss is :0.1137
+2025-05-18 08:09:20 - INFO - the acc is :1.0
+2025-05-18 08:09:27 - INFO - Epoch:15/20 Loss is :0.1335
+2025-05-18 08:12:19 - INFO - val accuarcy is : 0.6325
+2025-05-18 08:12:19 - INFO - VAL loss :1.9648
+2025-05-18 08:16:11 - INFO - epoch:16/20 iteration:0/15 batch loss is :0.0913
+2025-05-18 08:16:11 - INFO - the acc is :1.0
+2025-05-18 08:16:17 - INFO - epoch:16/20 iteration:5/15 batch loss is :0.1875
+2025-05-18 08:16:17 - INFO - the acc is :0.96875
+2025-05-18 08:16:24 - INFO - epoch:16/20 iteration:10/15 batch loss is :0.0987
+2025-05-18 08:16:24 - INFO - the acc is :1.0
+2025-05-18 08:16:31 - INFO - Epoch:16/20 Loss is :0.1327
+2025-05-18 08:19:22 - INFO - epoch:17/20 iteration:0/15 batch loss is :0.2059
+2025-05-18 08:19:22 - INFO - the acc is :0.96875
+2025-05-18 08:19:28 - INFO - epoch:17/20 iteration:5/15 batch loss is :0.1831
+2025-05-18 08:19:28 - INFO - the acc is :1.0
+2025-05-18 08:19:35 - INFO - epoch:17/20 iteration:10/15 batch loss is :0.2053
+2025-05-18 08:19:35 - INFO - the acc is :1.0
+2025-05-18 08:19:42 - INFO - Epoch:17/20 Loss is :0.1634
+2025-05-18 08:22:31 - INFO - epoch:18/20 iteration:0/15 batch loss is :0.1818
+2025-05-18 08:22:31 - INFO - the acc is :0.96875
+2025-05-18 08:22:38 - INFO - epoch:18/20 iteration:5/15 batch loss is :0.0999
+2025-05-18 08:22:38 - INFO - the acc is :1.0
+2025-05-18 08:22:45 - INFO - epoch:18/20 iteration:10/15 batch loss is :0.1132
+2025-05-18 08:22:45 - INFO - the acc is :1.0
+2025-05-18 08:22:52 - INFO - Epoch:18/20 Loss is :0.1306
+2025-05-18 08:25:43 - INFO - epoch:19/20 iteration:0/15 batch loss is :0.1287
+2025-05-18 08:25:43 - INFO - the acc is :1.0
+2025-05-18 08:25:49 - INFO - epoch:19/20 iteration:5/15 batch loss is :0.2181
+2025-05-18 08:25:49 - INFO - the acc is :0.96875
+2025-05-18 08:25:56 - INFO - epoch:19/20 iteration:10/15 batch loss is :0.1022
+2025-05-18 08:25:56 - INFO - the acc is :1.0
+2025-05-18 08:26:03 - INFO - Epoch:19/20 Loss is :0.1466
+2025-05-18 08:29:05 - INFO - val accuarcy is : 0.6154
+2025-05-18 08:29:05 - INFO - VAL loss :2.0266
+2025-05-18 08:29:21 - INFO - fold number:3
+2025-05-18 08:32:37 - INFO - epoch:0/20 iteration:0/15 batch loss is :0.0929
+2025-05-18 08:32:37 - INFO - the acc is :1.0
+2025-05-18 08:32:50 - INFO - epoch:0/20 iteration:5/15 batch loss is :0.1307
+2025-05-18 08:32:50 - INFO - the acc is :1.0
+2025-05-18 08:32:57 - INFO - epoch:0/20 iteration:10/15 batch loss is :0.1136
+2025-05-18 08:32:57 - INFO - the acc is :1.0
+2025-05-18 08:33:05 - INFO - Epoch:0/20 Loss is :0.1499
+2025-05-18 08:36:03 - INFO - val accuarcy is : 0.5897
+2025-05-18 08:36:03 - INFO - VAL loss :2.4505
+2025-05-18 08:39:09 - INFO - epoch:1/20 iteration:0/15 batch loss is :0.0620
+2025-05-18 08:39:09 - INFO - the acc is :1.0
+2025-05-18 08:39:17 - INFO - epoch:1/20 iteration:5/15 batch loss is :0.2324
+2025-05-18 08:39:17 - INFO - the acc is :0.9375
+2025-05-18 08:39:24 - INFO - epoch:1/20 iteration:10/15 batch loss is :0.0721
+2025-05-18 08:39:24 - INFO - the acc is :1.0
+2025-05-18 08:39:31 - INFO - Epoch:1/20 Loss is :0.1401

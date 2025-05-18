@@ -21,7 +21,7 @@ class BasicConvBlock(nn.Module):
     @staticmethod
     def create_conv(in_ch,out_ch,kernel,stride,padding):
         return(nn.Sequential(nn.Conv3d(in_ch,out_ch,kernel,stride,padding),
-                             nn.BatchNorm3d(out_ch,momentum=0.25),
+                             nn.BatchNorm3d(out_ch,momentum=0.1),
                              nn.ReLU()))
     
     def forward(self,x):
@@ -55,7 +55,7 @@ class Resnet18_3D(nn.Module):
     @staticmethod
     def create_conv(in_ch,out_ch,kernel,stride,padding):
         return(nn.Sequential(nn.Conv3d(in_ch,out_ch,kernel,stride,padding),
-                             nn.BatchNorm3d(out_ch,momentum=0.25),
+                             nn.BatchNorm3d(out_ch,momentum=0.1),
                             # nn.GroupNorm(32,out_ch),
                              nn.ReLU()))
     
@@ -76,6 +76,6 @@ class Resnet18_3D(nn.Module):
 if __name__=='__main__':
     from torchsummary import summary
     Device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model=Resnet18_3D(5,[32,64,128,256]).to(Device)
+    model=Resnet18_3D(5).to(Device)
     summary(model,(1,128,256,256),1)
     # print(list(model.children()))
