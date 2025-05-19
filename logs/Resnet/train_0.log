@@ -1056,3 +1056,73 @@
 2025-04-02 16:37:39 - INFO - val accuarcy is : 0.0427
 2025-04-02 16:37:39 - INFO - VAL loss :8.6410
 2025-04-02 16:37:39 - INFO - training complete!!!
+2025-05-18 09:49:57 - INFO - ------------------------------------------------------------------------------------------------
+2025-05-18 09:49:57 - INFO - starting new training !!!!
+2025-05-18 09:49:57 - INFO - ------------------------------------------------------------------------------------------------
+2025-05-18 09:49:57 - INFO - Namespace(batch=32, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=20, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', log_dir='logs/Resnet', lr=0.0001, model_ch=[16, 32, 64, 128], model_path='pretrained/resnet_10_23dataset.pth', num_classes=5, save_dir='model_parameter_Resnet_medicalnet', save_freq=5, step_size=10, weight_matrix=tensor([0.1250, 0.2500, 0.1670, 0.2500, 1.0000]))
+2025-05-18 09:49:57 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\0
+2025-05-18 09:49:58 - INFO - found 4 gpus!
+2025-05-18 09:49:58 - INFO - DataParallel(
+  (module): ResNet(
+    (conv1): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3), bias=False)
+    (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (relu): ReLU(inplace=True)
+    (maxpool): MaxPool3d(kernel_size=(3, 3, 3), stride=2, padding=1, dilation=1, ceil_mode=False)
+    (layer1): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer2): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv3d(64, 128, kernel_size=(1, 1, 1), stride=(2, 2, 2), bias=False)
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (layer3): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv3d(128, 256, kernel_size=(1, 1, 1), stride=(1, 1, 1), bias=False)
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (layer4): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(256, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv3d(256, 512, kernel_size=(1, 1, 1), stride=(1, 1, 1), bias=False)
+          (1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (GAP): AdaptiveAvgPool3d(output_size=(2, 2, 2))
+    (linear): Linear(in_features=4096, out_features=5, bias=True)
+  )
+)
+2025-05-18 09:49:58 - INFO - the missing keys are : 
+['module.conv1.weight', 'module.bn1.weight', 'module.bn1.bias', 'module.bn1.running_mean', 'module.bn1.running_var', 'module.layer1.0.conv1.weight', 'module.layer1.0.bn1.weight', 'module.layer1.0.bn1.bias', 'module.layer1.0.bn1.running_mean', 'module.layer1.0.bn1.running_var', 'module.layer1.0.conv2.weight', 'module.layer1.0.bn2.weight', 'module.layer1.0.bn2.bias', 'module.layer1.0.bn2.running_mean', 'module.layer1.0.bn2.running_var', 'module.layer2.0.conv1.weight', 'module.layer2.0.bn1.weight', 'module.layer2.0.bn1.bias', 'module.layer2.0.bn1.running_mean', 'module.layer2.0.bn1.running_var', 'module.layer2.0.conv2.weight', 'module.layer2.0.bn2.weight', 'module.layer2.0.bn2.bias', 'module.layer2.0.bn2.running_mean', 'module.layer2.0.bn2.running_var', 'module.layer2.0.downsample.0.weight', 'module.layer2.0.downsample.1.weight', 'module.layer2.0.downsample.1.bias', 'module.layer2.0.downsample.1.running_mean', 'module.layer2.0.downsample.1.running_var', 'module.layer3.0.conv1.weight', 'module.layer3.0.bn1.weight', 'module.layer3.0.bn1.bias', 'module.layer3.0.bn1.running_mean', 'module.layer3.0.bn1.running_var', 'module.layer3.0.conv2.weight', 'module.layer3.0.bn2.weight', 'module.layer3.0.bn2.bias', 'module.layer3.0.bn2.running_mean', 'module.layer3.0.bn2.running_var', 'module.layer3.0.downsample.0.weight', 'module.layer3.0.downsample.1.weight', 'module.layer3.0.downsample.1.bias', 'module.layer3.0.downsample.1.running_mean', 'module.layer3.0.downsample.1.running_var', 'module.layer4.0.conv1.weight', 'module.layer4.0.bn1.weight', 'module.layer4.0.bn1.bias', 'module.layer4.0.bn1.running_mean', 'module.layer4.0.bn1.running_var', 'module.layer4.0.conv2.weight', 'module.layer4.0.bn2.weight', 'module.layer4.0.bn2.bias', 'module.layer4.0.bn2.running_mean', 'module.layer4.0.bn2.running_var', 'module.layer4.0.downsample.0.weight', 'module.layer4.0.downsample.1.weight', 'module.layer4.0.downsample.1.bias', 'module.layer4.0.downsample.1.running_mean', 'module.layer4.0.downsample.1.running_var', 'module.linear.weight', 'module.linear.bias']
+2025-05-18 09:49:58 - INFO - the unexpected keys are :
+['state_dict']
+2025-05-18 09:49:58 - INFO - loaded model parameters from pretrained/resnet_10_23dataset.pth
+2025-05-18 09:49:58 - INFO - fold number:0

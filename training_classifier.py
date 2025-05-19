@@ -70,11 +70,11 @@ def intialise_logger_nd_create_folders(args):
 
     
 def load_model(args):
-    params=torch.load(args.model_path)
+    params=torch.load(args.model_path)['state_dict']
 
-    for key in params.keys():
-         if key.startswith('module.'):
-              params[f'module.{key}']=params.pop(key)
+    # for key in params.keys():
+    #      if key.startswith('module.'):
+    #           params[f'module.{key}']=params.pop(key)
         
     missing,unexpected=model.load_state_dict(params,strict=False)
     logging.info(f'the missing keys are : \n{missing}')
@@ -119,17 +119,17 @@ if __name__=="__main__":
 
         parser.add_argument("--lr", type=float, default=0.0001, help="learning rate")
         parser.add_argument('--batch',type=float,default=32,help='batch size')
-        parser.add_argument('--epoch',type=int,default=20,help='number of epoch')
-        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
+        parser.add_argument('--epoch',type=int,default=15,help='number of epoch')
+        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar_with_both_res.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
-        parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet')
+        parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_medicalnet')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
-        parser.add_argument('--log-dir',type=str,default='logs/Resnet',help='the directory in which training logs are to be saved')
+        parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
-        parser.add_argument('--model-path',type=str,default="model_parameter_Resnet\\90\\fold0_epoch15_val_3.6595_train_0.3012",help='path of model parameters to be loaded')
+        parser.add_argument('--model-path',type=str,default="pretrained/resnet_10_23dataset.pth",help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
-        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.125,0.25,0.167,0.25,1]),help='weights for weighted cross entropy')
+        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.91,0.111,0.111,0.125,1]),help='weights for weighted cross entropy')
         parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--num_classes',type=int,default=5,help="number of classes of the classifier")
         parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
@@ -139,7 +139,7 @@ if __name__=="__main__":
         param_dir=intialise_logger_nd_create_folders(args)
         
         # device_ids=[1,2,3]
-        register_hooks=True
+        register_hooks=False
         # model=Resnet18_3D(num_classes=args.num_classes,ch=args.model_ch).to(args.device)
         model=resnet10(num_classes=args.num_classes).to(args.device)
         # model = nn.SyncBatchNorm.convert_sync_batchnorm(model)  # Convert all BatchNorm layers
@@ -180,8 +180,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=16,timeout=600,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=16,timeout=600,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=8,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=8,timeout=600,collate_fn=collate_fn)
             if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue

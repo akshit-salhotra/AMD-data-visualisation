@@ -20,8 +20,8 @@ if __name__=="__main__":
             paths=json.load(file)
     # os.makedirs(results_dir,exist_ok=True)
     # save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+'confusion_matrix_test_set.png'
-    old_d=OLD(paths['test_path'],excel_path,transform)
-    new_d=OCTDataset(paths['test_path'],excel_path,transform)
+    old_d=OLD(paths['train_path'],excel_path,transform)
+    new_d=OCTDataset(paths['train_path'],excel_path,transform,undersample=True)
 
     new_d=DataLoader(new_d,batch_size=12,shuffle=False,num_workers=num_workers,timeout=timeout,collate_fn=collate_fn)
     old_d=DataLoader(old_d,batch_size=12,shuffle=False,num_workers=num_workers,timeout=timeout)

@@ -2,6 +2,7 @@ import torch
 import matplotlib
 matplotlib.use('Agg')
 from model.resnet_3d import Resnet18_3D
+from model.resnet_medicalnet import resnet10
 from dataloader import OCTDataset,collate_fn
 import json
 import torchvision.transforms as transforms
@@ -23,7 +24,8 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         paths=json.load(file)
     
        
-    model=Resnet18_3D(num_classes=6).to(device)
+    # model=Resnet18_3D(num_classes=6).to(device)
+    model=resnet10(num_classes=5).to(device)
 
     # hooks = []
     # for name, module in model.named_modules():
@@ -31,9 +33,9 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     #         hooks.append(module.register_forward_hook(create_hook(name)))
     if torch.cuda.device_count()>1:
         model=nn.DataParallel(model)
-    num_folds=5
+    # num_folds=5
     # kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
-    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,undersample=True,classes={'early':0,'inter':1,'ga':2,'wet':3,'scar':4,'notAMD':5})
+    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,undersample=True,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
 
     # for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):   
     model.load_state_dict(torch.load(model_path,map_location=device))
@@ -55,7 +57,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     # print(labels,preds)
     # labels=torch.concat(labels,dim=0).cpu().numpy()
     # preds=torch.concat(preds,dim=0).cpu().numpy()
-    classes=["early","inter","ga","wet","scar","notamd"]
+    classes=["early","inter","ga","wet","notamd"]
     c_matrix=confusion_matrix(labels,preds)
 
     plt.figure(figsize=(6, 4))
@@ -65,25 +67,25 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     plt.ylabel('Actual')
 
     # Save as image
-    plt.savefig('cm.png', dpi=300)
+    plt.savefig(save_path, dpi=300)
     # plt.show()
     # get_batch_stats_plot(batchnorm_stats,save_path)
     print('the accuarcy of model is:',np.mean(np.array(labels)==np.array(preds)))
         
     
 if __name__=="__main__":
-    model_path="model_parameter_Resnet3D\\15\\fold4_epoch30_val_0.1482_train_0.0672"
+    model_path="model_parameter_Resnet_medicalnet\\1\\fold2_epoch10_val_0.4990_train_0.6260"
     device='cuda' if torch.cuda.is_available() else 'cpu'
-    json_path="jsons\\train_test_val_split.json"
+    json_path="jsons\\train_test_val_split_without_scar.json"
     excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
-    batch_size=16
+    batch_size=32
     num_workers=12
     timeout=600
     results_dir="results"
     data='test'#can either be train or test
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
-    save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'batchnorm_stats_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}'
+    save_file= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
 
     evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data)

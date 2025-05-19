@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from utils.histogram import get_amdtype
 import torch
+import random
 
 def collate_fn(batch):
     lists=len(batch[0])-1
@@ -16,16 +17,21 @@ def collate_fn(batch):
     return data,torch.concat([val[-1] for val in batch],dim=0)
 
 def undersampler(needed_samples:int,total_samples:int)->list:
-    '''
-    issues to be address:
-    1. the current implementation does not account for the fact that random may return the same index twice 
-    2.there is one more possible issue with the undersampler , it is not working correctly, it is altering the output even when there are just 128 b scans
-    '''
+
     assert needed_samples>=total_samples//2,"this sampler is unfit for sampling if 2*need_samples<total_samples"
     sel_indexes=[i for i in range(0,total_samples,2)]
-    nums = (2*np.random.uniform(0, total_samples//2, needed_samples-len(sel_indexes)).astype(int)+1).tolist()
+
+    #this is not right since random function may return the same index twice
+    # nums = (2*np.random.uniform(0, total_samples//2, needed_samples-len(sel_indexes)).astype(int)+1).tolist()
+
+    odd_candidates = [i for i in range(1, total_samples, 2)]
+    nums = random.sample(odd_candidates, needed_samples-len(sel_indexes))
+    
+    # print(len(odd_candidates),needed_samples,len(sel_indexes))
+        
     sel_indexes.extend(nums)
     assert len(sel_indexes)==needed_samples,'the sampling is not right'
+    assert len(sel_indexes)==len(set(sel_indexes)),'duplicates are present in the list'
     
     return sorted(sel_indexes)
 
@@ -80,8 +86,9 @@ class OCTDataset(Dataset):
         pt_info=[sections[3],sections[4],sections[5]]
         amdtype=get_amdtype(pt_info,self.df)
         scan_list=sorted(os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0]))
-        if self.undersample:
-            scan_list=[scan_list[i] for i in undersampler(self.volume_shape[1][0],len(scan_list))]
+        if self.undersample and len(scan_list)!=self.volume_shape[0][0]:
+            # print("hi",len(scan_list),self.volume_shape[0][0])
+            scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
             # assert     add an assertion here
             
         for bscan in scan_list:
