@@ -74,16 +74,16 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         
     
 if __name__=="__main__":
-    model_path="model_parameter_Resnet_medicalnet\\1\\fold2_epoch10_val_0.4990_train_0.6260"
+    model_path="model_parameter_Resnet_medicalnet\\7\\fold4_epoch14_val_0.3108_train_0.3457"
     device='cuda' if torch.cuda.is_available() else 'cpu'
-    json_path="jsons\\train_test_val_split_without_scar.json"
+    json_path="jsons\\train_test_val_split_without_scar_with_both_res.json"
     excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
     batch_size=32
     num_workers=12
     timeout=600
     results_dir="results"
-    data='test'#can either be train or test
+    data='train'#can either be train or test
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
     save_file= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'

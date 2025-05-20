@@ -117,7 +117,7 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.0001, help="learning rate")
+        parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
         parser.add_argument('--batch',type=float,default=32,help='batch size')
         parser.add_argument('--epoch',type=int,default=15,help='number of epoch')
         parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar_with_both_res.json',help="path of json file containing path of volumes")
@@ -162,7 +162,7 @@ if __name__=="__main__":
         transform=transforms.Compose([transforms.ToTensor(),
                                     #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
-        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict)
+        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict)
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
@@ -180,8 +180,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=8,timeout=600,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=8,timeout=600,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=12,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=12,timeout=600,collate_fn=collate_fn)
             if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
