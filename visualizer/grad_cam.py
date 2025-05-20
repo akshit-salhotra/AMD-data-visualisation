@@ -53,42 +53,43 @@ for module in reversed(list(model.modules())):
         print('hook registered successfully....')
         
         
-        
-for i in data_indices:
-        vol,label=dataset[i]
-        vol=vol.to(device).unsqueeze(dim=0)
-        label=label.to(device).squeeze(dim=0)
-        
-        logits=model(vol)
-        pred=torch.argmax(logits,dim=-1)
-        pred.backward()
-        conv_activations=conv_activations.squeeze()
-        gradients=gradients.squeeze()
-        weights = gradients.mean(dim=(1, 2,3))                
-        cam = torch.sum(weights * conv_activations, dim=0) 
-        cam = F.relu(cam)                               
-        cam = cam - cam.min()
-        cam = cam / cam.max() 
-        cam=F.interpolate(cam.unsqueeze(dim=0),scale_factor=(8.0,8.0,8.0),mode='bilinear').squeeze()
-        
-        assert cam.shape==(128,256,256),f'the shape of heat map is not right ,{cam.shape}'
-        
-        mean_importance=torch.mean(cam,dim=(1,2))
-        _, top_indices = torch.topk(mean_importance, k=num_bscans_visualised)
-        
-        print('predicted class:',pred)
-        print('actual class',label)
-        print('max values of b scans is :')
-        for i in top_indices:
-            plt.subplot(num_bscans_visualised//2,4,i+1)
-            print(bscan_mask.max())
-            bscan_mask=cam[i]-cam.min()
-            bscan_mask=bscan_mask/bscan_mask.max()
-            plt.imshow(bscan_mask,cmap='viridis')
-            plt.colorbar()
-            plt.subplot(num_bscans_visualised//2,4,i+2)
-            plt.imshow(vol[i],cmap='greys')
+model.eval()
+with torch.no_grad():       
+    for i in data_indices:
+            vol,label=dataset[i]
+            vol=vol.to(device).unsqueeze(dim=0)
+            label=label.to(device).squeeze(dim=0)
             
+            logits=model(vol)
+            pred=torch.argmax(logits,dim=-1)
+            pred.backward()
+            conv_activations=conv_activations.squeeze()
+            gradients=gradients.squeeze()
+            weights = gradients.mean(dim=(1, 2,3))                
+            cam = torch.sum(weights * conv_activations, dim=0) 
+            cam = F.relu(cam)                               
+            cam = cam - cam.min()
+            cam = cam / cam.max() 
+            cam=F.interpolate(cam.unsqueeze(dim=0),scale_factor=(8.0,8.0,8.0),mode='bilinear').squeeze()
             
-        
+            assert cam.shape==(128,256,256),f'the shape of heat map is not right ,{cam.shape}'
             
+            mean_importance=torch.mean(cam,dim=(1,2))
+            _, top_indices = torch.topk(mean_importance, k=num_bscans_visualised)
+            
+            print('predicted class:',pred)
+            print('actual class',label)
+            print('max values of b scans is :')
+            for i in top_indices:
+                plt.subplot(num_bscans_visualised//2,4,i+1)
+                print(bscan_mask.max())
+                bscan_mask=cam[i]-cam.min()
+                bscan_mask=bscan_mask/bscan_mask.max()
+                plt.imshow(bscan_mask.cpu().numpy(),cmap='viridis')
+                plt.colorbar()
+                plt.subplot(num_bscans_visualised//2,4,i+2)
+                plt.imshow(vol[i].cpu().numpy(),cmap='greys')
+                
+                
+            
+                
