@@ -200,7 +200,7 @@ if __name__=="__main__":
                     # model.eval()
                     preds=[]
                     labels=[]
-                    for iter,(data,label) in tqdm(enumerate(train_loader)):
+                    for iter,(data,_,label) in tqdm(enumerate(train_loader)):
                         # print(image.shape)
                         # print(label)
                         epoch_loss,pred=train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds)
@@ -231,7 +231,7 @@ if __name__=="__main__":
                         val_labels=[]
                         val_preds=[]
                         with torch.no_grad():
-                            for (data,label) in test_loader:
+                            for (data,_,label) in test_loader:
                                 # print(data,label)
                                 val_loss,preds,label=val_step(args,data,label,val_loss,model,criteron)
                                 # print(preds.device,label.device)

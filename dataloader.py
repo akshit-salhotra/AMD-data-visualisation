@@ -9,12 +9,21 @@ import random
 
 def collate_fn(batch):
     lists=len(batch[0])-1
+    paths=None
+    if isinstance(batch[0][-2],str):
+        paths=[]
+        # for instance in batch:
+        #     paths.extends(instance.pop(-2))
+
     data=[]
     for i in range(lists):
+        if isinstance(paths,list) and i==lists-1:
+            paths=[val[i] for val in batch]
+            continue
         d=torch.stack([val[i] for val in batch],dim=0)
         data.append(d)
-    
-    return data,torch.concat([val[-1] for val in batch],dim=0)
+
+    return data,paths,torch.concat([val[-1] for val in batch],dim=0)
 
 def undersampler(needed_samples:int,total_samples:int)->list:
 
@@ -75,6 +84,11 @@ class OCTDataset(Dataset):
             self.raw_scans=kwargs['get_raw_scans']
         else:
             self.raw_scans=False
+        
+        if 'get_path' in kwargs:
+            self.get_path=kwargs['get_path']
+        else:
+            self.get_path=False
 
     def __getitem__(self, index):
         self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
@@ -127,12 +141,24 @@ class OCTDataset(Dataset):
             assert list(attn_mask.shape)==[self.context_length+1],f'the shape of attn mask is not right:{attn_mask.shape}'
             assert any(int(torch.sum(attn_mask).item())==self.context_length-n for n in list(np.array(self.volume_shape)[:,0])),f'the attention mask is not right:{torch.sum(attn_mask)} scans dir :{scans_dir}'
             
-            if self.raw_scans:
-                return volume.unsqueeze(dim=0),raw_volume.unsqueeze(dim=0),attn_mask,label
+            if self.raw_scans and self.get_path:
+                return volume.unsqueeze(dim=0),raw_volume.unsqueeze(dim=0),attn_mask,scans_dir,label
+            elif self.raw_scans:
+                return volume.unsqueeze(dim=0),raw_volume.unsqueeze(dim=0),attn_mask,scans_dir,label
+            elif self.get_path:
+                return volume.unsqueeze(dim=0),attn_mask,label
+
             return volume.unsqueeze(dim=0),attn_mask,label
 
-        if self.raw_scans:
+        if self.raw_scans and self.get_path:
+            return volume.unsqueeze(dim=0),raw_volume.unsqueeze(dim=0),scans_dir,label
+
+        elif self.raw_scans:
             return volume.unsqueeze(dim=0),raw_volume.unsqueeze(dim=0),label
+        
+        elif self.get_path:
+                    return volume.unsqueeze(dim=0),scans_dir,label
+
         return volume.unsqueeze(dim=0),label
             
     def __len__(self):

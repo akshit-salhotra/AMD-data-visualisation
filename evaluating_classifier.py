@@ -18,15 +18,16 @@ from tqdm import tqdm
 from sklearn.model_selection import KFold
 from hooks.batch_hook import create_hook,batchnorm_stats
 from utils.make_plots import get_batch_stats_plot
+import pandas as pd
 
-def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path:str,transform,batch_size:int,num_workers:int,timeout:int,save_path:str,data:str)->None:
+def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path:str,transform,batch_size:int,num_workers:int,timeout:int,save_path:str,data:str,save_misclassified:bool,excel_save_path:str)->None:
     with open(json_path,'r') as file:
         paths=json.load(file)
     
        
     # model=Resnet18_3D(num_classes=6).to(device)
     model=resnet10(num_classes=5).to(device)
-
+    class_dict={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4}
     # hooks = []
     # for name, module in model.named_modules():
     #     if isinstance(module, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
@@ -35,7 +36,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         model=nn.DataParallel(model)
     # num_folds=5
     # kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
-    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,undersample=True,classes={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
+    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,get_path=True,undersample=True,classes=class_dict)
 
     # for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):   
     model.load_state_dict(torch.load(model_path,map_location=device))
@@ -43,9 +44,10 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
 
     labels=[]
     preds=[]
+    path_scans=[]
     model.eval()
     with torch.no_grad():
-        for data,label in tqdm(dataloader):
+        for data,paths,label in tqdm(dataloader):
             # print(len(data))
             data=[d.to(device) for d in data]
             label=label.to(device)
@@ -54,6 +56,8 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
             pred=torch.argmax(logits,dim=-1)
             labels.extend(label.detach().cpu().tolist())
             preds.extend(pred.detach().cpu().tolist())
+            path_scans.extend(paths)
+
     # print(labels,preds)
     # labels=torch.concat(labels,dim=0).cpu().numpy()
     # preds=torch.concat(preds,dim=0).cpu().numpy()
@@ -69,6 +73,21 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     # Save as image
     plt.savefig(save_path, dpi=300)
     # plt.show()
+    if save_misclassified:
+        inverse_class_dict={v:k for k,v in class_dict.items()}
+        diff_indexes = [i for i, (a, b) in enumerate(zip(preds,labels )) if a != b]
+        pred_class=[inverse_class_dict[preds[i]] for i in diff_indexes]
+        label_class=[inverse_class_dict[labels[i]] for i in diff_indexes]
+        scans=[path_scans[i] for i in diff_indexes]
+        df=pd.DataFrame({
+            "scan_path":scans,
+            "predicted_class":pred_class,
+            "actual class":label_class
+        })
+        df.to_excel(excel_save_path,index=False)
+
+
+
     # get_batch_stats_plot(batchnorm_stats,save_path)
     print('the accuarcy of model is:',np.mean(np.array(labels)==np.array(preds)))
         
@@ -79,13 +98,15 @@ if __name__=="__main__":
     json_path="jsons\\train_test_val_split_without_scar_with_both_res.json"
     excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
+    save_excel_path="excel//misclassified_data.xlsx"
     batch_size=32
-    num_workers=12
+    num_workers=1
     timeout=600
+    save_misclassified_data=True
     results_dir="results"
-    data='train'#can either be train or test
+    data='test'#can either be train or test
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
     save_file= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
 
-    evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data)
+    evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data,save_misclassified_data,save_excel_path)
