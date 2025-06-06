@@ -1,7 +1,8 @@
 import argparse
 import matplotlib
 matplotlib.use('Agg')
-import torchvision
+from utils.logger import intialise_logger_nd_create_folders
+from utils.util import load_model
 import torch
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader,Subset
@@ -29,58 +30,11 @@ from hooks.batch_hook import create_hook,batchnorm_stats
 
 # Optionally, clear unused memory in PyTorch 1.6+
 # torch.cuda.ipc_collect()
-def intialise_logger_nd_create_folders(args):
-    # if args.model_path:
-        # logging.info('resumed training')
-        # num_folder=args.model_path.split(os.sep)[1]
-        # print(num_folder)
-        # save_path=args.save_dir+os.sep+num_folder
-    # else:
-    if os.path.exists(args.save_dir):
-            num_folder=str(int(sorted(os.listdir(args.save_dir),key=lambda x:int(x))[-1])+1)
-    else:
-            os.makedirs(args.save_dir,exist_ok=False)
-            num_folder='0'
-    save_path=args.save_dir+os.sep+num_folder
-    os.makedirs(save_path)
 
-
-    os.makedirs(args.log_dir,exist_ok=True)
-    logging.basicConfig(
-        level=logging.INFO,                  
-        format='%(asctime)s - %(levelname)s - %(message)s',  
-        datefmt='%Y-%m-%d %H:%M:%S',        
-        handlers=[
-            # logging.StreamHandler(),        
-            logging.FileHandler(args.log_dir+os.sep+f"train_{num_folder}.log")  
-        ]
-    )
-    print('logging at:',args.log_dir+os.sep+f"train_{num_folder}.log")
-    logging.info('------------------------------------------------------------------------------------------------')
-    logging.info('starting new training !!!!')
-    logging.info('------------------------------------------------------------------------------------------------')
-
-    logging.info(args)
-
-        
-    logging.info(f'parameters are being saved at :{save_path}')
-    
-    return save_path
 
 
     
-def load_model(args):
-    params=torch.load(args.model_path)['state_dict']
 
-    # for key in params.keys():
-    #      if key.startswith('module.'):
-    #           params[f'module.{key}']=params.pop(key)
-        
-    missing,unexpected=model.load_state_dict(params,strict=False)
-    logging.info(f'the missing keys are : \n{missing}')
-    logging.info(f'the unexpected keys are :\n{unexpected}')
-    print('loaded model parameters from ',args.model_path)
-    logging.info(f'loaded model parameters from {args.model_path}')
 
 def train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds):
     data=[d.to(args.device) for d in data]
@@ -153,7 +107,7 @@ if __name__=="__main__":
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
         
         if args.model_path:
-            load_model(args)
+            load_model(args,model)
             
         with open(args.json,'r') as file:
             paths= json.load(file) 
