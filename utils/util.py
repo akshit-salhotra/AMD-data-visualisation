@@ -38,10 +38,12 @@ class SliceLevelPerceptualLoss(nn.Module):
         self.std = torch.tensor([0.229, 0.224, 0.225]).view(1,3,1,1)
 
     def forward(self, x, y):
+        assert x.device==y.device, f' the device of x and y is not same'
         # Normalize inputs to match VGG expectations
         x = (x - self.mean.to(x.device)) / self.std.to(x.device)
         y = (y - self.mean.to(y.device)) / self.std.to(y.device)
 
+        self.blocks.to(x.device)
         # Compute perceptual features
         fx = self.blocks(x)
         fy = self.blocks(y)
@@ -51,6 +53,7 @@ class SliceLevelPerceptualLoss(nn.Module):
     def get_feature_map(self,x):
 
         x = (x - self.mean.to(x.device)) / self.std.to(x.device)
+        self.blocks.to(x.device)
         fx = self.blocks(x)
         
         print(fx.shape)

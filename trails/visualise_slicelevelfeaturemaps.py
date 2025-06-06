@@ -18,24 +18,32 @@ device='cuda' if torch.cuda.is_available() else 'cpu'
 json_path="jsons\\train_test_val_split_without_scar_with_both_res.json"
 excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
 num_slices=4
+num_feature_maps=32
 
 with open(json_path,'r') as f:
     paths=json.load(f)
 
-dataset=OCTDataset(paths['json_path'],excel_path,transform)
-dataloader=DataLoader(dataset,1,True,num_workers=4,timeout=600,collate_fn=collate_fn,undersample=True)
+dataset=OCTDataset(paths['test_path'],excel_path,transform,undersample=True)
+dataloader=DataLoader(dataset,1,True,collate_fn=collate_fn)
 
 for data,_,_ in dataloader:
     data=data[0].to(device)
-    data=data.view(1,-1,256,256)
+    data=data.view(-1,1,256,256)
     feature_maps=vgg.get_feature_map(data)
-    
-    sample = random.sample([i for i in range(data.shape[1])], num_slices)
-    
-    for i,idx in enumerate(sample):
-        plt.subplot(num_slices,2,2*(i+1))
-        plt.imshow(feature_maps.squeeze()[idx],cmap='viridis')
-        plt.subplot(num_slices,2,2*(i+1)+1)
-        plt.imshow(data[0,idx],cmap='gray')
+    print('the shape of feature map:',feature_maps.shape)
+    sample = random.sample([i for i in range(data.shape[0])], num_slices)
+    sample_feature_maps=random.sample([i for i in range(feature_maps.shape[1])],num_feature_maps)
+
+    for i,idx in enumerate(sample_feature_maps):
+        plt.subplot(num_feature_maps//2,2,i+1)
+        plt.imshow(feature_maps[100,idx].detach().cpu().numpy(),cmap='viridis')
+        # plt.subplot(num_feature_maps,2,2*(i+1))
+        # plt.imshow(data[100,0].detach().cpu().numpy(),cmap='gray')
+
+    # for i,idx in enumerate(sample):
+    #     plt.subplot(num_slices,2,2*(i+1)-1)
+    #     plt.imshow(feature_maps[idx,10].detach().cpu().numpy(),cmap='viridis')
+    #     plt.subplot(num_slices,2,2*(i+1))
+    #     plt.imshow(data[idx,0].detach().cpu().numpy(),cmap='gray')
     plt.show()
-    
+    break
