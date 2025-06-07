@@ -38,6 +38,9 @@ class SliceLevelPerceptualLoss(nn.Module):
         self.std = torch.tensor([0.229, 0.224, 0.225]).view(1,3,1,1)
 
     def forward(self, x, y):
+        '''
+        x and y be bscan level entities
+        '''
         assert x.device==y.device, f' the device of x and y is not same'
         # Normalize inputs to match VGG expectations
         x = (x - self.mean.to(x.device)) / self.std.to(x.device)
