@@ -15,7 +15,7 @@ class BasicUpsampleBlock(nn.Module):
         self.norm=nn.BatchNorm3d(out_ch)
         self.relu=nn.ReLU()
 
-        self.conv=[BasicConvBlock.create_conv(out_ch,out_ch,kernel,1,kernel//2) for _ in range(3)]
+        self.conv=nn.Sequential(*[BasicConvBlock.create_conv(out_ch,out_ch,kernel,1,kernel//2) for _ in range(3)])
         
         self.resize_conv=nn.ConvTranspose3d(in_ch,out_ch,2,2)
 
@@ -57,10 +57,20 @@ class AutoEncoder(nn.Module):
                                    Interpolate(),
                                    self.final_decoder
                                    )
+        self.sigmoid=nn.Sigmoid()
 
     def forward(self,x):
         x=self.encoder(x)
-        return F.sigmoid(self.decoder(x))
+        out=self.decoder(x)
+        return self.sigmoid(out)
+
+    @staticmethod
+    def get_decoder(ch):
+        pass
+
+    @staticmethod
+    def get_encoder(ch):
+        pass
 
 
 if __name__=="__main__":
@@ -72,5 +82,5 @@ if __name__=="__main__":
     # this data is misleading due to repetitions
     # summary(model,(1,128,256,256),2)
 
-    print(model(torch.ones((1,1,128,256,256))).shape)
+    print(model(torch.ones((1,1,128,256,256)).to(device)).shape)
     # print(model)

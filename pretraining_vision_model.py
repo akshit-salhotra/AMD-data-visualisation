@@ -66,29 +66,30 @@ if __name__=="__main__":
         parser = argparse.ArgumentParser(description="train arguments")
 
         parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
-        parser.add_argument('--batch',type=float,default=32,help='batch size')
+        parser.add_argument('--batch',type=float,default=4,help='batch size')
         parser.add_argument('--epoch',type=int,default=15,help='number of epoch')
         parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar_with_both_res.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
-        parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_medicalnet')
+        parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_pretraining')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
-        parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
+        parser.add_argument('--log-dir',type=str,default='logs/Resnet_pretraining',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
-        parser.add_argument('--model-path',type=str,default="pretrained/resnet_10_23dataset.pth",help='path of model parameters to be loaded')
-        parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
+        parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
+        parser.add_argument('--device',type=torch.device,default=torch.device('cpu' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--log-freq',type=int,default=5,help='after how many iterations losses are logged')
         parser.add_argument('--lambda_percep',type=float,default=0.8,help="weighting factor for perceptual loss")
         parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
-        parser.add_argument('--save_recons',type=bool,default=True,hep="whether to save some reconstructions")
+        parser.add_argument('--save_recons',type=bool,default=True,help="whether to save some reconstructions")
         parser.add_argument('--save_bscans',type=torch.Tensor,default=torch.tensor([36,48,60,72]),help="which reconstructed bscans to save")
+        parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
 
         args = parser.parse_args()
         
         param_dir=intialise_logger_nd_create_folders(args)
         
         model=AutoEncoder(args.model_ch).to(args.device)
-        model=nn.DataParallel(model)
+        # model=nn.DataParallel(model)
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
 
@@ -103,18 +104,17 @@ if __name__=="__main__":
         with open(args.json,'r') as file:
             paths= json.load(file) 
         train_paths=paths['train_path']
-
+        val_paths=paths['test_path']
         transform=transforms.Compose([transforms.ToTensor(),
                                     #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
         
         
-        
         train_dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict)
-        val_dataset=None
+        val_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict)
 
-        train_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True,num_workers=12,timeout=600,collate_fn=collate_fn)
-        test_loader = DataLoader(val_dataset, batch_size=args.batch, shuffle=False,num_workers=12,timeout=600,collate_fn=collate_fn)
+        train_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True,num_workers=0,timeout=0,collate_fn=collate_fn)
+        test_loader = DataLoader(val_dataset, batch_size=args.batch, shuffle=False,num_workers=0,timeout=0,collate_fn=collate_fn)
         
         
         
@@ -135,14 +135,20 @@ if __name__=="__main__":
                 model.train()
 
                 for iter,(data,_,_) in tqdm(enumerate(train_loader)):
-
+                    
+                    # print('hi...')
                     scans=data[0].to(args.device)
+                    # print(torch.cuda.memory_summary())
                     recons_scans=model(scans)
+                    # print('bye')
+                    # print(torch.cuda.memory_summary())
+
                     r_loss=recons_criteron(recons_scans,scans)
                     p_loss=percep_criteron(recons_scans.reshape(-1,1,256,256),scans.reshape(-1,1,256,256))
-
+                    # print('calculating loss')
                     loss=r_loss+args.lambda_percep*p_loss
-
+                    # print(torch.cuda.memory_summary())
+                    # print('....')
                     if iter% args.log_freq==0:
                         logging.info(f'Epoch:{i}/{args.epoch} iteration:{iter}/{math.ceil(len(train_dataset)/args.batch)} Loss is :{loss:.4f} reconstruction loss :{r_loss:.4f} perceptual loss :{p_loss:.4f}')
 
@@ -154,8 +160,6 @@ if __name__=="__main__":
                     optimizer.step()
                     optimizer.zero_grad()
 
-
-                    
                 epoch_loss/=len(train_dataset)
                 percep_loss/=len(train_dataset)
                 recons_loss/=len(train_dataset)
