@@ -34,29 +34,31 @@ class AutoEncoder(nn.Module):
     def __init__(self,ch=[64,128,256,512]):
         super().__init__()
 
-        self.conv1=BasicConvBlock.create_conv(1,ch[0],7,2,3)
-        self.maxpool=nn.MaxPool3d(3,2,padding=1)
-        self.conv2=BasicConvBlock(ch[0],ch[0],3,downsample=False)
-        self.conv3=BasicConvBlock(ch[0],ch[1],3)
-        self.conv4=BasicConvBlock(ch[1],ch[2],3)
-        self.conv5=BasicConvBlock(ch[2],ch[3],3)
+        # self.conv1=BasicConvBlock.create_conv(1,ch[0],7,2,3)
+        # self.maxpool=nn.MaxPool3d(3,2,padding=1)
+        # self.conv2=BasicConvBlock(ch[0],ch[0],3,downsample=False)
+        # self.conv3=BasicConvBlock(ch[0],ch[1],3)
+        # self.conv4=BasicConvBlock(ch[1],ch[2],3)
+        # self.conv5=BasicConvBlock(ch[2],ch[3],3)
 
-        self.encoder=nn.Sequential(self.conv1,self.maxpool,self.conv2,self.conv3,self.conv4,self.conv5)
+        # self.encoder=nn.Sequential(self.conv1,self.maxpool,self.conv2,self.conv3,self.conv4,self.conv5)
+        self.encoder=AutoEncoder.get_encoder(ch)
 
-        self.decode2=BasicUpsampleBlock(ch[0],ch[0],3)
-        self.decode3=BasicUpsampleBlock(ch[1],ch[0],3)
-        self.decode4=BasicUpsampleBlock(ch[2],ch[1],3)
-        self.decode5=BasicUpsampleBlock(ch[3],ch[2],3)
+        # self.decode2=BasicUpsampleBlock(ch[0],ch[0],3)
+        # self.decode3=BasicUpsampleBlock(ch[1],ch[0],3)
+        # self.decode4=BasicUpsampleBlock(ch[2],ch[1],3)
+        # self.decode5=BasicUpsampleBlock(ch[3],ch[2],3)
 
-        self.final_decoder=nn.Conv3d(ch[0],1,7,1,3)
+        # self.final_decoder=nn.Conv3d(ch[0],1,7,1,3)
 
-        self.decoder=nn.Sequential(self.decode5,
-                                   self.decode4,
-                                   self.decode3,
-                                   self.decode2,
-                                   Interpolate(),
-                                   self.final_decoder
-                                   )
+        # self.decoder=nn.Sequential(self.decode5,
+        #                            self.decode4,
+        #                            self.decode3,
+        #                            self.decode2,
+        #                            Interpolate(),
+        #                            self.final_decoder
+        #                            )
+        self.decoder=AutoEncoder.get_decoder(ch)
         self.sigmoid=nn.Sigmoid()
 
     def forward(self,x):
@@ -66,21 +68,46 @@ class AutoEncoder(nn.Module):
 
     @staticmethod
     def get_decoder(ch):
-        pass
+        ch.reverse()
+        l=len(ch)-1
+        # ch.append(ch[-1])
+        layers=[]
+        # print('the number of upsample blocks are :',ch)
+        for i in range(l):
+            layers.append(BasicUpsampleBlock(ch[i],ch[i+1],3))
+        
+        layers.append(Interpolate())
+        layers.append(nn.Conv3d(ch[-1],1,7,1,3))
+
+        return nn.Sequential(*layers)
 
     @staticmethod
     def get_encoder(ch):
-        pass
+        layers=[]
+        layers.append(BasicConvBlock.create_conv(1,ch[0],7,2,3))
+        layers.append(nn.MaxPool3d(3,2,padding=1))
+        l=len(ch)
+        ch.insert(0,ch[0])
+
+        for i in range(l):
+            if i==0:
+                layers.append(BasicConvBlock(ch[i],ch[i+1],3,downsample=False))
+            else:
+                layers.append(BasicConvBlock(ch[i],ch[i+1],3))
+        
+        return nn.Sequential(*layers)
 
 
 if __name__=="__main__":
     from torchsummary import summary
 
-    device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device=torch.device('cpu' if torch.cuda.is_available() else 'cpu')
     
     model=AutoEncoder().to(device)
     # this data is misleading due to repetitions
-    # summary(model,(1,128,256,256),2)
+    # summary(model,(1,128,256,256),2,device='cpu')
 
-    print(model(torch.ones((1,1,128,256,256)).to(device)).shape)
+    # print(model(torch.ones((1,1,128,256,256)).to(device)).shape)
     # print(model)
+
+    # print(AutoEncoder.get_decoder([64,128,256,512]))

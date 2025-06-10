@@ -4,24 +4,20 @@ matplotlib.use('Agg')
 from utils.logger import intialise_logger_nd_create_folders
 from utils.util import load_model
 import torch
+import torch.distributed as dist
 import torchvision.transforms as transforms
-from torch.utils.data import DataLoader,Subset
-# from torch.nn import CrossEntropyLoss
+from torch.utils.data import DataLoader,Subset,DistributedSampler
+from torch.nn.parallel import DistributedDataParallel as DDP
 from memory_profiler import profile
 from dataloader import OCTDataset,collate_fn
 import torchvision.utils as vutils
 import torch.optim as optim
-from model.resnet_3d import Resnet18_3D
-# from model.sequence_model import Seq_Model
-# from model.resnet_medicalnet import resnet10
 from model.auto_encoder import AutoEncoder
-# from utils.make_plots import get_batch_stats_plot
 from utils.util import SliceLevelPerceptualLoss
 import os
 from tqdm import tqdm
 import logging
 import json
-# from sklearn.model_selection import KFold
 import torch.nn as nn
 import math
 import re
@@ -29,8 +25,91 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-# from hooks.batch_hook import create_hook,batchnorm_stats
 
+def setup(rank, world_size):
+    dist.init_process_group("nccl", rank=rank, world_size=world_size)
+    if rank == 0:
+        torch.cuda.set_device(0)
+    elif rank == 1:
+        torch.cuda.set_device(2)
+
+def cleanup():
+    dist.destroy_process_group()
+
+def get_devices(rank):
+    # (model_device, perceptual_loss_device)
+    return (torch.device(f"cuda:{0 if rank == 0 else 2}"),
+            torch.device(f"cuda:{1 if rank == 0 else 3}"))
+
+def train(rank, world_size,args):
+    setup(rank, world_size)
+    model_device, perceptual_device = get_devices(rank)
+
+    # Dataset and DataLoader
+    train_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict)
+
+    sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
+    dataloader = DataLoader(train_dataset
+                            , batch_size=args.batch 
+                            ,shuffle=True
+                            ,num_workers=0
+                            ,timeout=0
+                            ,collate_fn=collate_fn
+                            , sampler=sampler
+                            , pin_memory=True)
+
+    # Model and loss
+    model = AutoEncoder.to(model_device)
+    model = DDP(model, device_ids=[model_device.index])
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    mse_loss = nn.MSELoss().to(model_device)
+    perceptual_loss_fn =SliceLevelPerceptualLoss().to(perceptual_device)
+
+    for epoch in range(args.epoch):
+        sampler.set_epoch(epoch)
+        for batch in dataloader:
+            scans=data[0].to(args.device)
+            recons_scans=model(scans)
+
+                        r_loss=recons_criteron(recons_scans,scans)
+                        p_loss=0
+                        # p_loss=percep_criteron(recons_scans.reshape(-1,1,256,256),scans.reshape(-1,1,256,256))
+                        # print('calculating loss')
+                        loss=r_loss+args.lambda_percep*p_loss
+                        # print(torch.cuda.memory_summary())
+                        # print('....')
+                        if iter% args.log_freq==0:
+                            logging.info(f'Epoch:{i}/{args.epoch} iteration:{iter}/{math.ceil(len(train_dataset)/args.batch)} Loss is :{loss:.4f} reconstruction loss :{r_loss:.4f} perceptual loss :{p_loss:.4f}')
+
+                        epoch_loss+=loss
+                        recons_loss+=r_loss
+                        percep_loss+=p_loss
+        
+                        loss.backward()
+                        optimizer.step()
+                        optimizer.zero_grad()
+            inputs, targets = batch
+            inputs = inputs.to(model_device, non_blocking=True)
+            targets = targets.to(model_device, non_blocking=True)
+
+            optimizer.zero_grad()
+            outputs = model(inputs)
+
+            loss_mse = mse_loss(outputs, targets)
+
+            # Perceptual loss on separate GPU
+            with torch.cuda.device(perceptual_device):
+                outputs_detached = outputs.detach().to(perceptual_device, non_blocking=True)
+                targets_detached = targets.detach().to(perceptual_device, non_blocking=True)
+                loss_percep = perceptual_loss_fn(outputs_detached, targets_detached)
+
+            total_loss = loss_mse + 0.1 * loss_percep.to(model_device)
+            total_loss.backward()
+            optimizer.step()
+
+        print(f"[Rank {rank}] Epoch {epoch} completed.")
+
+    cleanup()
 
 if __name__=="__main__":
     try:
@@ -83,7 +162,7 @@ if __name__=="__main__":
         
         train_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict)
         val_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict)
-        # train_dataset = Subset(train_dataset, indices=range(4))
+        train_dataset = Subset(train_dataset, indices=range(4))
 
         train_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True,num_workers=0,timeout=0,collate_fn=collate_fn)
         test_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=False,num_workers=0,timeout=0,collate_fn=collate_fn)
