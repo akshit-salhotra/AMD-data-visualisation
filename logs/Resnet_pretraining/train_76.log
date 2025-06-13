@@ -1,0 +1,37 @@
+2025-06-13 05:35:47 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-13 05:35:47 - INFO - starting new training !!!!
+2025-06-13 05:35:47 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-13 05:35:47 - INFO - Namespace(batch=1, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=2, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.8, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.001, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=10)
+2025-06-13 05:35:47 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\76
+2025-06-13 05:35:47 - INFO - found 4 gpus!
+2025-06-13 05:35:47 - ERROR - 
+        An attempt has been made to start a new process before the
+        current process has finished its bootstrapping phase.
+
+        This probably means that you are not using fork to start your
+        child processes and you have forgotten to use the proper idiom
+        in the main module:
+
+            if __name__ == '__main__':
+                freeze_support()
+                ...
+
+        The "freeze_support()" line can be omitted if the program
+        is not going to be frozen to produce an executable.
+2025-06-13 05:36:07 - INFO - Rank: 1 Epoch:0/2 iteration:0/585 Loss is :4.5500 reconstruction loss :0.1068 perceptual loss :5.5541
+2025-06-13 05:37:32 - INFO - Rank: 1 Epoch:0/2 iteration:5/585 Loss is :3.5085 reconstruction loss :0.0189 perceptual loss :4.3619
+2025-06-13 05:38:41 - INFO - Rank: 1 Epoch:0/2 iteration:10/585 Loss is :4.0569 reconstruction loss :0.0411 perceptual loss :5.0198
+2025-06-13 05:39:50 - INFO - Rank: 1 Epoch:0/2 iteration:15/585 Loss is :3.6683 reconstruction loss :0.0209 perceptual loss :4.5593
+2025-06-13 05:40:58 - INFO - Rank: 1 Epoch:0/2 iteration:20/585 Loss is :3.2789 reconstruction loss :0.0132 perceptual loss :4.0821
+2025-06-13 05:42:18 - INFO - Rank: 1 Epoch:0/2 iteration:25/585 Loss is :3.3398 reconstruction loss :0.0204 perceptual loss :4.1492
+2025-06-13 05:43:46 - INFO - Rank: 1 Epoch:0/2 iteration:30/585 Loss is :2.8610 reconstruction loss :0.0102 perceptual loss :3.5635
+2025-06-13 05:45:19 - INFO - Rank: 1 Epoch:0/2 iteration:35/585 Loss is :3.0495 reconstruction loss :0.0185 perceptual loss :3.7887
+2025-06-13 05:46:38 - INFO - Rank: 1 Epoch:0/2 iteration:40/585 Loss is :3.1078 reconstruction loss :0.0215 perceptual loss :3.8578
+2025-06-13 05:47:54 - INFO - Rank: 1 Epoch:0/2 iteration:45/585 Loss is :2.8843 reconstruction loss :0.0159 perceptual loss :3.5855
+2025-06-13 05:49:07 - INFO - Rank: 1 Epoch:0/2 iteration:50/585 Loss is :3.0058 reconstruction loss :0.0209 perceptual loss :3.7311
+2025-06-13 05:50:22 - INFO - Rank: 1 Epoch:0/2 iteration:55/585 Loss is :2.8341 reconstruction loss :0.0149 perceptual loss :3.5239
+2025-06-13 05:51:53 - INFO - Rank: 1 Epoch:0/2 iteration:60/585 Loss is :2.9340 reconstruction loss :0.0190 perceptual loss :3.6437
+2025-06-13 05:53:27 - INFO - Rank: 1 Epoch:0/2 iteration:65/585 Loss is :3.0053 reconstruction loss :0.0218 perceptual loss :3.7293
+2025-06-13 05:54:43 - INFO - Rank: 1 Epoch:0/2 iteration:70/585 Loss is :2.8432 reconstruction loss :0.0107 perceptual loss :3.5407
+2025-06-13 05:56:01 - INFO - Rank: 1 Epoch:0/2 iteration:75/585 Loss is :2.7485 reconstruction loss :0.0126 perceptual loss :3.4198
+2025-06-13 05:57:27 - INFO - Rank: 1 Epoch:0/2 iteration:80/585 Loss is :2.9665 reconstruction loss :0.0183 perceptual loss :3.6853

@@ -1,0 +1,38 @@
+2025-06-10 09:45:41 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 09:45:41 - INFO - starting new training !!!!
+2025-06-10 09:45:41 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 09:45:41 - INFO - Namespace(batch=1, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=2, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.8, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.001, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=10)
+2025-06-10 09:45:41 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\19
+2025-06-10 09:45:41 - INFO - found 4 gpus!
+2025-06-10 09:46:00 - ERROR - 
+
+-- Process 0 terminated with the following error:
+Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\multiprocessing\spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "D:\AMD-data-visualisation\pretraining_vision_distributed.py", line 116, in train
+    p_loss = perceptual_loss_fn(recons_scans.reshape(-1,1,256,256), scans.reshape(-1,1,256,256))
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "D:\AMD-data-visualisation\utils\util.py", line 51, in forward
+    fx = self.blocks(x)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\container.py", line 217, in forward
+    input = module(input)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\pooling.py", line 164, in forward
+    return F.max_pool2d(input, self.kernel_size, self.stride,
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\_jit_internal.py", line 497, in fn
+    return if_false(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\functional.py", line 796, in _max_pool2d
+    return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU  has a total capacity of 11.00 GiB of which 0 bytes is free. Of the allocated memory 10.13 GiB is allocated by PyTorch, and 15.38 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+

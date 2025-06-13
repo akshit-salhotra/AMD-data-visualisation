@@ -1,0 +1,7 @@
+2025-06-10 08:05:05 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 08:05:05 - INFO - starting new training !!!!
+2025-06-10 08:05:05 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 08:05:05 - INFO - Namespace(batch=1, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=2, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.8, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.001, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=10)
+2025-06-10 08:05:05 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\1
+2025-06-10 08:05:05 - INFO - found 4 gpus!
+2025-06-10 08:05:05 - ERROR - name 'config' is not defined

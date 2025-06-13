@@ -1,0 +1,18 @@
+2025-06-13 02:21:12 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-13 02:21:12 - INFO - starting new training !!!!
+2025-06-13 02:21:12 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-13 02:21:12 - INFO - Namespace(batch=1, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=2, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.8, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.001, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=10)
+2025-06-13 02:21:12 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\54
+2025-06-13 02:21:12 - INFO - found 4 gpus!
+2025-06-13 02:21:22 - ERROR - 
+
+-- Process 0 terminated with the following error:
+Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\multiprocessing\spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "D:\AMD-data-visualisation\pretraining_vision_distributed.py", line 91, in train
+    perceptual_loss_fn =SliceLevelPerceptualLoss(layer='relu1_1').to(perceptual_device)
+  File "D:\AMD-data-visualisation\utils\util.py", line 33, in __init__
+    self.blocks = vgg[:layer_map[layer] + 1].eval()
+KeyError: 'relu1_1'
+

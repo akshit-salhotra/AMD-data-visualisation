@@ -1,0 +1,28 @@
+2025-06-10 09:57:29 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 09:57:29 - INFO - starting new training !!!!
+2025-06-10 09:57:29 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 09:57:29 - INFO - Namespace(batch=1, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=2, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.8, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.001, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=10)
+2025-06-10 09:57:29 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\30
+2025-06-10 09:57:29 - INFO - found 4 gpus!
+2025-06-10 09:58:13 - ERROR - 
+
+-- Process 0 terminated with the following error:
+Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\multiprocessing\spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "D:\AMD-data-visualisation\pretraining_vision_distributed.py", line 113, in train
+    recons_scans=model(scans)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\parallel\distributed.py", line 1589, in forward
+    inputs, kwargs = self._pre_forward(*inputs, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\parallel\distributed.py", line 1480, in _pre_forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 0: 16 17 18 19 34 35 36 37 52 53 54 55 70 71 72 73
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+

@@ -1,0 +1,28 @@
+2025-06-10 08:06:09 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 08:06:09 - INFO - starting new training !!!!
+2025-06-10 08:06:09 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-10 08:06:09 - INFO - Namespace(batch=1, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=2, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.8, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.001, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=10)
+2025-06-10 08:06:09 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\2
+2025-06-10 08:06:09 - INFO - found 4 gpus!
+2025-06-10 08:06:15 - ERROR - 
+
+-- Process 0 terminated with the following error:
+Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\multiprocessing\spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "D:\AMD-data-visualisation\pretraining_vision_distributed.py", line 44, in train
+    setup(rank, world_size)
+  File "D:\AMD-data-visualisation\pretraining_vision_distributed.py", line 28, in setup
+    dist.init_process_group("nccl", rank=rank, world_size=world_size)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\distributed\c10d_logger.py", line 75, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\distributed\c10d_logger.py", line 89, in wrapper
+    func_return = func(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\distributed\distributed_c10d.py", line 1305, in init_process_group
+    store, rank, world_size = next(rendezvous_iterator)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\distributed\rendezvous.py", line 242, in _env_rendezvous_handler
+    master_addr = _get_env_or_raise("MASTER_ADDR")
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\distributed\rendezvous.py", line 219, in _get_env_or_raise
+    raise _env_error(env_var)
+ValueError: Error initializing torch.distributed using env:// rendezvous: environment variable MASTER_ADDR expected, but not set
+

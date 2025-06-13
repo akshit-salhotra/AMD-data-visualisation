@@ -1,0 +1,243 @@
+2025-06-13 05:35:47 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-13 05:35:47 - INFO - starting new training !!!!
+2025-06-13 05:35:47 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-13 05:35:47 - INFO - Namespace(batch=1, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=2, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.8, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.001, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=10)
+2025-06-13 05:35:47 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\75
+2025-06-13 05:35:47 - INFO - found 4 gpus!
+2025-06-13 05:35:47 - ERROR - 
+        An attempt has been made to start a new process before the
+        current process has finished its bootstrapping phase.
+
+        This probably means that you are not using fork to start your
+        child processes and you have forgotten to use the proper idiom
+        in the main module:
+
+            if __name__ == '__main__':
+                freeze_support()
+                ...
+
+        The "freeze_support()" line can be omitted if the program
+        is not going to be frozen to produce an executable.
+2025-06-13 05:35:49 - INFO - AutoEncoder(
+  (encoder): Sequential(
+    (0): Sequential(
+      (0): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3))
+      (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+    )
+    (1): MaxPool3d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (2): BasicConvBlock(
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (3): BasicConvBlock(
+      (conv1x1): Conv3d(64, 128, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (4): BasicConvBlock(
+      (conv1x1): Conv3d(128, 256, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (5): BasicConvBlock(
+      (conv1x1): Conv3d(256, 512, kernel_size=(1, 1, 1), stride=(2, 2, 2))
+      (layers): Sequential(
+        (0): Sequential(
+          (0): Conv3d(256, 512, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1))
+          (1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+  )
+  (decoder): Sequential(
+    (0): BasicUpsampleBlock(
+      (upsample): ConvTranspose3d(512, 256, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), output_padding=(1, 1, 1))
+      (norm): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU()
+      (conv): Sequential(
+        (0): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+      (resize_conv): ConvTranspose3d(512, 256, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+    )
+    (1): BasicUpsampleBlock(
+      (upsample): ConvTranspose3d(256, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), output_padding=(1, 1, 1))
+      (norm): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU()
+      (conv): Sequential(
+        (0): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+      (resize_conv): ConvTranspose3d(256, 128, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+    )
+    (2): BasicUpsampleBlock(
+      (upsample): ConvTranspose3d(128, 64, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), output_padding=(1, 1, 1))
+      (norm): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU()
+      (conv): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+      (resize_conv): ConvTranspose3d(128, 64, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+    )
+    (3): BasicUpsampleBlock(
+      (upsample): ConvTranspose3d(64, 64, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), output_padding=(1, 1, 1))
+      (norm): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU()
+      (conv): Sequential(
+        (0): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+          (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+      (resize_conv): ConvTranspose3d(64, 64, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+    )
+    (4): Interpolate()
+    (5): Conv3d(64, 1, kernel_size=(7, 7, 7), stride=(1, 1, 1), padding=(3, 3, 3))
+  )
+  (sigmoid): Sigmoid()
+)
+2025-06-13 05:36:07 - INFO - Rank: 0 Epoch:0/2 iteration:0/585 Loss is :4.6410 reconstruction loss :0.1123 perceptual loss :5.6608
+2025-06-13 05:37:32 - INFO - Rank: 0 Epoch:0/2 iteration:5/585 Loss is :3.9430 reconstruction loss :0.0177 perceptual loss :4.9066
+2025-06-13 05:38:41 - INFO - Rank: 0 Epoch:0/2 iteration:10/585 Loss is :3.9725 reconstruction loss :0.0375 perceptual loss :4.9188
+2025-06-13 05:39:50 - INFO - Rank: 0 Epoch:0/2 iteration:15/585 Loss is :3.6871 reconstruction loss :0.0149 perceptual loss :4.5903
+2025-06-13 05:40:58 - INFO - Rank: 0 Epoch:0/2 iteration:20/585 Loss is :3.3724 reconstruction loss :0.0150 perceptual loss :4.1968
+2025-06-13 05:42:18 - INFO - Rank: 0 Epoch:0/2 iteration:25/585 Loss is :3.2631 reconstruction loss :0.0284 perceptual loss :4.0435
+2025-06-13 05:43:46 - INFO - Rank: 0 Epoch:0/2 iteration:30/585 Loss is :3.1932 reconstruction loss :0.0150 perceptual loss :3.9728
+2025-06-13 05:45:18 - INFO - Rank: 0 Epoch:0/2 iteration:35/585 Loss is :3.0906 reconstruction loss :0.0232 perceptual loss :3.8343
+2025-06-13 05:46:38 - INFO - Rank: 0 Epoch:0/2 iteration:40/585 Loss is :3.1184 reconstruction loss :0.0178 perceptual loss :3.8758
+2025-06-13 05:47:54 - INFO - Rank: 0 Epoch:0/2 iteration:45/585 Loss is :3.1677 reconstruction loss :0.0279 perceptual loss :3.9248
+2025-06-13 05:49:07 - INFO - Rank: 0 Epoch:0/2 iteration:50/585 Loss is :2.7751 reconstruction loss :0.0148 perceptual loss :3.4505
+2025-06-13 05:50:22 - INFO - Rank: 0 Epoch:0/2 iteration:55/585 Loss is :2.8405 reconstruction loss :0.0187 perceptual loss :3.5272
+2025-06-13 05:51:53 - INFO - Rank: 0 Epoch:0/2 iteration:60/585 Loss is :2.8186 reconstruction loss :0.0149 perceptual loss :3.5047
+2025-06-13 05:53:27 - INFO - Rank: 0 Epoch:0/2 iteration:65/585 Loss is :2.9849 reconstruction loss :0.0250 perceptual loss :3.6998
+2025-06-13 05:54:44 - INFO - Rank: 0 Epoch:0/2 iteration:70/585 Loss is :2.8628 reconstruction loss :0.0150 perceptual loss :3.5597
+2025-06-13 05:56:01 - INFO - Rank: 0 Epoch:0/2 iteration:75/585 Loss is :2.8603 reconstruction loss :0.0122 perceptual loss :3.5602
+2025-06-13 05:57:27 - INFO - Rank: 0 Epoch:0/2 iteration:80/585 Loss is :2.9355 reconstruction loss :0.0173 perceptual loss :3.6478
