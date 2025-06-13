@@ -1,4 +1,6 @@
-2025-06-13 06:39:18 - INFO - AutoEncoder(
+2025-06-13 08:47:19 - INFO - Namespace(accum_size=4, batch=1, bscan_step=2, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=25, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.1, log_dir='logs/Resnet_pretraining', log_freq=5, lr=0.0015, model_ch=[64, 128, 256, 512], model_path=None, percep_layer='relu2_2', save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_Resnet_pretraining', save_freq=5, save_recons=True, step_size=3)
+2025-06-13 08:47:19 - INFO - parameters are being saved at :model_parameter_Resnet_pretraining\1
+2025-06-13 08:47:19 - INFO - AutoEncoder(
   (encoder): Sequential(
     (0): Sequential(
       (0): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3))
@@ -204,6 +206,16 @@
   )
   (sigmoid): Sigmoid()
 )
-2025-06-13 06:39:29 - INFO - Rank: 0 Epoch:0/25 iteration:0/585 Loss is :0.6693 reconstruction loss :0.1004 perceptual loss :5.6888
-2025-06-13 06:40:35 - INFO - Rank: 0 Epoch:0/25 iteration:5/585 Loss is :0.6913 reconstruction loss :0.1018 perceptual loss :5.8946
-2025-06-13 06:41:49 - INFO - Rank: 0 Epoch:0/25 iteration:10/585 Loss is :0.6643 reconstruction loss :0.0951 perceptual loss :5.6927
+2025-06-13 08:47:19 - INFO - found 4 gpus!
+2025-06-13 08:47:51 - ERROR - 
+
+-- Process 1 terminated with the following error:
+Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\multiprocessing\spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "D:\AMD-data-visualisation\pretraining_vision_distributed.py", line 160, in train
+    logging.info(f'Rank: {rank} Epoch:{epoch}/{args.epoch} iteration:{iteration}/{math.ceil(len(train_dataset)/args.batch)} Loss is :{loss:.4f} reconstruction loss :{r_loss:.4f} perceptual loss :{p_loss:.4f}')
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\_tensor.py", line 991, in __format__
+    return object.__format__(self, format_spec)
+TypeError: unsupported format string passed to Tensor.__format__
+

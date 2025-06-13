@@ -13,7 +13,7 @@ from dataloader import OCTDataset,collate_fn
 import torchvision.utils as vutils
 import torch.optim as optim
 from model.auto_encoder import AutoEncoder
-from utils.util import SliceLevelPerceptualLoss
+from utils.util import SliceLevelPerceptualLoss,PixelWiseWeightedMSE
 import os
 from tqdm import tqdm
 import logging
@@ -84,8 +84,8 @@ def train(rank, world_size,args,param_dir,log_dir):
                                     #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
     # Dataset and DataLoader
-    train_dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict)
-    val_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict)
+    train_dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict,multiThread=True)
+    val_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict,multiThread=True)
 
     train_sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
     val_sampler=DistributedSampler(val_dataset,num_replicas=world_size, rank=rank)
@@ -117,7 +117,8 @@ def train(rank, world_size,args,param_dir,log_dir):
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
 
-    recons_criteron = nn.MSELoss().to(model_device)
+    # recons_criteron = nn.MSELoss().to(model_device)
+    recons_criteron=PixelWiseWeightedMSE().to(model_device)
     perceptual_loss_fn =SliceLevelPerceptualLoss(layer=args.percep_layer).to(perceptual_device)
 
     if args.model_path:
@@ -173,9 +174,9 @@ def train(rank, world_size,args,param_dir,log_dir):
             torch.cuda.empty_cache()
             # print(torch.cuda.memory_summary())
 
-        epoch_loss/=math.ceil(len(train_dataset/world_size)/args.batch)
-        percep_loss/=math.ceil(len(train_dataset/world_size)/args.batch)
-        recons_loss/=math.ceil(len(train_dataset/world_size)/args.batch)
+        epoch_loss/=math.ceil(len(train_dataset)/world_size/args.batch)
+        percep_loss/=math.ceil(len(train_dataset)/world_size/args.batch)
+        recons_loss/=math.ceil(len(train_dataset)/world_size/args.batch)
         
         print(f"[Rank {rank}] Epoch {epoch} completed.")
         scheduler.step()
@@ -215,9 +216,9 @@ def train(rank, world_size,args,param_dir,log_dir):
 
                     vutils.save_image(b_scans,recons_dir+os.sep+'rank_'+str(rank)+"_"+str(idx)+".png",normalize=True,nrow=args.save_bscans.shape[0])
                     
-                val_loss/=math.ceil(len(val_dataset/world_size)/args.batch)
-                val_recons_loss/=math.ceil(len(val_dataset/world_size)/args.batch)
-                val_percep_loss/=math.ceil(len(val_dataset/world_size)/args.batch)
+                val_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
+                val_recons_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
+                val_percep_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
 
                 logging.info(f'Rank: {rank} VAL loss :{val_loss:.4f} reconstruction loss :{val_recons_loss:.4f} perceptual loss :{val_percep_loss:.4f}')
                 
@@ -231,7 +232,7 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
+        parser.add_argument("--lr", type=float, default=0.0015, help="learning rate")
         parser.add_argument('--batch',type=float,default=1,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")

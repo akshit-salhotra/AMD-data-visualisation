@@ -6,7 +6,34 @@ import pandas as pd
 from utils.histogram import get_amdtype
 import torch
 import random
+from concurrent.futures import ThreadPoolExecutor, as_completed
 # from memory_profiler import profile
+
+def process_bscan(bscan, scans_dir, clahe, raw_scans, transforms):
+    img_path = scans_dir + os.sep + bscan
+    img = cv2.imread(img_path, 0)
+
+    # Store raw scan
+    if raw_scans:
+        raw = torch.from_numpy(img)
+
+    # Histogram Equalization
+    img = clahe.apply(img)
+    
+    assert img.shape in [(1024, 512), (1024, 200)], \
+        f'The shape of bscan must be [1024,512] or [1024,200] but was {img.shape}. Path: {img_path}'
+
+    # Apply transforms
+    if transforms:
+        img = transforms(img)
+    
+    img = img.squeeze(dim=0)
+    
+    if raw_scans:
+        return raw, img
+    else:
+        return img
+
 def collate_fn(batch):
     lists=len(batch[0])-1
     paths=None
@@ -90,6 +117,12 @@ class OCTDataset(Dataset):
         else:
             self.get_path=False
 
+        if 'multiThread' in kwargs:
+            self.multiThread=kwargs['multiThread']
+        else:
+            self.multiThread=False
+
+    
     def __getitem__(self, index):
         self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
         scans_dir=self.image_paths[index]
@@ -105,19 +138,41 @@ class OCTDataset(Dataset):
             # print(self.volume_shape[0][0],len(scan_list))
             scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
             # assert     add an assertion here
-            
-        for bscan in scan_list:
-            img=cv2.imread(scans_dir+os.sep+bscan,0)
-            if self.raw_scans:
-                raw_volume.append(torch.from_numpy(img))
+        if self.multiThread:
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                futures = [
+        executor.submit(process_bscan, bscan, scans_dir, self.clahe, self.raw_scans, self.transforms)
+        for bscan in scan_list
+    ]
+                for future in as_completed(futures):
+                    if self.raw_scans:
+                        raw, processed = future.result()
+
+                        raw_volume.append(raw)
+                    else:
+                        processed=future.result()
+                    volume.append(processed)
+
+        
+        else:
+            for bscan in scan_list:
+                if self.raw_scans:
+                    raw,img=process_bscan(bscan,scans_dir,self.clahe,self.raw_scans,self.transforms)
+                    raw_volume.append(raw)
+                else:
+                    img=process_bscan(bscan,scans_dir,self.clahe,self.raw_scans,self.transforms)
+                volume.append(img.squeeze(dim=0))
+
+                # img=cv2.imread(scans_dir+os.sep+bscan,0)
+                # if self.raw_scans:
+                #     raw_volume.append(torch.from_numpy(img))
+                    
+                # #histogram equalization
+                # img = self.clahe.apply(img)
+                # assert img.shape==(1024,512) or img.shape==(1024,200),f' the shape of b scan must be [1024,512] or [1024,200] but was found to be {img.shape} the scan dir is :{scans_dir}'
+                # if self.transforms:
+                #     img=self.transforms(img)
                 
-            #histogram equalization
-            img = self.clahe.apply(img)
-            assert img.shape==(1024,512) or img.shape==(1024,200),f' the shape of b scan must be [1024,512] or [1024,200] but was found to be {img.shape} the scan dir is :{scans_dir}'
-            if self.transforms:
-                img=self.transforms(img)
-            volume.append(img.squeeze(dim=0))
-            
 
         volume=torch.stack(volume,dim=0)
         if self.raw_scans:
@@ -126,6 +181,7 @@ class OCTDataset(Dataset):
         assert any(list(volume.shape)==vol for vol in self.volume_shape),f'the shape of scan should be {self.volume_shape} but it was found to be {volume.shape}'
 
         label=torch.tensor([self.classes[amdtype]])
+
         if self.attn:
             if volume.shape[0]<self.context_length:
                 attn_mask=torch.tensor([ i>=volume.shape[0]+1 for i in range(self.context_length+1)],dtype=torch.float32)
