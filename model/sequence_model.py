@@ -41,7 +41,39 @@ class Seq_Model(nn.Module):
         logits=self.classification_head(outputs)
         
         return logits
+class Upsample(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.block1=nn.Sequential(nn.ConvTranspose2d)
+class ResNetAutoencoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Encoder: modify for 1-channel input
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),  # [B, 64, H/2, W/2]
+            *list(models.resnet18().children())[1:-2],  # exclude avgpool and fc
+        )
         
+        # Decoder: upsampling path to reconstruct
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(512, 256, 4, stride=2, padding=1),  # [B, 256, H/32, W/32]
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(256, 128, 4, stride=2, padding=1),  # [B, 128, H/16, W/16]
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(128, 64, 4, stride=2, padding=1),   # [B, 64, H/8, W/8]
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(64, 32, 4, stride=2, padding=1),    # [B, 32, H/4, W/4]
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(32, 16, 4, stride=2, padding=1),    # [B, 16, H/2, W/2]
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(16, 1, 4, stride=2, padding=1),     # [B, 1, H, W]
+            nn.Sigmoid()  # use Tanh or None for other ranges
+        )
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded       
 
 if __name__=="__main__":
     from torchsummary import summary
