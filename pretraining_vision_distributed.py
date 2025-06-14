@@ -118,7 +118,15 @@ def train(rank, world_size,args,param_dir,log_dir):
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
 
     # recons_criteron = nn.MSELoss().to(model_device)
-    recons_criteron=PixelWiseWeightedMSE().to(model_device)
+    recons_criteron=PixelWiseWeightedMSE(scaling_function=args.scaling_fn).to(model_device)
+    recons_config={}
+    if args.scaling_fn=='adaptiveHybridSigmoid':
+        recons_config={
+            'intial_k':0
+            ,'theta':0.4
+            ,'delta':0.01
+            }
+        
     perceptual_loss_fn =SliceLevelPerceptualLoss(layer=args.percep_layer).to(perceptual_device)
 
     if args.model_path:
@@ -140,10 +148,10 @@ def train(rank, world_size,args,param_dir,log_dir):
         percep_loss=0
         recons_loss=0
 
-        for iteration,(data,_,_) in enumerate(train_dataloader):
+        for iteration,(data,_,_) in enumerate(val_dataloader):
             scans=data[0].to(model_device)
             recons_scans=model(scans)
-            r_loss=recons_criteron(recons_scans,scans)
+            r_loss=recons_criteron(recons_scans,scans,**recons_config)
             
             p_loss=0
             with torch.cuda.device(perceptual_device):
@@ -157,7 +165,7 @@ def train(rank, world_size,args,param_dir,log_dir):
             # loss=r_loss
 
             if iteration% args.log_freq==0:
-                logging.info(f'Rank: {rank} Epoch:{epoch}/{args.epoch} iteration:{iteration}/{math.ceil(len(train_dataset)/args.batch)} Loss is :{loss:.4f} reconstruction loss :{r_loss:.4f} perceptual loss :{p_loss:.4f}')
+                logging.info(f'Rank: {rank} Epoch:{epoch}/{args.epoch} iteration:{iteration}/{math.ceil(math.ceil(len(train_dataset)/args.batch)/world_size)} Loss is :{loss.item():.4f} reconstruction loss :{r_loss.item():.4f} perceptual loss :{p_loss.item():.4f}')
 
             epoch_loss+=loss.detach()
             recons_loss+=r_loss.detach()
@@ -213,14 +221,14 @@ def train(rank, world_size,args,param_dir,log_dir):
                     for index in range(min(4,args.batch)):
                         b_scans.append(recons_scans[index,0,args.save_bscans].unsqueeze(1))
                         b_scans.append(scans[index,0,args.save_bscans].unsqueeze(1))
-
+                    print('bscan shape ',b_scans.shape)
                     vutils.save_image(b_scans,recons_dir+os.sep+'rank_'+str(rank)+"_"+str(idx)+".png",normalize=True,nrow=args.save_bscans.shape[0])
                     
                 val_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
                 val_recons_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
                 val_percep_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
 
-                logging.info(f'Rank: {rank} VAL loss :{val_loss:.4f} reconstruction loss :{val_recons_loss:.4f} perceptual loss :{val_percep_loss:.4f}')
+                logging.info(f'Rank: {rank} VAL loss :{val_loss.item():.4f} reconstruction loss :{val_recons_loss.item():.4f} perceptual loss :{val_percep_loss.item():.4f}')
                 
                 if rank==0:
                     torch.save(model.state_dict(),f'{param_dir}/epoch{epoch}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')
@@ -253,6 +261,7 @@ if __name__=="__main__":
         parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--percep_layer',type=str,default='relu2_2',help='which layer of vgg is to used for computation of perceptual loss')
         parser.add_argument('--bscan-step',type=int,default=2,help='step size for b-scans to be considered in perceptual loss')
+        parser.add_argument('--scaling_fn',type=str,default='adaptiveHybridSigmoid',help='which scaling function to use in PixelWiseWeightedMSE')
         
 
         args = parser.parse_args()

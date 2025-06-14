@@ -66,17 +66,21 @@ class SliceLevelPerceptualLoss(nn.Module):
 class PixelWiseWeightedMSE(nn.Module):
     def __init__(self,scaling_function='Hyb_Sigmoid'):
         super().__init__()
-        self.scaleFuncDict={'Hyb_Sigmoid':self.Hybrid_Sigmoid}
+        self.scaleFuncDict={'Hyb_Sigmoid':self.Hybrid_Sigmoid
+                            ,'adaptiveHybridSigmoid':self.adaptiveHybridSigmoid}
         self.scaleFunc=scaling_function
     
-    def forward(self,pred,target):
+    def forward(self,pred,target,**kwargs):
 
         assert pred.shape==target.shape , f' the shape of prediction and target must be same'
 
-        weights=self.scaleFuncDict[self.scaleFunc](target)
-        loss=weights*(pred-target)**2/(torch.numel(pred))
+        weights=self.scaleFuncDict[self.scaleFunc](target,**kwargs)
+        loss=torch.sum(weights*(pred-target)**2)/(torch.numel(pred))
 
         return loss
     
-    def Hybrid_Sigmoid(self,target,k=5,theta=1):
+    def Hybrid_Sigmoid(self,target,k=1.5,theta=0.5):
         return 1 / (1 + torch.exp(-k * (target - theta)))
+    
+    def adaptiveHybridSigmoid(self,target,iteration,delta,intial_k=0,theta=0.4):
+        return 1/(1+torch.exp(-(intial_k+delta*iteration)*(target-theta)))
