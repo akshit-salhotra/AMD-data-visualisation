@@ -2,6 +2,7 @@ import torch
 import logging
 import torch.nn as nn
 import torchvision.models as models
+import wandb
 
 def load_model(args,model):
     params=torch.load(args.model_path)['state_dict']
@@ -82,5 +83,10 @@ class PixelWiseWeightedMSE(nn.Module):
     def Hybrid_Sigmoid(self,target,k=1.5,theta=0.5):
         return 1 / (1 + torch.exp(-k * (target - theta)))
     
-    def adaptiveHybridSigmoid(self,target,iteration,delta,intial_k=0,theta=0.4):
-        return 1/(1+torch.exp(-(intial_k+delta*iteration)*(target-theta)))
+    def adaptiveHybridSigmoid(self,target,iteration,rank,delta,intial_k=0,theta=0.4,log=True):
+        k=intial_k+delta*iteration
+
+        if rank==0:
+
+            wandb.log({"k (activation function)":k})
+        return 1/(1+torch.exp(-k*(target-theta)))

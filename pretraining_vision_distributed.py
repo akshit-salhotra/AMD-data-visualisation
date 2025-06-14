@@ -23,6 +23,7 @@ import math
 import re
 import numpy as np
 import torch.multiprocessing as mp
+import wandb
 
 def intialise_logger(log_dir,rank):
     logging.basicConfig(
@@ -69,6 +70,12 @@ def get_devices(rank):
 
 def train(rank, world_size,args,param_dir,log_dir):
     
+    if rank==0:
+       run = wandb.init(
+    project='Auto-encoder AMD',
+    config=vars(args))
+       run.config.update({'arch':'3d resnet'
+                              })
     setup(rank, world_size)
     print('starting process:',rank)
     intialise_logger(log_dir,rank)
@@ -86,7 +93,7 @@ def train(rank, world_size,args,param_dir,log_dir):
     # Dataset and DataLoader
     train_dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict,multiThread=True)
     val_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict,multiThread=True)
-
+    val_dataset=Subset(val_dataset,range(1))
     train_sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
     val_sampler=DistributedSampler(val_dataset,num_replicas=world_size, rank=rank)
     train_dataloader = DataLoader(train_dataset
@@ -116,7 +123,8 @@ def train(rank, world_size,args,param_dir,log_dir):
     model = DDP(model, device_ids=[model_device.index],find_unused_parameters=True)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
-
+    if rank==0:
+        wandb.watch(model.module,log='all',log_freq=args.log_freq)
     # recons_criteron = nn.MSELoss().to(model_device)
     recons_criteron=PixelWiseWeightedMSE(scaling_function=args.scaling_fn).to(model_device)
     recons_config={}
@@ -125,8 +133,10 @@ def train(rank, world_size,args,param_dir,log_dir):
             'intial_k':0
             ,'theta':0.4
             ,'delta':0.01
+            ,'rank':rank
             }
-        
+    if  rank==0:
+        run.config.update(recons_config)   
     perceptual_loss_fn =SliceLevelPerceptualLoss(layer=args.percep_layer).to(perceptual_device)
 
     if args.model_path:
@@ -151,6 +161,8 @@ def train(rank, world_size,args,param_dir,log_dir):
         for iteration,(data,_,_) in enumerate(val_dataloader):
             scans=data[0].to(model_device)
             recons_scans=model(scans)
+            if args.scaling_fn=='adaptiveHybridSigmoid':
+                recons_config['iteration']=iteration
             r_loss=recons_criteron(recons_scans,scans,**recons_config)
             
             p_loss=0
@@ -163,6 +175,19 @@ def train(rank, world_size,args,param_dir,log_dir):
                 # print(torch.cuda.memory_summary())
             loss=r_loss+args.lambda_percep*p_loss.to(model_device)
             # loss=r_loss
+
+            gathered_losses = [torch.zeros_like(loss) for _ in range(dist.get_world_size())]
+            dist.all_gather(gathered_losses, loss)
+            gathered_r_losses = [torch.zeros_like(r_loss) for _ in range(dist.get_world_size())]
+            dist.all_gather(gathered_r_losses, r_loss)
+            gathered_p_losses = [torch.zeros_like(p_loss) for _ in range(dist.get_world_size())]
+            dist.all_gather(gathered_p_losses, p_loss)
+
+            if dist.get_rank() == 0:
+                for i, (l,p,r) in enumerate(zip(gathered_losses,gathered_p_losses,gathered_r_losses)):
+                    wandb.log({f"loss_rank_{i}": l.item()
+                               ,f'reconstruction loss rank {i}':r.item()
+                               ,f'perceptual loss rank {i}':p.item()})
 
             if iteration% args.log_freq==0:
                 logging.info(f'Rank: {rank} Epoch:{epoch}/{args.epoch} iteration:{iteration}/{math.ceil(math.ceil(len(train_dataset)/args.batch)/world_size)} Loss is :{loss.item():.4f} reconstruction loss :{r_loss.item():.4f} perceptual loss :{p_loss.item():.4f}')
@@ -186,7 +211,7 @@ def train(rank, world_size,args,param_dir,log_dir):
         percep_loss/=math.ceil(len(train_dataset)/world_size/args.batch)
         recons_loss/=math.ceil(len(train_dataset)/world_size/args.batch)
         
-        print(f"[Rank {rank}] Epoch {epoch} completed.")
+        logging.info(f"[Rank {rank}] Epoch {epoch} completed.")
         scheduler.step()
         
         if epoch%args.save_freq==0 or args.epoch==epoch+1:
@@ -200,7 +225,7 @@ def train(rank, world_size,args,param_dir,log_dir):
                     
                     scans=data[0].to(model_device)
                     recons_scans=model(scans)
-                    val_r_loss=recons_criteron(recons_scans,scans)
+                    val_r_loss=recons_criteron(recons_scans,scans,**recons_config)
                     
                     with torch.cuda.device(perceptual_device):
                         recons_scans = recons_scans.to(perceptual_device, non_blocking=True)
@@ -209,6 +234,18 @@ def train(rank, world_size,args,param_dir,log_dir):
 
                     loss=val_r_loss +args.lambda_percep*val_p_loss.to(model_device)
                     
+                    gathered_val_losses = [torch.zeros_like(loss) for _ in range(dist.get_world_size())]
+                    dist.all_gather(gathered_val_losses, loss)
+                    gathered_val_r_losses = [torch.zeros_like(val_r_loss) for _ in range(dist.get_world_size())]
+                    dist.all_gather(gathered_val_r_losses, val_r_loss)
+                    gathered_val_p_losses = [torch.zeros_like(val_p_loss) for _ in range(dist.get_world_size())]
+                    dist.all_gather(gathered_val_p_losses, val_p_loss)
+
+                    if dist.get_rank() == 0:
+                        for i, (l,p,r) in enumerate(zip(gathered_val_losses,gathered_val_p_losses,gathered_val_r_losses)):
+                            wandb.log({f"val loss_rank_{i}": l.item()
+                                    ,f'val reconstruction loss rank {i}':r.item()
+                                    ,f'val perceptual loss rank {i}':p.item()})
                     val_loss+=loss
                     val_recons_loss+=val_r_loss
                     val_percep_loss+=val_p_loss
@@ -221,7 +258,8 @@ def train(rank, world_size,args,param_dir,log_dir):
                     for index in range(min(4,args.batch)):
                         b_scans.append(recons_scans[index,0,args.save_bscans].unsqueeze(1))
                         b_scans.append(scans[index,0,args.save_bscans].unsqueeze(1))
-                    print('bscan shape ',b_scans.shape)
+                    # print('bscan shape ',len(b_scans),b_scans[0].shape)
+                    b_scans=torch.concat(b_scans,dim=0)
                     vutils.save_image(b_scans,recons_dir+os.sep+'rank_'+str(rank)+"_"+str(idx)+".png",normalize=True,nrow=args.save_bscans.shape[0])
                     
                 val_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
@@ -234,6 +272,8 @@ def train(rank, world_size,args,param_dir,log_dir):
                     torch.save(model.state_dict(),f'{param_dir}/epoch{epoch}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')
 
     cleanup()
+    if rank==0:
+        wandb.finish()
 
 if __name__=="__main__":
     try:
