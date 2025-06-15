@@ -2,11 +2,15 @@ from model.resnet_3d import BasicConvBlock
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
+import torchvision.models as models
 
 class Interpolate(nn.Module):
     def forward(self,x):
         return F.interpolate(x,scale_factor=2.0,mode='trilinear')
 
+class Interpolate_2d(nn.Module):
+    def forward(self,x):
+        return F.interpolate(x,scale_factor=2.0,mode='bilinear')
         
 class BasicUpsampleBlock(nn.Module):
     def __init__(self,in_ch,out_ch,kernel):
@@ -97,15 +101,73 @@ class AutoEncoder(nn.Module):
         
         return nn.Sequential(*layers)
 
+class AutoEncoder_2d(nn.Module):
 
+    def __init__(self):
+        super().__init__()
+        self.encoder=nn.Sequential(nn.Conv2d(1,64,7,2,3),*(list(models.resnet18().children())[1:-2]))
+        self.decoder=AutoEncoder_2d.get_decoder()
+        self.sig=nn.Sigmoid()
+
+    def forward(self,x):
+        x=self.encoder(x)
+        x=self.decoder(x)
+
+        return self.sig(x)
+
+    @staticmethod
+    def get_decoder(ch=[64,128,256,512]):
+        ch.reverse()
+        l=len(ch)
+        ch.append(ch[-1])
+        layers=[]
+        # print('the number of upsample blocks are :',ch)
+        for i in range(l):
+            layers.append(Decoder_block_2d(ch[i],ch[i+1],3))
+        
+        layers.append(Interpolate_2d())
+        layers.append(nn.Conv2d(ch[-1],1,7,1,3))
+
+        return nn.Sequential(*layers)
+
+class Decoder_block_2d(nn.Module):
+    
+    def __init__(self,in_ch,out_ch,kernel):
+        super().__init__()
+        self.upsample=nn.ConvTranspose2d(in_ch,out_ch,kernel,stride=2,padding=1,output_padding=1)
+        self.norm=nn.BatchNorm2d(out_ch)
+        self.relu=nn.ReLU()
+
+        self.conv=nn.Sequential(*[Decoder_block_2d.create_conv(out_ch,out_ch,kernel,1,kernel//2) for _ in range(3)])
+        
+        self.resize_conv=nn.ConvTranspose2d(in_ch,out_ch,2,2)
+
+    
+    def forward(self,x):
+        out=self.relu(self.norm(self.upsample(x)))
+        out=self.conv[0][0](out)+self.resize_conv(x)
+
+        out=self.conv[0][1:](out)
+
+        out=self.conv[1](out)
+        out=self.conv[2](out)
+
+        return out
+    
+    @staticmethod
+    def create_conv(in_ch,out_ch,kernel,stride,padding):
+        return(nn.Sequential(nn.Conv2d(in_ch,out_ch,kernel,stride,padding),
+                             nn.BatchNorm2d(out_ch,momentum=0.1),
+                             nn.ReLU()))
+    
 if __name__=="__main__":
     from torchsummary import summary
 
     device=torch.device('cpu' if torch.cuda.is_available() else 'cpu')
     
-    model=AutoEncoder().to(device)
+    model=AutoEncoder_2d().to(device)
     # this data is misleading due to repetitions
-    # summary(model,(1,128,256,256),2,device='cpu')
+    summary(model,(1,256,256),2,device='cpu')
 
     # print(model(torch.ones((1,1,128,256,256)).to(device)).shape)
     # print(model)

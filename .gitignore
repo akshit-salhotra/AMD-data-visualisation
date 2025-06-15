@@ -4,3 +4,4 @@ model_parameter_Seq_Model
 model_parameter_Resnet_medicalnet
 pretrained
 wandb
+model_parameter_Resnet_pretraining

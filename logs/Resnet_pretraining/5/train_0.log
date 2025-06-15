@@ -1,0 +1,5 @@
+2025-06-15 08:37:03 - INFO - Rank: 0 Epoch:0/25 iteration:0/482 Loss is :0.7545 reconstruction loss :0.0712 perceptual loss :6.8331
+2025-06-15 08:39:25 - INFO - Rank: 0 Epoch:0/25 iteration:5/482 Loss is :0.6435 reconstruction loss :0.0684 perceptual loss :5.7509
+2025-06-15 08:41:46 - INFO - Rank: 0 Epoch:0/25 iteration:10/482 Loss is :0.7589 reconstruction loss :0.0791 perceptual loss :6.7982
+2025-06-15 08:44:12 - INFO - Rank: 0 Epoch:0/25 iteration:15/482 Loss is :0.6370 reconstruction loss :0.0644 perceptual loss :5.7255
+2025-06-15 08:46:39 - INFO - Rank: 0 Epoch:0/25 iteration:20/482 Loss is :0.6178 reconstruction loss :0.0768 perceptual loss :5.4102

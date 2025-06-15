@@ -9,13 +9,16 @@ import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 # from memory_profiler import profile
 
-def process_bscan(bscan, scans_dir, clahe, raw_scans, transforms):
+def process_bscan(bscan, scans_dir, denoise,clahe, raw_scans, transforms):
     img_path = scans_dir + os.sep + bscan
     img = cv2.imread(img_path, 0)
 
     # Store raw scan
     if raw_scans:
         raw = torch.from_numpy(img)
+
+    if denoise:
+        img= cv2.fastNlMeansDenoising(img, h=10, templateWindowSize=7, searchWindowSize=21)
 
     # Histogram Equalization
     img = clahe.apply(img)
@@ -121,6 +124,11 @@ class OCTDataset(Dataset):
             self.multiThread=kwargs['multiThread']
         else:
             self.multiThread=False
+        
+        if 'denoise' in kwargs:
+            self.denoise=kwargs['denoise']
+        else:
+            self.denoise=False
 
     
     def __getitem__(self, index):
@@ -141,7 +149,7 @@ class OCTDataset(Dataset):
         if self.multiThread:
             with ThreadPoolExecutor(max_workers=8) as executor:
                 futures = [
-        executor.submit(process_bscan, bscan, scans_dir, self.clahe, self.raw_scans, self.transforms)
+        executor.submit(process_bscan, bscan, scans_dir,self.denoise, self.clahe, self.raw_scans, self.transforms)
         for bscan in scan_list
     ]
                 for future in as_completed(futures):
@@ -157,10 +165,10 @@ class OCTDataset(Dataset):
         else:
             for bscan in scan_list:
                 if self.raw_scans:
-                    raw,img=process_bscan(bscan,scans_dir,self.clahe,self.raw_scans,self.transforms)
+                    raw,img=process_bscan(bscan,scans_dir,self.denoise,self.clahe,self.raw_scans,self.transforms)
                     raw_volume.append(raw)
                 else:
-                    img=process_bscan(bscan,scans_dir,self.clahe,self.raw_scans,self.transforms)
+                    img=process_bscan(bscan,scans_dir,self.denoise,self.clahe,self.raw_scans,self.transforms)
                 volume.append(img.squeeze(dim=0))
 
                 # img=cv2.imread(scans_dir+os.sep+bscan,0)

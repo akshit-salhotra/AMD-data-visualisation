@@ -26,6 +26,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from hooks.batch_hook import create_hook,batchnorm_stats
+import wandb
 # torch.cuda.empty_cache()
 
 # Optionally, clear unused memory in PyTorch 1.6+
@@ -86,16 +87,19 @@ if __name__=="__main__":
         parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.91,0.111,0.111,0.125,1]),help='weights for weighted cross entropy')
         parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--num_classes',type=int,default=5,help="number of classes of the classifier")
-        parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
+        # parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
 
         args = parser.parse_args()
         
+        run=wandb.init(project='classifier AMD'
+        ,config=vars(args))
         param_dir=intialise_logger_nd_create_folders(args)
         
         # device_ids=[1,2,3]
         register_hooks=False
         # model=Resnet18_3D(num_classes=args.num_classes,ch=args.model_ch).to(args.device)
         model=resnet10(num_classes=args.num_classes).to(args.device)
+        wandb.watch(model,log='all',log_freq=5)
         # model = nn.SyncBatchNorm.convert_sync_batchnorm(model)  # Convert all BatchNorm layers
         # model=Seq_Model(num_classes=args.num_classes,device=args.device).to(args.device)
         model=nn.DataParallel(model)
@@ -116,7 +120,14 @@ if __name__=="__main__":
         transform=transforms.Compose([transforms.ToTensor(),
                                     #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
-        dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict)
+        dataset_config={'transforms':transform
+                        ,'attn':False
+                        ,'undersample':True
+                        ,'classes':args.class_dict
+                        ,'denoise':True
+                        ,'multiThread':False}
+        run.config.update(dataset_config)
+        dataset=OCTDataset(train_paths,args.excel_path,**dataset_config)
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
@@ -134,8 +145,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=12,timeout=600,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=12,timeout=600,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=4,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=4,timeout=600,collate_fn=collate_fn)
             if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
@@ -164,7 +175,8 @@ if __name__=="__main__":
                     epoch_loss/=((len(dataset)*(num_folds-1))//(num_folds*args.batch)+1)
                     cm=confusion_matrix(labels,preds)
                     classes=["early","inter","ga","wet","notamd"]
-
+                    wandb.log({'epoch loss':epoch_loss
+                               ,'accuracy':np.mean(np.array(labels)==np.array(preds))})
                     plt.figure(figsize=(6, 4))
                     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
                     plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
@@ -201,7 +213,8 @@ if __name__=="__main__":
                             plt.title(f'Confusion Matrix,acc:{np.mean(np.array(val_labels)==np.array(val_preds)):.4f}')
                             plt.xlabel('Predicted')
                             plt.ylabel('Actual')
-
+                            wandb.log({'val loss':val_loss,
+                                       'val accuracy':np.mean(np.array(val_labels)==np.array(val_preds))})
                             plt.savefig(f'{param_dir+os.sep}confusion_matrix_val_fold_{fold}_epoch_{i}.png')
                             plt.close()
                             torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')
@@ -211,6 +224,7 @@ if __name__=="__main__":
                 
         print('training completed !!')
         logging.info('training complete!!!')
+        wandb.finish()
     
     except Exception as e:
         print(e)

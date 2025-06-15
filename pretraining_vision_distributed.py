@@ -42,6 +42,18 @@ def intialise_logger(log_dir,rank):
             
         # logging.info()
 
+def save_recons(param_dir,epoch,recons_scans,scans,rank,idx,args):
+    recons_dir=param_dir+os.sep+"reconstructions"+os.sep+f"epoch_{epoch}"
+    os.makedirs(recons_dir,exist_ok=True)
+    b_scans=[]
+    
+    for index in range(min(4,args.batch)):
+        b_scans.append(recons_scans[index,0,args.save_bscans].unsqueeze(1))
+        b_scans.append(scans[index,0,args.save_bscans].unsqueeze(1))
+    # print('bscan shape ',len(b_scans),b_scans[0].shape)
+    b_scans=torch.concat(b_scans,dim=0)
+    vutils.save_image(b_scans,recons_dir+os.sep+'rank_'+str(rank)+"_"+str(idx)+".png",normalize=True,nrow=args.save_bscans.shape[0])
+                        
 def log_train_config(args,param_dir):
     logging.info(args)
     logging.info(f'parameters are being saved at :{param_dir}')
@@ -91,9 +103,21 @@ def train(rank, world_size,args,param_dir,log_dir):
                                     #   transforms.RandomHorizontalFlip(),
                                       transforms.Resize((256,256))])
     # Dataset and DataLoader
-    train_dataset=OCTDataset(train_paths,args.excel_path,transform,attn=False,undersample=True,classes=args.class_dict,multiThread=True)
-    val_dataset=OCTDataset(val_paths,args.excel_path,transform,attn=False,undersample=False,classes=args.class_dict,multiThread=True)
-    val_dataset=Subset(val_dataset,range(1))
+    train_dataloader_config={'attn':False
+                        ,'undersample':True
+                        ,'denoise':True
+                        ,'classes':args.class_dict
+                        ,'multiThread':True
+                        ,'transforms':transform}
+    val_dataloader_config=train_dataloader_config
+
+    if rank==0:
+        run.config.update(train_dataloader_config)
+        run.config.update(val_dataloader_config)
+        
+    train_dataset=OCTDataset(train_paths,args.excel_path,**train_dataloader_config)
+    val_dataset=OCTDataset(val_paths,args.excel_path,**val_dataloader_config)
+    # val_dataset=Subset(val_dataset,range(1))
     train_sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
     val_sampler=DistributedSampler(val_dataset,num_replicas=world_size, rank=rank)
     train_dataloader = DataLoader(train_dataset
@@ -125,8 +149,8 @@ def train(rank, world_size,args,param_dir,log_dir):
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
     if rank==0:
         wandb.watch(model.module,log='all',log_freq=args.log_freq)
-    # recons_criteron = nn.MSELoss().to(model_device)
-    recons_criteron=PixelWiseWeightedMSE(scaling_function=args.scaling_fn).to(model_device)
+    recons_criteron = nn.MSELoss().to(model_device)
+    # recons_criteron=PixelWiseWeightedMSE(scaling_function=args.scaling_fn).to(model_device)
     recons_config={}
     if args.scaling_fn=='adaptiveHybridSigmoid':
         recons_config={
@@ -138,6 +162,7 @@ def train(rank, world_size,args,param_dir,log_dir):
     if  rank==0:
         run.config.update(recons_config)   
     perceptual_loss_fn =SliceLevelPerceptualLoss(layer=args.percep_layer).to(perceptual_device)
+    # perceptual_loss_fn=nn.MSELoss()
 
     if args.model_path:
             load_model(args,model)
@@ -158,7 +183,7 @@ def train(rank, world_size,args,param_dir,log_dir):
         percep_loss=0
         recons_loss=0
 
-        for iteration,(data,_,_) in enumerate(val_dataloader):
+        for iteration,(data,_,_) in enumerate(train_dataloader):
             scans=data[0].to(model_device)
             recons_scans=model(scans)
             if args.scaling_fn=='adaptiveHybridSigmoid':
@@ -191,6 +216,15 @@ def train(rank, world_size,args,param_dir,log_dir):
 
             if iteration% args.log_freq==0:
                 logging.info(f'Rank: {rank} Epoch:{epoch}/{args.epoch} iteration:{iteration}/{math.ceil(math.ceil(len(train_dataset)/args.batch)/world_size)} Loss is :{loss.item():.4f} reconstruction loss :{r_loss.item():.4f} perceptual loss :{p_loss.item():.4f}')
+                if rank==0:
+                    b_scans=[]
+                    for index in range(min(4,args.batch)):
+                        b_scans.append(recons_scans[index,0,args.save_bscans].unsqueeze(1))
+                        b_scans.append(scans[index,0,args.save_bscans].unsqueeze(1))
+                        # print('bscan shape ',len(b_scans),b_scans[0].shape)
+                        b_scans=torch.concat(b_scans,dim=0)
+                        images = [wandb.Image(bscan, caption=f"Image {i}") for i, bscan in enumerate(b_scans)]
+                        wandb.log({"reconstructed bscans": images})
 
             epoch_loss+=loss.detach()
             recons_loss+=r_loss.detach()
@@ -250,18 +284,9 @@ def train(rank, world_size,args,param_dir,log_dir):
                     val_recons_loss+=val_r_loss
                     val_percep_loss+=val_p_loss
                     
-                if args.save_recons:
-                    recons_dir=param_dir+os.sep+"reconstructions"+os.sep+f"epoch_{epoch}"
-                    os.makedirs(recons_dir,exist_ok=True)
-                    b_scans=[]
-                    
-                    for index in range(min(4,args.batch)):
-                        b_scans.append(recons_scans[index,0,args.save_bscans].unsqueeze(1))
-                        b_scans.append(scans[index,0,args.save_bscans].unsqueeze(1))
-                    # print('bscan shape ',len(b_scans),b_scans[0].shape)
-                    b_scans=torch.concat(b_scans,dim=0)
-                    vutils.save_image(b_scans,recons_dir+os.sep+'rank_'+str(rank)+"_"+str(idx)+".png",normalize=True,nrow=args.save_bscans.shape[0])
-                    
+                    if args.save_recons:
+                        save_recons(param_dir,epoch,recons_scans,rank,idx,args)
+                       
                 val_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
                 val_recons_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
                 val_percep_loss/=math.ceil(len(val_dataset)/world_size/args.batch)
@@ -280,10 +305,10 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.0015, help="learning rate")
+        parser.add_argument("--lr", type=float, default=0.0001, help="learning rate")
         parser.add_argument('--batch',type=float,default=1,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
-        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
+        parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar_with_both_res.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_pretraining')
         parser.add_argument('--accum-size',type=int,default=4,help='gradient accumulation')
@@ -294,14 +319,14 @@ if __name__=="__main__":
         parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--log-freq',type=int,default=5,help='after how many iterations losses are logged')
-        parser.add_argument('--lambda_percep',type=float,default=0.1,help="weighting factor for perceptual loss")
+        parser.add_argument('--lambda_percep',type=float,default=0.004,help="weighting factor for perceptual loss")
         parser.add_argument('--model_ch',type=list,default=[64,128,256,512],help="channels in different layers of resnet")
         parser.add_argument('--save_recons',type=bool,default=True,help="whether to save some reconstructions")
         parser.add_argument('--save_bscans',type=torch.Tensor,default=torch.tensor([36,48,60,72]),help="which reconstructed bscans to save")
         parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--percep_layer',type=str,default='relu2_2',help='which layer of vgg is to used for computation of perceptual loss')
         parser.add_argument('--bscan-step',type=int,default=2,help='step size for b-scans to be considered in perceptual loss')
-        parser.add_argument('--scaling_fn',type=str,default='adaptiveHybridSigmoid',help='which scaling function to use in PixelWiseWeightedMSE')
+        parser.add_argument('--scaling_fn',type=str,default=None,help='which scaling function to use in PixelWiseWeightedMSE')
         
 
         args = parser.parse_args()
