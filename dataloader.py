@@ -130,7 +130,6 @@ class OCTDataset(Dataset):
         else:
             self.denoise=False
 
-    
     def __getitem__(self, index):
         self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
         scans_dir=self.image_paths[index]
@@ -164,11 +163,28 @@ class OCTDataset(Dataset):
         
         else:
             for bscan in scan_list:
+                img_path = scans_dir + os.sep + bscan
+                img = cv2.imread(img_path, 0)
+
+                # Store raw scan
                 if self.raw_scans:
-                    raw,img=process_bscan(bscan,scans_dir,self.denoise,self.clahe,self.raw_scans,self.transforms)
+                    raw = torch.from_numpy(img)
                     raw_volume.append(raw)
-                else:
-                    img=process_bscan(bscan,scans_dir,self.denoise,self.clahe,self.raw_scans,self.transforms)
+
+                if self.denoise:
+                    img= cv2.fastNlMeansDenoising(img, h=10, templateWindowSize=7, searchWindowSize=21)
+
+                # Histogram Equalization
+                img = self.clahe.apply(img)
+                
+                assert img.shape in [(1024, 512), (1024, 200)], \
+                    f'The shape of bscan must be [1024,512] or [1024,200] but was {img.shape}. Path: {img_path}'
+
+                # Apply transforms
+                if self.transforms:
+                    img = self.transforms(img)
+                
+                img = img.squeeze(dim=0)
                 volume.append(img.squeeze(dim=0))
 
                 # img=cv2.imread(scans_dir+os.sep+bscan,0)
@@ -227,3 +243,33 @@ class OCTDataset(Dataset):
             
     def __len__(self):
         return len(self.image_paths)
+    
+if __name__=="__main__":
+
+    import torchvision.transforms as transforms
+    import json
+    from torch.utils.data import DataLoader,Subset
+    from time import time
+
+    device='cuda' if torch.cuda.is_available() else 'cpu'
+    json_path=r"d:\\AMD-data-visualisation\\jsons\\train_test_val_split.json"
+    excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
+    transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
+    batch_size=1
+    num_workers=0
+    timeout=0
+    # results_dir="results"
+    with open(json_path,'r') as file:
+            paths=json.load(file)
+    # os.makedirs(results_dir,exist_ok=True)
+    # save_file= model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+'confusion_matrix_test_set.png'
+    new_d=OCTDataset(paths['train_path'],excel_path,transform,undersample=True,denoise=True,multiThread=False)
+    new_d=Subset(new_d,range(10))
+    new_d=DataLoader(new_d,batch_size=12,shuffle=False,num_workers=num_workers,timeout=timeout,collate_fn=collate_fn)
+
+    t=time()
+    for data,_,_ in new_d:
+            
+        #     print(time()-t)
+        #     t=time()
+        t=time()

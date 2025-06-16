@@ -1,10 +1,10 @@
-2025-05-19 02:33:30 - INFO - ------------------------------------------------------------------------------------------------
-2025-05-19 02:33:30 - INFO - starting new training !!!!
-2025-05-19 02:33:30 - INFO - ------------------------------------------------------------------------------------------------
-2025-05-19 02:33:30 - INFO - Namespace(batch=32, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=15, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar_with_both_res.json', log_dir='logs/Resnet_medicalnet', lr=0.0001, model_ch=[16, 32, 64, 128], model_path='pretrained/resnet_10_23dataset.pth', num_classes=5, save_dir='model_parameter_Resnet_medicalnet', save_freq=5, step_size=10, weight_matrix=tensor([0.9100, 0.1110, 0.1110, 0.1250, 1.0000]))
-2025-05-19 02:33:30 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\5
-2025-05-19 02:33:31 - INFO - found 4 gpus!
-2025-05-19 02:33:31 - INFO - DataParallel(
+2025-06-16 02:43:29 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-16 02:43:29 - INFO - starting new training !!!!
+2025-06-16 02:43:29 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-16 02:43:29 - INFO - Namespace(batch=32, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), epoch=15, excel_path='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx', gamma=0.1, json='jsons/train_test_val_split_without_scar_with_both_res.json', log_dir='logs/Resnet_medicalnet', lr=0.001, model_path='pretrained/resnet_10_23dataset.pth', num_classes=5, save_dir='model_parameter_Resnet_medicalnet', save_freq=5, step_size=10, weight_matrix=tensor([0.9100, 0.1110, 0.1110, 0.1250, 1.0000]))
+2025-06-16 02:43:29 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\5
+2025-06-16 02:43:30 - INFO - found 4 gpus!
+2025-06-16 02:43:30 - INFO - DataParallel(
   (module): ResNet(
     (conv1): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3), bias=False)
     (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
@@ -62,20 +62,9 @@
     (linear): Linear(in_features=4096, out_features=5, bias=True)
   )
 )
-2025-05-19 02:33:31 - INFO - the missing keys are : 
+2025-06-16 02:43:30 - INFO - the missing keys are : 
 ['module.linear.weight', 'module.linear.bias']
-2025-05-19 02:33:31 - INFO - the unexpected keys are :
+2025-06-16 02:43:30 - INFO - the unexpected keys are :
 []
-2025-05-19 02:33:31 - INFO - loaded model parameters from pretrained/resnet_10_23dataset.pth
-2025-05-19 02:33:31 - INFO - fold number:0
-2025-05-19 02:35:41 - INFO - epoch:0/15 iteration:0/25 batch loss is :1.8838
-2025-05-19 02:35:41 - INFO - the acc is :0.28125
-2025-05-19 02:35:59 - INFO - epoch:0/15 iteration:5/25 batch loss is :1.4394
-2025-05-19 02:35:59 - INFO - the acc is :0.125
-2025-05-19 02:37:02 - INFO - epoch:0/15 iteration:10/25 batch loss is :1.4032
-2025-05-19 02:37:02 - INFO - the acc is :0.15625
-2025-05-19 02:37:18 - INFO - epoch:0/15 iteration:15/25 batch loss is :1.4820
-2025-05-19 02:37:18 - INFO - the acc is :0.125
-2025-05-19 02:38:22 - INFO - epoch:0/15 iteration:20/25 batch loss is :1.2959
-2025-05-19 02:38:22 - INFO - the acc is :0.125
-2025-05-19 02:38:35 - INFO - Epoch:0/15 Loss is :1.3825
+2025-06-16 02:43:30 - INFO - loaded model parameters from pretrained/resnet_10_23dataset.pth
+2025-06-16 02:43:30 - INFO - fold number:0

@@ -1,2 +1,2 @@
 # from .dataloader import collate_fn,OCTDataset
-import small_exp.dataloader_latency_checker
+import utils.dataloader_latency_checker as dataloader_latency_checker

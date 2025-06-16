@@ -11,8 +11,12 @@ blurred = cv2.GaussianBlur(img, (5, 5), 1.4)
 # Apply Canny edge detector
 # You can tune the thresholds: lower and upper
 # edges = cv2.Canny(blurred, threshold1=30, threshold2=100)
-denoised = cv2.medianBlur(img, 5)  # Kernel size: 3, 5, or 7 (odd)
-denoised = cv2.fastNlMeansDenoising(img, h=10, templateWindowSize=7, searchWindowSize=21)
+# denoised = cv2.medianBlur(img, 5)  # Kernel size: 3, 5, or 7 (odd)
+@profile
+def d(img):
+    denoised = cv2.fastNlMeansDenoising(img, h=10, templateWindowSize=7, searchWindowSize=21)
+    return denoised
+denoised=d(img)
 # Show results
 plt.subplot(1, 2, 1)
 plt.title("Original")
@@ -24,3 +28,4 @@ plt.imshow(denoised, cmap='gray')
 
 plt.tight_layout()
 plt.show()
+
