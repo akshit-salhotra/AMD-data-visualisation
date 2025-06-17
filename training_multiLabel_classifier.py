@@ -41,6 +41,8 @@ def train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,
     epoch_loss+=loss
     if iter%5==0:
                 # print(logits,label)
+                wandb.log({'batch loss':loss
+                               })
                 logging.info(f'epoch:{i}/{args.epoch} iteration:{iter}/{(len(dataset)*(num_folds-1))//(num_folds*args.batch)+1} batch loss is :{loss:.4f}')
                 # logging.info(f'the acc is :{torch.mean((torch.argmax(logits,dim=-1)==label).to(torch.float32)).detach().cpu()}')
     loss.backward()
@@ -64,7 +66,7 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
+        parser.add_argument("--lr", type=float, default=0.0015, help="learning rate")
         parser.add_argument('--batch',type=float,default=12,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json',help="path of json file containing path of volumes")
@@ -74,7 +76,7 @@ if __name__=="__main__":
         parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
-        parser.add_argument('--model-path',type=str,default="pretrained/resnet_10_23dataset.pth",help='path of model parameters to be loaded')
+        parser.add_argument('--model-path',type=str,default="pretrained/resnet_34_23dataset.pth",help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.27,0.208,0.074,0.038,0.136,1]),help='weights for weighted cross entropy')
         parser.add_argument('--class_dict',type=dict,default={'EarlyAMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5})
@@ -90,7 +92,7 @@ if __name__=="__main__":
         # device_ids=[1,2,3]
         register_hooks=False
         # model=Resnet18_3D(num_classes=args.num_classes,ch=args.model_ch).to(args.device)
-        model=resnet34(num_classes=args.num_classes).to(args.device)
+        model=resnet34(num_classes=args.num_classes,shortcut_type='A').to(args.device)
         arch="resnet34_medicalnet"
         multiLabel=True
 
@@ -180,8 +182,7 @@ if __name__=="__main__":
                     epoch_loss/=((len(dataset)*(num_folds-1))//(num_folds*args.batch)+1)
                     # cm=confusion_matrix(labels,preds)
                     # classes=["early","inter","ga","wet","notamd"]
-                    wandb.log({'epoch loss':epoch_loss
-                               })
+                   
                     # plt.figure(figsize=(6, 4))
                     # sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
                     # plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
