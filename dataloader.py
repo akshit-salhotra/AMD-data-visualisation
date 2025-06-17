@@ -76,7 +76,7 @@ def undersampler(needed_samples:int,total_samples:int)->list:
 
     
 class OCTDataset(Dataset):
-    def __init__(self,image_paths,excel_path,transforms,cliplimit=1.1,**kwargs):
+    def __init__(self,image_paths,excel_path,transforms=None,cliplimit=1.1,**kwargs):
         super().__init__()
         self.cliplimit=cliplimit
         self.image_paths=image_paths
@@ -273,3 +273,17 @@ if __name__=="__main__":
         #     print(time()-t)
         #     t=time()
         t=time()
+
+
+class B_ScanDataset(Dataset):
+    def __init__(self,transforms,paths,denoise):
+        self.transforms=transforms
+        self.paths=paths
+        self.denoise=denoise
+
+    def __len__(self):
+        return len(self.paths)
+    def __getitem__(self,idx):
+        path=self.paths[idx]
+        process_bscan()
+        pass
