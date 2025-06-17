@@ -65,10 +65,10 @@ if __name__=="__main__":
         parser = argparse.ArgumentParser(description="train arguments")
 
         parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
-        parser.add_argument('--batch',type=float,default=4,help='batch size')
+        parser.add_argument('--batch',type=float,default=12,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json',help="path of json file containing path of volumes")
-        parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_Data\\06_03_2025\\vol_annotations_06_03_2025.xlsx',help='path of excel containing labels')
+        parser.add_argument('--excel-path',type=str,default='excel/vol_annotations_06_03_2025.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_medicalnet')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
         parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
@@ -104,7 +104,7 @@ if __name__=="__main__":
         # model = nn.SyncBatchNorm.convert_sync_batchnorm(model)  # Convert all BatchNorm layers
         # model=Seq_Model(num_classes=args.num_classes,device=args.device).to(args.device)
         model=nn.DataParallel(model)
-        logging.info("the wandb run name is :",wandb.run.name)
+        logging.info(f"the wandb run name is : {wandb.run.name}")
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
         # criteron=CrossEntropyLoss(weight=args.weight_matrix.to(args.device))##make sure to add weight factor

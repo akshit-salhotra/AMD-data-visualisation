@@ -16,3 +16,5 @@ Datasplit was done such no more than 10 scans for each patient are selected if t
 
 // "d:\\cleaning_GUI_annotated_data\\Cirrus_OCT_Imaging_Data\\737650964\\R\\20170413\\140118\\OPT\\Carl_Zeiss_Meditec\\200X1024X200\\Original\\B-Scans",
 This volume has a few scans that are not right
+
+index 5809 has only 5 b scans
