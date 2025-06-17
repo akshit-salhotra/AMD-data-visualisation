@@ -2,19 +2,22 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 from collections import Counter
 import json
+import ast
 
 def getFreqPlotFromNewExcel(save_path,excel_path=None,df=None):
-    
-    assert excel_path or df , ' both excel_path and df can not be null'
-    assert excel_path and df , ' can not pass both excel_path and df simulateanously'
+
+    assert excel_path or isinstance(df,pd.DataFrame) , ' both excel_path and df can not be null'
+    assert not (excel_path and isinstance(df,pd.DataFrame)) , ' can not pass both excel_path and df simulateanously'
     
     if excel_path:
-        df=pd.read_csv(excel_path)
+        df=pd.read_excel(excel_path,sheet_name='vol_annotations')
+
         
     stages=df['stage']
     stages_flattened=[]
     for val in stages:
-        if isinstance(val,list):
+        if val[0]=='[':
+            val = ast.literal_eval(val)
             stages_flattened.extend(val)
         else:
             stages_flattened.append(val)
@@ -25,7 +28,13 @@ def getFreqPlotFromNewExcel(save_path,excel_path=None,df=None):
     counts = list(freq.values())
 
     plt.figure(figsize=(8, 4))
-    plt.bar(values, counts, color='skyblue', edgecolor='black')
+    bars=plt.bar(values, counts, color='skyblue', edgecolor='black')
+
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width() / 2, height, str(height),
+                ha='center', va='bottom')
+    
     plt.xlabel('Stage')
     plt.ylabel('Frequency')
     plt.title('Frequency of Stages in new dataset')
@@ -45,12 +54,13 @@ if __name__=="__main__":
     with open("jsons\\patient_level\\train_val_split_new_dataset.json",'r') as f:
         indices=json.load(f)
     
-    df=pd.read_csv(excel_path)
+    df=pd.read_excel(excel_path,sheet_name='vol_annotations')
+
     
     train_df=df.iloc[indices['train_indices']]
     val_df=df.iloc[indices['val_indices']]
     
-    getFreqPlotFromNewExcel("images\\plots\\frequencyHistogramNewDataset_trainSet.png",train_df)
-    getFreqPlotFromNewExcel("images\\plots\\frequencyHistogramNewDataset_testSet.png",val_df)
+    getFreqPlotFromNewExcel("images\\plots\\frequencyHistogramNewDataset_trainSet.png",df=train_df)
+    getFreqPlotFromNewExcel("images\\plots\\frequencyHistogramNewDataset_testSet.png",df=val_df)
     
     
