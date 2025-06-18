@@ -7,6 +7,7 @@ from utils.histogram import get_amdtype
 import torch
 import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import ast
 # from memory_profiler import profile
 
 def process_bscan(bscan, scans_dir, denoise,clahe, raw_scans, transforms):
@@ -53,7 +54,7 @@ def collate_fn(batch):
         d=torch.stack([val[i] for val in batch],dim=0)
         data.append(d)
 
-    return data,paths,torch.concat([val[-1] for val in batch],dim=0)
+    return data,paths,torch.stack([val[-1] for val in batch],dim=0)
 
 def undersampler(needed_samples:int,total_samples:int)->list:
 
@@ -76,16 +77,27 @@ def undersampler(needed_samples:int,total_samples:int)->list:
 
     
 class OCTDataset(Dataset):
-    def __init__(self,image_paths,excel_path,transforms,cliplimit=1.1,**kwargs):
+    def __init__(self,image_paths,excel_path,transforms=None,old_excel=True,cliplimit=1.1,**kwargs):
         super().__init__()
         self.cliplimit=cliplimit
-        self.image_paths=image_paths
-        self.df=pd.read_excel(excel_path,sheet_name='annotations')
+        self.old_excel=old_excel
+        if self.old_excel:
+            self.image_paths=image_paths
+            self.df=pd.read_excel(excel_path,sheet_name='annotations')
+        else:
+            self.df=pd.read_excel(excel_path,sheet_name='vol_annotations')
+            self.indices_map=image_paths
+            self.image_paths=list(self.df['folder_path'].iloc[image_paths])
             
         if 'classes' in kwargs:
             self.classes=kwargs['classes']
         else:
-            self.classes={'early':0,'inter':1,'ga':2,'wet':3,'scar':4,'notAMD':5}
+            if self.old_excel:
+                self.classes={'early':0,'inter':1,'ga':2,'wet':3,'scar':4,'notAMD':5}
+            else:
+                self.classes={'EarlyAMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
+        
+
             
         if transforms:
             self.transforms=transforms
@@ -135,15 +147,34 @@ class OCTDataset(Dataset):
         scans_dir=self.image_paths[index]
         volume=[]
         if self.raw_scans:
-            raw_volume=[]   
-        sections=scans_dir.split("\\")
-        pt_info=[sections[3],sections[4],sections[5]]
-        amdtype=get_amdtype(pt_info,self.df)
+            raw_volume=[] 
+        if self.old_excel:      
+            sections=scans_dir.split("\\")
+            pt_info=[sections[3],sections[4],sections[5]]
+            amdtype=get_amdtype(pt_info,self.df)
+            label=torch.tensor(self.classes[amdtype])
+
+        else:
+            amdtype=self.df['stage'].iloc[self.indices_map[index]]
+            if amdtype[0]=='[':
+                amdtype= ast.literal_eval(amdtype)
+            else:
+                amdtype=[amdtype]
+
+            label=torch.zeros(len(self.classes))
+
+            for c in amdtype:
+                label[self.classes.get(c)]=1
+
         scan_list=sorted(os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0]))
         if self.undersample and len(scan_list)!=self.volume_shape[0][0]:
             # print("hi",len(scan_list),self.volume_shape[0][0])
             # print(self.volume_shape[0][0],len(scan_list))
-            scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
+            try:
+                scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
+            except ValueError:
+                print(scans_dir)
+                raise AssertionError
             # assert     add an assertion here
         if self.multiThread:
             with ThreadPoolExecutor(max_workers=8) as executor:
@@ -187,15 +218,6 @@ class OCTDataset(Dataset):
                 img = img.squeeze(dim=0)
                 volume.append(img.squeeze(dim=0))
 
-                # img=cv2.imread(scans_dir+os.sep+bscan,0)
-                # if self.raw_scans:
-                #     raw_volume.append(torch.from_numpy(img))
-                    
-                # #histogram equalization
-                # img = self.clahe.apply(img)
-                # assert img.shape==(1024,512) or img.shape==(1024,200),f' the shape of b scan must be [1024,512] or [1024,200] but was found to be {img.shape} the scan dir is :{scans_dir}'
-                # if self.transforms:
-                #     img=self.transforms(img)
                 
 
         volume=torch.stack(volume,dim=0)
@@ -204,7 +226,6 @@ class OCTDataset(Dataset):
         
         assert any(list(volume.shape)==vol for vol in self.volume_shape),f'the shape of scan should be {self.volume_shape} but it was found to be {volume.shape}'
 
-        label=torch.tensor([self.classes[amdtype]])
 
         if self.attn:
             if volume.shape[0]<self.context_length:
@@ -273,3 +294,17 @@ if __name__=="__main__":
         #     print(time()-t)
         #     t=time()
         t=time()
+
+
+class B_ScanDataset(Dataset):
+    def __init__(self,transforms,paths,denoise):
+        self.transforms=transforms
+        self.paths=paths
+        self.denoise=denoise
+
+    def __len__(self):
+        return len(self.paths)
+    def __getitem__(self,idx):
+        path=self.paths[idx]
+        process_bscan()
+        pass

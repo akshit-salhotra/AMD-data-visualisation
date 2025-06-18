@@ -1,0 +1,192 @@
+2025-06-17 14:04:27 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-17 14:04:27 - INFO - starting new training !!!!
+2025-06-17 14:04:27 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-17 14:04:27 - INFO - Namespace(batch=12, class_dict={'EarlyAMD': 0, 'Int AMD': 1, 'GA': 2, 'Wet': 3, 'Scar': 4, 'Not AMD': 5}, device=device(type='cuda'), epoch=25, excel_path='excel/vol_annotations_06_03_2025.xlsx', gamma=0.1, json='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json', log_dir='logs/Resnet_medicalnet', lr=0.0015, model_path='pretrained/resnet_34_23dataset.pth', num_classes=6, save_dir='model_parameter_Resnet_medicalnet', save_freq=5, step_size=10, weight_matrix=tensor([0.2700, 0.2080, 0.0740, 0.0380, 0.1360, 1.0000]))
+2025-06-17 14:04:27 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\26
+2025-06-17 14:04:29 - INFO - the wandb run name is : smart-fire-27
+2025-06-17 14:04:29 - INFO - found 4 gpus!
+2025-06-17 14:04:29 - INFO - DataParallel(
+  (module): ResNet(
+    (conv1): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3), bias=False)
+    (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (relu): ReLU(inplace=True)
+    (maxpool): MaxPool3d(kernel_size=(3, 3, 3), stride=2, padding=1, dilation=1, ceil_mode=False)
+    (layer1): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer2): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer3): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (4): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (5): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer4): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(256, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (GAP): AdaptiveAvgPool3d(output_size=(2, 2, 2))
+    (linear): Linear(in_features=4096, out_features=6, bias=True)
+  )
+)
+2025-06-17 14:04:29 - INFO - the missing keys are : 
+['module.linear.weight', 'module.linear.bias']
+2025-06-17 14:04:29 - INFO - the unexpected keys are :
+[]
+2025-06-17 14:04:29 - INFO - loaded model parameters from pretrained/resnet_34_23dataset.pth
+2025-06-17 14:04:30 - INFO - fold number:0
+2025-06-17 14:08:13 - INFO - epoch:0/25 iteration:0/459 batch loss is :0.3653
+2025-06-17 14:08:35 - INFO - epoch:0/25 iteration:5/459 batch loss is :1.2982
+2025-06-17 14:08:57 - INFO - epoch:0/25 iteration:10/459 batch loss is :0.4818
+2025-06-17 14:09:18 - INFO - epoch:0/25 iteration:15/459 batch loss is :0.3269
+2025-06-17 14:09:40 - INFO - epoch:0/25 iteration:20/459 batch loss is :0.3780
+2025-06-17 14:10:02 - INFO - epoch:0/25 iteration:25/459 batch loss is :0.1322
+2025-06-17 14:10:23 - INFO - epoch:0/25 iteration:30/459 batch loss is :0.2102
+2025-06-17 14:10:43 - INFO - epoch:0/25 iteration:35/459 batch loss is :0.4822
+2025-06-17 14:11:03 - INFO - epoch:0/25 iteration:40/459 batch loss is :0.1964
+2025-06-17 14:11:23 - INFO - epoch:0/25 iteration:45/459 batch loss is :0.1898
+2025-06-17 14:11:44 - INFO - epoch:0/25 iteration:50/459 batch loss is :0.2808
+2025-06-17 14:12:03 - INFO - epoch:0/25 iteration:55/459 batch loss is :0.2337
+2025-06-17 14:12:24 - INFO - epoch:0/25 iteration:60/459 batch loss is :0.2243
+2025-06-17 14:12:43 - INFO - epoch:0/25 iteration:65/459 batch loss is :0.0795
+2025-06-17 14:13:02 - INFO - epoch:0/25 iteration:70/459 batch loss is :0.0872
+2025-06-17 14:13:21 - INFO - epoch:0/25 iteration:75/459 batch loss is :0.0969
+2025-06-17 14:13:40 - INFO - epoch:0/25 iteration:80/459 batch loss is :0.1872
+2025-06-17 14:13:59 - INFO - epoch:0/25 iteration:85/459 batch loss is :0.1637
+2025-06-17 14:14:18 - INFO - epoch:0/25 iteration:90/459 batch loss is :0.1702
+2025-06-17 14:14:37 - INFO - epoch:0/25 iteration:95/459 batch loss is :0.0995
+2025-06-17 14:14:56 - INFO - epoch:0/25 iteration:100/459 batch loss is :0.1069
+2025-06-17 14:15:15 - INFO - epoch:0/25 iteration:105/459 batch loss is :0.2136
+2025-06-17 14:15:35 - INFO - epoch:0/25 iteration:110/459 batch loss is :0.1840
+2025-06-17 14:15:54 - INFO - epoch:0/25 iteration:115/459 batch loss is :0.1877
+2025-06-17 14:16:13 - INFO - epoch:0/25 iteration:120/459 batch loss is :0.2185
+2025-06-17 14:16:32 - INFO - epoch:0/25 iteration:125/459 batch loss is :0.6561
+2025-06-17 14:16:51 - INFO - epoch:0/25 iteration:130/459 batch loss is :0.4764
+2025-06-17 14:17:10 - INFO - epoch:0/25 iteration:135/459 batch loss is :0.1897
+2025-06-17 14:17:30 - INFO - epoch:0/25 iteration:140/459 batch loss is :0.1717
+2025-06-17 14:17:49 - INFO - epoch:0/25 iteration:145/459 batch loss is :0.2218
+2025-06-17 14:18:08 - INFO - epoch:0/25 iteration:150/459 batch loss is :0.1843
+2025-06-17 14:18:19 - ERROR - Caught ValueError in DataLoader worker process 14.
+Original Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\_utils\worker.py", line 308, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\_utils\fetch.py", line 49, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\dataset.py", line 419, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\dataset.py", line 419, in <listcomp>
+    return [self.dataset[self.indices[idx]] for idx in indices]
+  File "D:\AMD-data-visualisation\dataloader.py", line 174, in __getitem__
+    scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
+  File "D:\AMD-data-visualisation\dataloader.py", line 68, in undersampler
+    nums = random.sample(odd_candidates, needed_samples-len(sel_indexes))
+  File "C:\Users\AKS396\.conda\envs\amd\lib\random.py", line 363, in sample
+    raise ValueError("Sample larger than population or is negative")
+ValueError: Sample larger than population or is negative
+

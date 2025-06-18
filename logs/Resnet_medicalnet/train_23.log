@@ -1,0 +1,215 @@
+2025-06-17 13:02:16 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-17 13:02:16 - INFO - starting new training !!!!
+2025-06-17 13:02:16 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-17 13:02:16 - INFO - Namespace(batch=12, class_dict={'EarlyAMD': 0, 'Int AMD': 1, 'GA': 2, 'Wet': 3, 'Scar': 4, 'Not AMD': 5}, device=device(type='cuda'), epoch=25, excel_path='excel/vol_annotations_06_03_2025.xlsx', gamma=0.1, json='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json', log_dir='logs/Resnet_medicalnet', lr=0.001, model_path='pretrained/resnet_10_23dataset.pth', num_classes=6, save_dir='model_parameter_Resnet_medicalnet', save_freq=5, step_size=10, weight_matrix=tensor([0.2700, 0.2080, 0.0740, 0.0380, 0.1360, 1.0000]))
+2025-06-17 13:02:16 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\23
+2025-06-17 13:02:18 - INFO - the wandb run name is : rural-star-24
+2025-06-17 13:02:18 - INFO - found 4 gpus!
+2025-06-17 13:02:18 - INFO - DataParallel(
+  (module): ResNet(
+    (conv1): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3), bias=False)
+    (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (relu): ReLU(inplace=True)
+    (maxpool): MaxPool3d(kernel_size=(3, 3, 3), stride=2, padding=1, dilation=1, ceil_mode=False)
+    (layer1): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer2): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv3d(64, 128, kernel_size=(1, 1, 1), stride=(2, 2, 2), bias=False)
+          (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer3): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv3d(128, 256, kernel_size=(1, 1, 1), stride=(1, 1, 1), bias=False)
+          (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (4): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (5): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer4): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(256, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): Sequential(
+          (0): Conv3d(256, 512, kernel_size=(1, 1, 1), stride=(1, 1, 1), bias=False)
+          (1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (GAP): AdaptiveAvgPool3d(output_size=(2, 2, 2))
+    (linear): Linear(in_features=4096, out_features=6, bias=True)
+  )
+)
+2025-06-17 13:02:18 - INFO - the missing keys are : 
+['module.layer1.1.conv1.weight', 'module.layer1.1.bn1.weight', 'module.layer1.1.bn1.bias', 'module.layer1.1.bn1.running_mean', 'module.layer1.1.bn1.running_var', 'module.layer1.1.conv2.weight', 'module.layer1.1.bn2.weight', 'module.layer1.1.bn2.bias', 'module.layer1.1.bn2.running_mean', 'module.layer1.1.bn2.running_var', 'module.layer1.2.conv1.weight', 'module.layer1.2.bn1.weight', 'module.layer1.2.bn1.bias', 'module.layer1.2.bn1.running_mean', 'module.layer1.2.bn1.running_var', 'module.layer1.2.conv2.weight', 'module.layer1.2.bn2.weight', 'module.layer1.2.bn2.bias', 'module.layer1.2.bn2.running_mean', 'module.layer1.2.bn2.running_var', 'module.layer2.1.conv1.weight', 'module.layer2.1.bn1.weight', 'module.layer2.1.bn1.bias', 'module.layer2.1.bn1.running_mean', 'module.layer2.1.bn1.running_var', 'module.layer2.1.conv2.weight', 'module.layer2.1.bn2.weight', 'module.layer2.1.bn2.bias', 'module.layer2.1.bn2.running_mean', 'module.layer2.1.bn2.running_var', 'module.layer2.2.conv1.weight', 'module.layer2.2.bn1.weight', 'module.layer2.2.bn1.bias', 'module.layer2.2.bn1.running_mean', 'module.layer2.2.bn1.running_var', 'module.layer2.2.conv2.weight', 'module.layer2.2.bn2.weight', 'module.layer2.2.bn2.bias', 'module.layer2.2.bn2.running_mean', 'module.layer2.2.bn2.running_var', 'module.layer2.3.conv1.weight', 'module.layer2.3.bn1.weight', 'module.layer2.3.bn1.bias', 'module.layer2.3.bn1.running_mean', 'module.layer2.3.bn1.running_var', 'module.layer2.3.conv2.weight', 'module.layer2.3.bn2.weight', 'module.layer2.3.bn2.bias', 'module.layer2.3.bn2.running_mean', 'module.layer2.3.bn2.running_var', 'module.layer3.1.conv1.weight', 'module.layer3.1.bn1.weight', 'module.layer3.1.bn1.bias', 'module.layer3.1.bn1.running_mean', 'module.layer3.1.bn1.running_var', 'module.layer3.1.conv2.weight', 'module.layer3.1.bn2.weight', 'module.layer3.1.bn2.bias', 'module.layer3.1.bn2.running_mean', 'module.layer3.1.bn2.running_var', 'module.layer3.2.conv1.weight', 'module.layer3.2.bn1.weight', 'module.layer3.2.bn1.bias', 'module.layer3.2.bn1.running_mean', 'module.layer3.2.bn1.running_var', 'module.layer3.2.conv2.weight', 'module.layer3.2.bn2.weight', 'module.layer3.2.bn2.bias', 'module.layer3.2.bn2.running_mean', 'module.layer3.2.bn2.running_var', 'module.layer3.3.conv1.weight', 'module.layer3.3.bn1.weight', 'module.layer3.3.bn1.bias', 'module.layer3.3.bn1.running_mean', 'module.layer3.3.bn1.running_var', 'module.layer3.3.conv2.weight', 'module.layer3.3.bn2.weight', 'module.layer3.3.bn2.bias', 'module.layer3.3.bn2.running_mean', 'module.layer3.3.bn2.running_var', 'module.layer3.4.conv1.weight', 'module.layer3.4.bn1.weight', 'module.layer3.4.bn1.bias', 'module.layer3.4.bn1.running_mean', 'module.layer3.4.bn1.running_var', 'module.layer3.4.conv2.weight', 'module.layer3.4.bn2.weight', 'module.layer3.4.bn2.bias', 'module.layer3.4.bn2.running_mean', 'module.layer3.4.bn2.running_var', 'module.layer3.5.conv1.weight', 'module.layer3.5.bn1.weight', 'module.layer3.5.bn1.bias', 'module.layer3.5.bn1.running_mean', 'module.layer3.5.bn1.running_var', 'module.layer3.5.conv2.weight', 'module.layer3.5.bn2.weight', 'module.layer3.5.bn2.bias', 'module.layer3.5.bn2.running_mean', 'module.layer3.5.bn2.running_var', 'module.layer4.1.conv1.weight', 'module.layer4.1.bn1.weight', 'module.layer4.1.bn1.bias', 'module.layer4.1.bn1.running_mean', 'module.layer4.1.bn1.running_var', 'module.layer4.1.conv2.weight', 'module.layer4.1.bn2.weight', 'module.layer4.1.bn2.bias', 'module.layer4.1.bn2.running_mean', 'module.layer4.1.bn2.running_var', 'module.layer4.2.conv1.weight', 'module.layer4.2.bn1.weight', 'module.layer4.2.bn1.bias', 'module.layer4.2.bn1.running_mean', 'module.layer4.2.bn1.running_var', 'module.layer4.2.conv2.weight', 'module.layer4.2.bn2.weight', 'module.layer4.2.bn2.bias', 'module.layer4.2.bn2.running_mean', 'module.layer4.2.bn2.running_var', 'module.linear.weight', 'module.linear.bias']
+2025-06-17 13:02:18 - INFO - the unexpected keys are :
+[]
+2025-06-17 13:02:18 - INFO - loaded model parameters from pretrained/resnet_10_23dataset.pth
+2025-06-17 13:02:19 - INFO - fold number:0
+2025-06-17 13:06:00 - INFO - epoch:0/25 iteration:0/459 batch loss is :0.4815
+2025-06-17 13:06:19 - INFO - epoch:0/25 iteration:5/459 batch loss is :0.3309
+2025-06-17 13:06:39 - INFO - epoch:0/25 iteration:10/459 batch loss is :0.2336
+2025-06-17 13:06:58 - INFO - epoch:0/25 iteration:15/459 batch loss is :0.1851
+2025-06-17 13:07:19 - INFO - epoch:0/25 iteration:20/459 batch loss is :0.4181
+2025-06-17 13:07:39 - INFO - epoch:0/25 iteration:25/459 batch loss is :0.1684
+2025-06-17 13:07:59 - INFO - epoch:0/25 iteration:30/459 batch loss is :0.1085
+2025-06-17 13:08:19 - INFO - epoch:0/25 iteration:35/459 batch loss is :0.2183
+2025-06-17 13:08:38 - INFO - epoch:0/25 iteration:40/459 batch loss is :0.2155
+2025-06-17 13:08:57 - INFO - epoch:0/25 iteration:45/459 batch loss is :0.2115
+2025-06-17 13:09:16 - INFO - epoch:0/25 iteration:50/459 batch loss is :0.2981
+2025-06-17 13:09:35 - INFO - epoch:0/25 iteration:55/459 batch loss is :0.1499
+2025-06-17 13:09:55 - INFO - epoch:0/25 iteration:60/459 batch loss is :0.1148
+2025-06-17 13:10:14 - INFO - epoch:0/25 iteration:65/459 batch loss is :0.2306
+2025-06-17 13:10:33 - INFO - epoch:0/25 iteration:70/459 batch loss is :0.2315
+2025-06-17 13:10:52 - INFO - epoch:0/25 iteration:75/459 batch loss is :0.3134
+2025-06-17 13:11:11 - INFO - epoch:0/25 iteration:80/459 batch loss is :0.1931
+2025-06-17 13:11:30 - INFO - epoch:0/25 iteration:85/459 batch loss is :0.2183
+2025-06-17 13:11:49 - INFO - epoch:0/25 iteration:90/459 batch loss is :0.1132
+2025-06-17 13:12:08 - INFO - epoch:0/25 iteration:95/459 batch loss is :0.1502
+2025-06-17 13:12:27 - INFO - epoch:0/25 iteration:100/459 batch loss is :0.0980
+2025-06-17 13:12:46 - INFO - epoch:0/25 iteration:105/459 batch loss is :0.1960
+2025-06-17 13:13:06 - INFO - epoch:0/25 iteration:110/459 batch loss is :0.0917
+2025-06-17 13:13:24 - INFO - epoch:0/25 iteration:115/459 batch loss is :0.1178
+2025-06-17 13:13:44 - INFO - epoch:0/25 iteration:120/459 batch loss is :0.0930
+2025-06-17 13:14:02 - INFO - epoch:0/25 iteration:125/459 batch loss is :0.1824
+2025-06-17 13:14:22 - INFO - epoch:0/25 iteration:130/459 batch loss is :0.1319
+2025-06-17 13:14:40 - INFO - epoch:0/25 iteration:135/459 batch loss is :0.1120
+2025-06-17 13:14:59 - INFO - epoch:0/25 iteration:140/459 batch loss is :0.1384
+2025-06-17 13:15:18 - INFO - epoch:0/25 iteration:145/459 batch loss is :0.1611
+2025-06-17 13:15:37 - INFO - epoch:0/25 iteration:150/459 batch loss is :0.1442
+2025-06-17 13:15:56 - INFO - epoch:0/25 iteration:155/459 batch loss is :0.1191
+2025-06-17 13:16:15 - INFO - epoch:0/25 iteration:160/459 batch loss is :0.0947
+2025-06-17 13:16:34 - INFO - epoch:0/25 iteration:165/459 batch loss is :0.2308
+2025-06-17 13:16:53 - INFO - epoch:0/25 iteration:170/459 batch loss is :0.1982
+2025-06-17 13:17:12 - INFO - epoch:0/25 iteration:175/459 batch loss is :0.2429
+2025-06-17 13:17:31 - INFO - epoch:0/25 iteration:180/459 batch loss is :0.1660
+2025-06-17 13:17:50 - INFO - epoch:0/25 iteration:185/459 batch loss is :0.1634
+2025-06-17 13:18:09 - INFO - epoch:0/25 iteration:190/459 batch loss is :0.1352
+2025-06-17 13:18:28 - INFO - epoch:0/25 iteration:195/459 batch loss is :0.0838
+2025-06-17 13:18:47 - INFO - epoch:0/25 iteration:200/459 batch loss is :0.2783
+2025-06-17 13:19:06 - INFO - epoch:0/25 iteration:205/459 batch loss is :0.1505
+2025-06-17 13:19:25 - INFO - epoch:0/25 iteration:210/459 batch loss is :0.1659
+2025-06-17 13:19:44 - INFO - epoch:0/25 iteration:215/459 batch loss is :0.1594
+2025-06-17 13:20:03 - INFO - epoch:0/25 iteration:220/459 batch loss is :0.1376
+2025-06-17 13:20:22 - INFO - epoch:0/25 iteration:225/459 batch loss is :0.1094
+2025-06-17 13:20:41 - INFO - epoch:0/25 iteration:230/459 batch loss is :0.1270
+2025-06-17 13:21:00 - INFO - epoch:0/25 iteration:235/459 batch loss is :0.1252
+2025-06-17 13:21:19 - INFO - epoch:0/25 iteration:240/459 batch loss is :0.3682
+2025-06-17 13:21:38 - INFO - epoch:0/25 iteration:245/459 batch loss is :0.1447
+2025-06-17 13:21:57 - INFO - epoch:0/25 iteration:250/459 batch loss is :0.1759
+2025-06-17 13:22:16 - INFO - epoch:0/25 iteration:255/459 batch loss is :0.2052
+2025-06-17 13:22:36 - INFO - epoch:0/25 iteration:260/459 batch loss is :0.1885
+2025-06-17 13:22:55 - INFO - epoch:0/25 iteration:265/459 batch loss is :0.1180
+2025-06-17 13:23:14 - INFO - epoch:0/25 iteration:270/459 batch loss is :0.1556
+2025-06-17 13:23:33 - INFO - epoch:0/25 iteration:275/459 batch loss is :0.0926
+2025-06-17 13:23:52 - INFO - epoch:0/25 iteration:280/459 batch loss is :0.2577
+2025-06-17 13:24:11 - INFO - epoch:0/25 iteration:285/459 batch loss is :0.1619
+2025-06-17 13:24:30 - INFO - epoch:0/25 iteration:290/459 batch loss is :0.1451
+2025-06-17 13:24:49 - INFO - epoch:0/25 iteration:295/459 batch loss is :0.1521

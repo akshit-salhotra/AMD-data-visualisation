@@ -145,8 +145,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=15,timeout=2400,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=15,timeout=2400,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=15,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=15,timeout=600,collate_fn=collate_fn)
             if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
