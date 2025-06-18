@@ -56,8 +56,9 @@ def val_step(args,data,label,val_loss,model,criteron):
     logits=model(*data)
     loss=criteron(logits,label)
     val_loss+=loss
+    wandb.log({'batch val loss':loss})
     # preds=torch.argmax(logits,dim=-1)
-    assert label.shape==preds.shape, 'the number of labels and images do not match'
+    # assert label.shape==preds.shape, 'the number of labels and images do not match'
     return val_loss
 
 
@@ -152,8 +153,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=20,timeout=0,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=20,timeout=0,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=20,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=20,timeout=600,collate_fn=collate_fn)
             if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
@@ -219,8 +220,8 @@ if __name__=="__main__":
                             # plt.title(f'Confusion Matrix,acc:{np.mean(np.array(val_labels)==np.array(val_preds)):.4f}')
                             # plt.xlabel('Predicted')
                             # plt.ylabel('Actual')
-                            wandb.log({'val loss':val_loss,
-                                       'val accuracy':np.mean(np.array(val_labels)==np.array(val_preds))})
+                            wandb.log({'val loss':val_loss
+                                       })
                             # plt.savefig(f'{param_dir+os.sep}confusion_matrix_val_fold_{fold}_epoch_{i}.png')
                             # plt.close()
                             torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')

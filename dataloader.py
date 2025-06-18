@@ -165,12 +165,16 @@ class OCTDataset(Dataset):
 
             for c in amdtype:
                 label[self.classes.get(c)]=1
-                
+
         scan_list=sorted(os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0]))
         if self.undersample and len(scan_list)!=self.volume_shape[0][0]:
             # print("hi",len(scan_list),self.volume_shape[0][0])
             # print(self.volume_shape[0][0],len(scan_list))
-            scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
+            try:
+                scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
+            except ValueError:
+                print(scans_dir)
+                raise AssertionError
             # assert     add an assertion here
         if self.multiThread:
             with ThreadPoolExecutor(max_workers=8) as executor:

@@ -1,11 +1,11 @@
-2025-06-17 13:38:11 - INFO - ------------------------------------------------------------------------------------------------
-2025-06-17 13:38:11 - INFO - starting new training !!!!
-2025-06-17 13:38:11 - INFO - ------------------------------------------------------------------------------------------------
-2025-06-17 13:38:11 - INFO - Namespace(batch=12, class_dict={'EarlyAMD': 0, 'Int AMD': 1, 'GA': 2, 'Wet': 3, 'Scar': 4, 'Not AMD': 5}, device=device(type='cuda'), epoch=25, excel_path='excel/vol_annotations_06_03_2025.xlsx', gamma=0.1, json='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json', log_dir='logs/Resnet_medicalnet', lr=0.0015, model_path='pretrained/resnet_34_23dataset.pth', num_classes=6, save_dir='model_parameter_Resnet_medicalnet', save_freq=5, step_size=10, weight_matrix=tensor([0.2700, 0.2080, 0.0740, 0.0380, 0.1360, 1.0000]))
-2025-06-17 13:38:11 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\25
-2025-06-17 13:38:12 - INFO - the wandb run name is : zany-music-26
-2025-06-17 13:38:12 - INFO - found 4 gpus!
-2025-06-17 13:38:12 - INFO - DataParallel(
+2025-06-17 14:24:33 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-17 14:24:33 - INFO - starting new training !!!!
+2025-06-17 14:24:33 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-17 14:24:33 - INFO - Namespace(batch=12, class_dict={'EarlyAMD': 0, 'Int AMD': 1, 'GA': 2, 'Wet': 3, 'Scar': 4, 'Not AMD': 5}, device=device(type='cuda'), epoch=25, excel_path='excel/vol_annotations_06_03_2025.xlsx', gamma=0.1, json='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json', log_dir='logs/Resnet_medicalnet', lr=0.0015, model_path='pretrained/resnet_34_23dataset.pth', num_classes=6, save_dir='model_parameter_Resnet_medicalnet', save_freq=5, step_size=10, weight_matrix=tensor([0.2700, 0.2080, 0.0740, 0.0380, 0.1360, 1.0000]))
+2025-06-17 14:24:33 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\27
+2025-06-17 14:24:34 - INFO - the wandb run name is : wise-voice-28
+2025-06-17 14:24:34 - INFO - found 4 gpus!
+2025-06-17 14:24:34 - INFO - DataParallel(
   (module): ResNet(
     (conv1): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3), bias=False)
     (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
@@ -135,37 +135,109 @@
     (linear): Linear(in_features=4096, out_features=6, bias=True)
   )
 )
-2025-06-17 13:38:12 - INFO - the missing keys are : 
+2025-06-17 14:24:35 - INFO - the missing keys are : 
 ['module.linear.weight', 'module.linear.bias']
-2025-06-17 13:38:12 - INFO - the unexpected keys are :
+2025-06-17 14:24:35 - INFO - the unexpected keys are :
 []
-2025-06-17 13:38:12 - INFO - loaded model parameters from pretrained/resnet_34_23dataset.pth
-2025-06-17 13:38:14 - INFO - fold number:0
-2025-06-17 13:41:49 - INFO - epoch:0/25 iteration:0/459 batch loss is :0.5906
-2025-06-17 13:42:10 - INFO - epoch:0/25 iteration:5/459 batch loss is :1.9413
-2025-06-17 13:42:32 - INFO - epoch:0/25 iteration:10/459 batch loss is :0.3461
-2025-06-17 13:42:53 - INFO - epoch:0/25 iteration:15/459 batch loss is :0.2616
-2025-06-17 13:43:15 - INFO - epoch:0/25 iteration:20/459 batch loss is :0.1517
-2025-06-17 13:43:35 - INFO - epoch:0/25 iteration:25/459 batch loss is :0.2915
-2025-06-17 13:43:56 - INFO - epoch:0/25 iteration:30/459 batch loss is :0.2095
-2025-06-17 13:44:16 - INFO - epoch:0/25 iteration:35/459 batch loss is :0.6459
-2025-06-17 13:44:36 - INFO - epoch:0/25 iteration:40/459 batch loss is :0.4477
-2025-06-17 13:44:56 - INFO - epoch:0/25 iteration:45/459 batch loss is :0.3647
-2025-06-17 13:45:16 - INFO - epoch:0/25 iteration:50/459 batch loss is :0.2639
-2025-06-17 13:45:36 - INFO - epoch:0/25 iteration:55/459 batch loss is :0.2880
-2025-06-17 13:45:57 - INFO - epoch:0/25 iteration:60/459 batch loss is :0.2428
-2025-06-17 13:46:17 - INFO - epoch:0/25 iteration:65/459 batch loss is :0.1729
-2025-06-17 13:46:37 - INFO - epoch:0/25 iteration:70/459 batch loss is :0.1622
-2025-06-17 13:46:58 - INFO - epoch:0/25 iteration:75/459 batch loss is :0.1490
-2025-06-17 13:47:18 - INFO - epoch:0/25 iteration:80/459 batch loss is :0.3122
-2025-06-17 13:47:38 - INFO - epoch:0/25 iteration:85/459 batch loss is :0.1331
-2025-06-17 13:47:58 - INFO - epoch:0/25 iteration:90/459 batch loss is :0.1822
-2025-06-17 13:48:18 - INFO - epoch:0/25 iteration:95/459 batch loss is :0.1921
-2025-06-17 13:48:38 - INFO - epoch:0/25 iteration:100/459 batch loss is :0.1893
-2025-06-17 13:48:58 - INFO - epoch:0/25 iteration:105/459 batch loss is :0.1231
-2025-06-17 13:49:18 - INFO - epoch:0/25 iteration:110/459 batch loss is :0.1279
-2025-06-17 13:49:30 - ERROR - Caught ValueError in DataLoader worker process 14.
+2025-06-17 14:24:35 - INFO - loaded model parameters from pretrained/resnet_34_23dataset.pth
+2025-06-17 14:24:36 - INFO - fold number:0
+2025-06-17 14:28:16 - INFO - epoch:0/25 iteration:0/459 batch loss is :0.8963
+2025-06-17 14:28:39 - INFO - epoch:0/25 iteration:5/459 batch loss is :1.4031
+2025-06-17 14:29:02 - INFO - epoch:0/25 iteration:10/459 batch loss is :0.4491
+2025-06-17 14:29:23 - INFO - epoch:0/25 iteration:15/459 batch loss is :0.9031
+2025-06-17 14:29:45 - INFO - epoch:0/25 iteration:20/459 batch loss is :0.1728
+2025-06-17 14:30:06 - INFO - epoch:0/25 iteration:25/459 batch loss is :0.2608
+2025-06-17 14:30:27 - INFO - epoch:0/25 iteration:30/459 batch loss is :0.1778
+2025-06-17 14:30:48 - INFO - epoch:0/25 iteration:35/459 batch loss is :0.3775
+2025-06-17 14:31:08 - INFO - epoch:0/25 iteration:40/459 batch loss is :0.1734
+2025-06-17 14:31:28 - INFO - epoch:0/25 iteration:45/459 batch loss is :0.0984
+2025-06-17 14:31:49 - INFO - epoch:0/25 iteration:50/459 batch loss is :0.1495
+2025-06-17 14:32:08 - INFO - epoch:0/25 iteration:55/459 batch loss is :0.0984
+2025-06-17 14:32:28 - INFO - epoch:0/25 iteration:60/459 batch loss is :0.2843
+2025-06-17 14:32:49 - INFO - epoch:0/25 iteration:65/459 batch loss is :0.3637
+2025-06-17 14:33:09 - INFO - epoch:0/25 iteration:70/459 batch loss is :0.3372
+2025-06-17 14:33:29 - INFO - epoch:0/25 iteration:75/459 batch loss is :0.3801
+2025-06-17 14:33:49 - INFO - epoch:0/25 iteration:80/459 batch loss is :0.2408
+2025-06-17 14:34:09 - INFO - epoch:0/25 iteration:85/459 batch loss is :0.0628
+2025-06-17 14:34:29 - INFO - epoch:0/25 iteration:90/459 batch loss is :0.1040
+2025-06-17 14:34:49 - INFO - epoch:0/25 iteration:95/459 batch loss is :0.2201
+2025-06-17 14:35:09 - INFO - epoch:0/25 iteration:100/459 batch loss is :0.1810
+2025-06-17 14:35:28 - INFO - epoch:0/25 iteration:105/459 batch loss is :0.1139
+2025-06-17 14:35:49 - INFO - epoch:0/25 iteration:110/459 batch loss is :0.3048
+2025-06-17 14:36:09 - INFO - epoch:0/25 iteration:115/459 batch loss is :0.3869
+2025-06-17 14:36:29 - INFO - epoch:0/25 iteration:120/459 batch loss is :0.2552
+2025-06-17 14:36:49 - INFO - epoch:0/25 iteration:125/459 batch loss is :0.1753
+2025-06-17 14:37:09 - INFO - epoch:0/25 iteration:130/459 batch loss is :0.2344
+2025-06-17 14:37:29 - INFO - epoch:0/25 iteration:135/459 batch loss is :0.1470
+2025-06-17 14:37:50 - INFO - epoch:0/25 iteration:140/459 batch loss is :0.1005
+2025-06-17 14:38:10 - INFO - epoch:0/25 iteration:145/459 batch loss is :0.1018
+2025-06-17 14:38:30 - INFO - epoch:0/25 iteration:150/459 batch loss is :0.1981
+2025-06-17 14:38:49 - INFO - epoch:0/25 iteration:155/459 batch loss is :0.0788
+2025-06-17 14:39:10 - INFO - epoch:0/25 iteration:160/459 batch loss is :0.1781
+2025-06-17 14:39:30 - INFO - epoch:0/25 iteration:165/459 batch loss is :0.1364
+2025-06-17 14:39:50 - INFO - epoch:0/25 iteration:170/459 batch loss is :0.3129
+2025-06-17 14:40:10 - INFO - epoch:0/25 iteration:175/459 batch loss is :0.2104
+2025-06-17 14:40:31 - INFO - epoch:0/25 iteration:180/459 batch loss is :0.1693
+2025-06-17 14:40:51 - INFO - epoch:0/25 iteration:185/459 batch loss is :0.2255
+2025-06-17 14:41:12 - INFO - epoch:0/25 iteration:190/459 batch loss is :0.2391
+2025-06-17 14:41:32 - INFO - epoch:0/25 iteration:195/459 batch loss is :0.1911
+2025-06-17 14:41:53 - INFO - epoch:0/25 iteration:200/459 batch loss is :0.2453
+2025-06-17 14:42:13 - INFO - epoch:0/25 iteration:205/459 batch loss is :0.2118
+2025-06-17 14:42:33 - INFO - epoch:0/25 iteration:210/459 batch loss is :0.0863
+2025-06-17 14:42:53 - INFO - epoch:0/25 iteration:215/459 batch loss is :0.1673
+2025-06-17 14:43:13 - INFO - epoch:0/25 iteration:220/459 batch loss is :0.2888
+2025-06-17 14:43:33 - INFO - epoch:0/25 iteration:225/459 batch loss is :0.1497
+2025-06-17 14:43:53 - INFO - epoch:0/25 iteration:230/459 batch loss is :0.1685
+2025-06-17 14:44:14 - INFO - epoch:0/25 iteration:235/459 batch loss is :0.2438
+2025-06-17 14:44:35 - INFO - epoch:0/25 iteration:240/459 batch loss is :0.1501
+2025-06-17 14:44:55 - INFO - epoch:0/25 iteration:245/459 batch loss is :0.2333
+2025-06-17 14:45:15 - INFO - epoch:0/25 iteration:250/459 batch loss is :0.2463
+2025-06-17 14:45:35 - INFO - epoch:0/25 iteration:255/459 batch loss is :0.2535
+2025-06-17 14:45:55 - INFO - epoch:0/25 iteration:260/459 batch loss is :0.1036
+2025-06-17 14:46:15 - INFO - epoch:0/25 iteration:265/459 batch loss is :0.1866
+2025-06-17 14:46:35 - INFO - epoch:0/25 iteration:270/459 batch loss is :0.2154
+2025-06-17 14:46:55 - INFO - epoch:0/25 iteration:275/459 batch loss is :0.1148
+2025-06-17 14:47:16 - INFO - epoch:0/25 iteration:280/459 batch loss is :0.1847
+2025-06-17 14:47:36 - INFO - epoch:0/25 iteration:285/459 batch loss is :0.1532
+2025-06-17 14:47:56 - INFO - epoch:0/25 iteration:290/459 batch loss is :0.2071
+2025-06-17 14:48:16 - INFO - epoch:0/25 iteration:295/459 batch loss is :0.1650
+2025-06-17 14:48:37 - INFO - epoch:0/25 iteration:300/459 batch loss is :0.1146
+2025-06-17 14:48:57 - INFO - epoch:0/25 iteration:305/459 batch loss is :0.1268
+2025-06-17 14:49:17 - INFO - epoch:0/25 iteration:310/459 batch loss is :0.1512
+2025-06-17 14:49:37 - INFO - epoch:0/25 iteration:315/459 batch loss is :0.1521
+2025-06-17 14:49:58 - INFO - epoch:0/25 iteration:320/459 batch loss is :0.2203
+2025-06-17 14:50:18 - INFO - epoch:0/25 iteration:325/459 batch loss is :0.2185
+2025-06-17 14:50:38 - INFO - epoch:0/25 iteration:330/459 batch loss is :0.2719
+2025-06-17 14:50:58 - INFO - epoch:0/25 iteration:335/459 batch loss is :0.1458
+2025-06-17 14:51:18 - INFO - epoch:0/25 iteration:340/459 batch loss is :0.2105
+2025-06-17 14:51:38 - INFO - epoch:0/25 iteration:345/459 batch loss is :0.1401
+2025-06-17 14:51:58 - INFO - epoch:0/25 iteration:350/459 batch loss is :0.0802
+2025-06-17 14:52:19 - INFO - epoch:0/25 iteration:355/459 batch loss is :0.1510
+2025-06-17 14:52:39 - INFO - epoch:0/25 iteration:360/459 batch loss is :0.1070
+2025-06-17 14:52:59 - INFO - epoch:0/25 iteration:365/459 batch loss is :0.0971
+2025-06-17 14:53:20 - INFO - epoch:0/25 iteration:370/459 batch loss is :0.1966
+2025-06-17 14:53:40 - INFO - epoch:0/25 iteration:375/459 batch loss is :0.2027
+2025-06-17 14:54:00 - INFO - epoch:0/25 iteration:380/459 batch loss is :0.1575
+2025-06-17 14:54:20 - INFO - epoch:0/25 iteration:385/459 batch loss is :0.1053
+2025-06-17 14:54:41 - INFO - epoch:0/25 iteration:390/459 batch loss is :0.1683
+2025-06-17 14:55:01 - INFO - epoch:0/25 iteration:395/459 batch loss is :0.0722
+2025-06-17 14:55:21 - INFO - epoch:0/25 iteration:400/459 batch loss is :0.2926
+2025-06-17 14:55:41 - INFO - epoch:0/25 iteration:405/459 batch loss is :0.1640
+2025-06-17 14:56:01 - INFO - epoch:0/25 iteration:410/459 batch loss is :0.3009
+2025-06-17 14:56:21 - INFO - epoch:0/25 iteration:415/459 batch loss is :0.1124
+2025-06-17 14:56:32 - ERROR - Caught AssertionError in DataLoader worker process 19.
 Original Traceback (most recent call last):
+  File "D:\AMD-data-visualisation\dataloader.py", line 174, in __getitem__
+    scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
+  File "D:\AMD-data-visualisation\dataloader.py", line 68, in undersampler
+    nums = random.sample(odd_candidates, needed_samples-len(sel_indexes))
+  File "C:\Users\AKS396\.conda\envs\amd\lib\random.py", line 363, in sample
+    raise ValueError("Sample larger than population or is negative")
+ValueError: Sample larger than population or is negative
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
   File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\_utils\worker.py", line 308, in _worker_loop
     data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
   File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\_utils\fetch.py", line 49, in fetch
@@ -174,11 +246,7 @@ Original Traceback (most recent call last):
     return [self.dataset[self.indices[idx]] for idx in indices]
   File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\utils\data\dataset.py", line 419, in <listcomp>
     return [self.dataset[self.indices[idx]] for idx in indices]
-  File "D:\AMD-data-visualisation\dataloader.py", line 173, in __getitem__
-    scan_list=[scan_list[i] for i in undersampler(self.volume_shape[0][0],len(scan_list))]
-  File "D:\AMD-data-visualisation\dataloader.py", line 68, in undersampler
-    nums = random.sample(odd_candidates, needed_samples-len(sel_indexes))
-  File "C:\Users\AKS396\.conda\envs\amd\lib\random.py", line 363, in sample
-    raise ValueError("Sample larger than population or is negative")
-ValueError: Sample larger than population or is negative
+  File "D:\AMD-data-visualisation\dataloader.py", line 177, in __getitem__
+    raise AssertionError
+AssertionError
 
