@@ -2,7 +2,7 @@ import torch
 import matplotlib
 matplotlib.use('Agg')
 from model.resnet_3d import Resnet18_3D
-from model.resnet_medicalnet import resnet10
+from model.resnet_medicalnet import resnet10,resnet34
 from dataloader import OCTDataset,collate_fn
 import json
 import torchvision.transforms as transforms
@@ -19,60 +19,102 @@ from sklearn.model_selection import KFold
 from hooks.batch_hook import create_hook,batchnorm_stats
 from utils.make_plots import get_batch_stats_plot
 import pandas as pd
+from utils.evaluation_metrics import rocPlotter
 
 def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path:str,transform,batch_size:int,num_workers:int,timeout:int,save_path:str,data:str,save_misclassified:bool,excel_save_path:str)->None:
     with open(json_path,'r') as file:
         paths=json.load(file)
     
-       
-    # model=Resnet18_3D(num_classes=6).to(device)
-    model=resnet10(num_classes=5).to(device)
-    class_dict={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4}
-    # hooks = []
-    # for name, module in model.named_modules():
-    #     if isinstance(module, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
-    #         hooks.append(module.register_forward_hook(create_hook(name)))
+    n_classes=6
+    model=resnet34(num_classes=n_classes,shortcut_type='A').to(device)
+    class_dict={'EarlyAMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
+    classes=[key for key in class_dict.keys()]
+    multilabel=True
+    
+    assert class_dict.values()==sorted(class_dict.values()),'the values of class dict keys must be sorted'
+    
     if torch.cuda.device_count()>1:
         model=nn.DataParallel(model)
-    # num_folds=5
-    # kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
-    dataset=OCTDataset(paths[f'{data}_path'],excel_path,transform,attn=False,get_path=True,undersample=True,classes=class_dict)
 
-    # for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):   
+    dataset_config={'transforms':transform
+                        ,'attn':False
+                        ,'undersample':True
+                        ,'classes':class_dict
+                        ,'denoise':False
+                        ,'multiThread':False
+                        ,'old_excel':False}
+    
+    dataset=OCTDataset(paths[f'{data}_path'],excel_path,**dataset_config)
+
     model.load_state_dict(torch.load(model_path,map_location=device))
     dataloader=DataLoader(dataset,batch_size,shuffle=False,num_workers=num_workers,timeout=timeout,collate_fn=collate_fn)
 
     labels=[]
-    preds=[]
+    if multilabel:
+        LOGITS=[]
+    else:
+        preds=[]
     path_scans=[]
     model.eval()
     with torch.no_grad():
         for data,paths,label in tqdm(dataloader):
-            # print(len(data))
             data=[d.to(device) for d in data]
             label=label.to(device)
             logits=model(*data)
-            # print(logits,label)
-            pred=torch.argmax(logits,dim=-1)
-            labels.extend(label.detach().cpu().tolist())
-            preds.extend(pred.detach().cpu().tolist())
+            
+            if multilabel:
+                logits=nn.functional.sigmoid(logits)
+                LOGITS.append(logits)
+            else:
+                pred=torch.argmax(logits,dim=-1)
+                preds.extend(pred.detach().cpu().tolist())
+                
+            labels.extend(label.detach().cpu().tolist())               
             path_scans.extend(paths)
 
-    # print(labels,preds)
-    # labels=torch.concat(labels,dim=0).cpu().numpy()
-    # preds=torch.concat(preds,dim=0).cpu().numpy()
-    classes=["early","inter","ga","wet","notamd"]
-    c_matrix=confusion_matrix(labels,preds)
+    if multilabel:
+        save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
 
-    plt.figure(figsize=(6, 4))
-    sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
-    plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
+        optimalThresholds=rocPlotter(label,logits,n_classes,os.path.dirname(save_path)+os.sep+save_roc,classNames=classes)
+        thres=torch.tensor([optimalThresholds[key] for key in classes])
+        preds = (logits >= thres).int().tolist()
+        conf_matrix_per_class = []
+        for i in range(n_classes):
+            cm = confusion_matrix(label[:, i], preds[:, i], labels=[0, 1])
+            conf_matrix_per_class.append(cm)
+            
 
-    # Save as image
+        # Plot confusion matrix per class in a grid
+        fig, axes = plt.subplots(2, 3, figsize=(15, 8))
+        axes = axes.ravel()
+
+        for i in range(n_classes):
+            sns.heatmap(conf_matrix_per_class[i],
+                        annot=True,
+                        fmt='d',
+                        cmap='Blues',
+                        cbar=False,
+                        ax=axes[i],
+                        xticklabels=["Pred 0", "Pred 1"],
+                        yticklabels=["True 0", "True 1"])
+            axes[i].set_title(f'Class {classes[i]}')
+            axes[i].set_xlabel('Predicted')
+            axes[i].set_ylabel('Actual')
+
+            
+    
+    else:       
+        c_matrix=confusion_matrix(labels,preds)
+        plt.figure(figsize=(6, 4))
+        sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
+        plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
+
+    plt.tight_layout()
     plt.savefig(save_path, dpi=300)
     # plt.show()
+    
     if save_misclassified:
         inverse_class_dict={v:k for k,v in class_dict.items()}
         diff_indexes = [i for i, (a, b) in enumerate(zip(preds,labels )) if a != b]
@@ -93,6 +135,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         
     
 if __name__=="__main__":
+    
     model_path="model_parameter_Resnet_medicalnet\\7\\fold4_epoch14_val_0.3108_train_0.3457"
     device='cuda' if torch.cuda.is_available() else 'cpu'
     json_path="jsons\\train_test_val_split_without_scar_with_both_res.json"
@@ -102,7 +145,7 @@ if __name__=="__main__":
     batch_size=32
     num_workers=1
     timeout=600
-    save_misclassified_data=True
+    save_misclassified_data=False
     results_dir="results"
     data='test'#can either be train or test
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
