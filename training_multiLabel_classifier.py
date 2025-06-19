@@ -77,7 +77,7 @@ if __name__=="__main__":
         parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
-        parser.add_argument('--model-path',type=str,default="pretrained/resnet_34_23dataset.pth",help='path of model parameters to be loaded')
+        parser.add_argument('--model-path',type=str,default="model_parameter_Resnet_medicalnet/30/fold0_epoch10_val_0.0943_train_0.1080",help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.27,0.208,0.074,0.038,0.136,1]),help='weights for weighted cross entropy')
         parser.add_argument('--class_dict',type=dict,default={'EarlyAMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5})
@@ -88,6 +88,7 @@ if __name__=="__main__":
         
         run=wandb.init(project='classifier AMD'
         ,config=vars(args))
+        # wandb.init(id="rosy-dew-31", resume="must")
         param_dir=intialise_logger_nd_create_folders(args)
         
         # device_ids=[1,2,3]
@@ -153,8 +154,8 @@ if __name__=="__main__":
             logging.info(f'fold number:{str(fold)}')
             print(f'fold number :',fold)
 
-            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=20,timeout=600,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=20,timeout=600,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, shuffle=True,num_workers=15,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=15,timeout=600,collate_fn=collate_fn)
             if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
