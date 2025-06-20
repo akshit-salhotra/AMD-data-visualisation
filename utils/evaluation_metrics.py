@@ -69,7 +69,7 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,clas
         optimal_thresholds[key]=str(optimal_thresholds[key]) if not np.isnan(optimal_thresholds[key]) else "1" 
 
     if save_metrics:
-        with open(json_dir+os.sep+"eval_matrix.json",'a') as f:
+        with open(json_dir+os.sep+"eval_matrix.json",'w') as f:
             print(roc_auc,optimal_thresholds)
             json.dump({
                 # 'fpr':fpr,

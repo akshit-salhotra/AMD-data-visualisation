@@ -88,11 +88,12 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         #save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_test_set_{(json_path.split(os.sep)[-1]).split(".")[0]}.png'
         save_roc=save_path.replace("confusion_matrix","roc")
         optimalThresholds=rocPlotter(LOGITS,labels,n_classes,save_roc,json_dir=os.path.dirname(model_path),classNames=classes)
-        thres=np.array([optimalThresholds[key] for key in classes])
-        preds =(LOGITS >= thres).astype(int).tolist()
+        thres=np.array([float(optimalThresholds[key]) for key in classes])
+        print(thres.shape,LOGITS.shape)
+        preds =(LOGITS >= thres).astype(int)
         conf_matrix_per_class = []
         for i in range(n_classes):
-            cm = confusion_matrix(label[:, i], preds[:, i], labels=[0, 1])
+            cm = confusion_matrix(labels[:, i], preds[:, i], labels=[0, 1])
             conf_matrix_per_class.append(cm)
             
 
