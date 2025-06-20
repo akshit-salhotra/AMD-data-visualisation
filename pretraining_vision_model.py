@@ -15,6 +15,7 @@ from model.resnet_3d import Resnet18_3D
 # from model.sequence_model import Seq_Model
 # from model.resnet_medicalnet import resnet10
 from model.auto_encoder import AutoEncoder,AutoEncoder_2d
+from model.networks import NLayerDiscriminator
 from utils.util import SliceLevelPerceptualLoss
 import os
 from tqdm import tqdm
@@ -67,12 +68,12 @@ if __name__=="__main__":
         parser = argparse.ArgumentParser(description="train arguments")
 
         parser.add_argument("--lr", type=float, default=0.0015, help="learning rate")
-        parser.add_argument('--batch',type=float,default=64,help='batch size')
+        parser.add_argument('--batch',type=int,default=4,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='excel\\vol_annotations_06_03_2025.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_2DAutoEncoder')
-        parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
+        parser.add_argument('--save-freq',type=int,default=1,help='after how many epochs are the parameters saved')
         parser.add_argument('--log-dir',type=str,default='logs/2DAutoEncoder',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
@@ -86,6 +87,7 @@ if __name__=="__main__":
         parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--is_2D',type=bool,default=True)
         parser.add_argument('--encoder_type',type=str,default='resnet34',help='which encoder to use')
+        parser.add_argument('--disc_lr_factor',type=float,default=0.25)
 
         args = parser.parse_args()
         
@@ -96,6 +98,16 @@ if __name__=="__main__":
         # model=AutoEncoder(args.model_ch).to(args.device)
         model=AutoEncoder_2d(encoder_type=args.encoder_type).to(args.device)
         model=nn.DataParallel(model)
+
+        disc_config={
+            'input_nc':1
+            ,'ndf':64
+            ,'n_layers':3
+        }
+        run.config.update(disc_config)
+        disc=NLayerDiscriminator(**disc_config)
+        disc=nn.DataParallel(disc)
+
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
 
@@ -151,8 +163,8 @@ if __name__=="__main__":
 
         # run.config.update(dataset_config)
         # print('hi',collate_fn)
-        train_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True,num_workers=15,timeout=300,collate_fn=collate_fn)
-        test_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=False,num_workers=15,timeout=300,collate_fn=collate_fn)
+        train_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True,num_workers=1,timeout=300,collate_fn=collate_fn)
+        test_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=False,num_workers=1,timeout=300,collate_fn=collate_fn)
         
         
         
@@ -179,6 +191,10 @@ if __name__=="__main__":
                             scans=data.to(args.device)
                             
                         recons_scans=model(scans)
+                        print(recons_scans.device,recons_scans.shape)
+                        # label_real = torch.ones(b_size, device=device)
+                        # label_fake = torch.zeros(b_size, device=device)
+                        # logits=disc(recons)
 
                         r_loss=recons_criteron(recons_scans,scans)
                         if not args.is_2D:
@@ -194,7 +210,12 @@ if __name__=="__main__":
                         if iter% args.log_freq==0:
                             logging.info(f'Epoch:{i}/{args.epoch} iteration:{iter}/{math.ceil(len(train_dataset)/args.batch)} Loss is :{loss:.4f} reconstruction loss :{r_loss:.4f} perceptual loss :{p_loss:.4f}')
                         
-                        if iter%(args.log_freq*5)==0:
+                        if iter%(args.log_freq*50)==0:
+                            wandb.log({ "batch loss":loss
+                                       , "batch recon loss":r_loss
+                                       ,"batch percep loss":p_loss
+
+                            })
                             if args.is_2D:
                                 save_reconstructions_2d(args,recons_scans,scans)
                             else:

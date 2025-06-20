@@ -87,9 +87,9 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         LOGITS=np.array(LOGITS)
         #save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_test_set_{(json_path.split(os.sep)[-1]).split(".")[0]}.png'
         save_roc=save_path.replace("confusion_matrix","roc")
-        optimalThresholds=rocPlotter(LOGITS,labels,n_classes,save_roc,json_dir=os.path.basename(model_path),classNames=classes)
+        optimalThresholds=rocPlotter(LOGITS,labels,n_classes,save_roc,json_dir=os.path.dirname(model_path),classNames=classes)
         thres=np.array([optimalThresholds[key] for key in classes])
-        preds =(np.array(LOGITS) >= thres).int().tolist()
+        preds =(LOGITS >= thres).astype(int).tolist()
         conf_matrix_per_class = []
         for i in range(n_classes):
             cm = confusion_matrix(label[:, i], preds[:, i], labels=[0, 1])
@@ -150,7 +150,7 @@ if __name__=="__main__":
     
     model_path="model_parameter_Resnet_medicalnet\\32\\fold2_epoch0_val_0.0846_train_0.0851"
     device='cuda' if torch.cuda.is_available() else 'cpu'
-    json_path="jsons/patient_level/train_val_split_new_dataset.json"
+    json_path="jsons\\patient_level\\train_val_split_new_dataset.json"
     excel_path="excel/vol_annotations_06_03_2025.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
     save_excel_path="excel//misclassified_data.xlsx"
@@ -163,5 +163,6 @@ if __name__=="__main__":
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
     save_file= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
+    print(save_file)
 
     evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data,save_misclassified_data,save_excel_path)

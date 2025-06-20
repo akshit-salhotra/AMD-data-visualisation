@@ -119,6 +119,7 @@ class AutoEncoder_2d(nn.Module):
         self.sig=nn.Sigmoid()
 
     def forward(self,x):
+
         x=self.encoder(x)
         x=self.decoder(x)
 

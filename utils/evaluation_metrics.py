@@ -37,6 +37,8 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,clas
     axs = axs.ravel()  # flatten the 2D array of axes
 
     for i in range(n_classes):
+        key=classNames[i] if classNames is not None else i
+       
         axs[i].plot(fpr[key], tpr[key], label=f'AUC = {roc_auc[key]:.2f}', color='C0')
         
         # Mark optimal threshold
@@ -57,22 +59,22 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,clas
         plt.tight_layout()
 
     for key in tpr.keys():
-        tpr[key]=tpr[key].tolist()
-        fpr[key]=fpr[key].tolist()
-        for i,val in enumerate(thresholds[key]):
-            if np.isnan(val):
-                thresholds[key][i]=1
-        thresholds[key]=thresholds[key].tolist()
-        roc_auc[key]=[roc_auc[key]]
-        optimal_thresholds[key]=[optimal_thresholds[key] if not np.isnan(optimal_thresholds[key]) else 1 ]
+    #     tpr[key]=tpr[key].tolist()
+    #     fpr[key]=fpr[key].tolist()
+    #     for i,val in enumerate(thresholds[key]):
+    #         if np.isnan(val):
+    #             thresholds[key][i]=1
+    #     thresholds[key]=thresholds[key].tolist()
+        roc_auc[key]=str(roc_auc[key])
+        optimal_thresholds[key]=str(optimal_thresholds[key]) if not np.isnan(optimal_thresholds[key]) else "1" 
 
     if save_metrics:
         with open(json_dir+os.sep+"eval_matrix.json",'a') as f:
-            print(tpr,fpr,thresholds,roc_auc,optimal_thresholds)
+            print(roc_auc,optimal_thresholds)
             json.dump({
-                'fpr':fpr,
-                'tpr':tpr,
-                'threshold':thresholds,
+                # 'fpr':fpr,
+                # 'tpr':tpr,
+                # 'threshold':thresholds,
                 'roc_auc':roc_auc,
                 'optimal threshold':optimal_thresholds,
             },f,indent=4)

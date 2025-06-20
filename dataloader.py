@@ -14,6 +14,9 @@ def process_bscan(bscan, scans_dir, denoise,clahe, raw_scans, transforms):
     img_path = scans_dir + os.sep + bscan
     img = cv2.imread(img_path, 0)
 
+    if img is None:
+        print(img_path)
+
     # Store raw scan
     if raw_scans:
         raw = torch.from_numpy(img)
@@ -283,6 +286,7 @@ class B_ScanDataset(Dataset):
         return len(self.bscan_paths)
     
     def __getitem__(self,idx):
+
         path=self.bscan_paths[idx]
         self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
 
