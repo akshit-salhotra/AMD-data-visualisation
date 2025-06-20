@@ -5,3 +5,4 @@ model_parameter_Resnet_medicalnet
 pretrained
 wandb
 model_parameter_Resnet_pretraining
+model_parameter_2DAutoEncoder

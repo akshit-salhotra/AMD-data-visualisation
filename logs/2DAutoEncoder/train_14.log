@@ -1,0 +1,393 @@
+2025-06-20 04:16:42 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-20 04:16:42 - INFO - starting new training !!!!
+2025-06-20 04:16:42 - INFO - ------------------------------------------------------------------------------------------------
+2025-06-20 04:16:42 - INFO - Namespace(batch=32, class_dict={'early': 0, 'inter': 1, 'ga': 2, 'wet': 3, 'notAMD': 4}, device=device(type='cuda'), encoder_type='resnet34', epoch=25, excel_path='excel\\vol_annotations_06_03_2025.xlsx', gamma=0.1, is_2D=True, json='jsons/train_test_val_split_without_scar.json', lambda_percep=0.01, log_dir='logs/2DAutoEncoder', log_freq=5, lr=0.0015, model_ch=[64, 128, 256, 512], model_path=None, save_bscans=tensor([36, 48, 60, 72]), save_dir='model_parameter_2DAutoEncoder', save_freq=5, save_recons=True, step_size=10)
+2025-06-20 04:16:42 - INFO - parameters are being saved at :model_parameter_2DAutoEncoder\14
+2025-06-20 04:16:45 - INFO - found 4 gpus!
+2025-06-20 04:16:45 - INFO - DataParallel(
+  (module): AutoEncoder_2d(
+    (encoder): Sequential(
+      (0): Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))
+      (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): MaxPool2d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+      (4): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (2): BasicBlock(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (5): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (downsample): Sequential(
+            (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (2): BasicBlock(
+          (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (3): BasicBlock(
+          (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (6): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (downsample): Sequential(
+            (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (2): BasicBlock(
+          (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (3): BasicBlock(
+          (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (4): BasicBlock(
+          (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (5): BasicBlock(
+          (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (7): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (downsample): Sequential(
+            (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+            (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (2): BasicBlock(
+          (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (decoder): Sequential(
+      (0): Decoder_block_2d(
+        (upsample): ConvTranspose2d(512, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1))
+        (norm): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU()
+        (conv): Sequential(
+          (0): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+        )
+        (aux_conv): Sequential(
+          (0): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (3): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (4): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (5): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (6): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (7): Sequential(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+        )
+        (resize_conv): ConvTranspose2d(512, 256, kernel_size=(2, 2), stride=(2, 2))
+      )
+      (1): Decoder_block_2d(
+        (upsample): ConvTranspose2d(256, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1))
+        (norm): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU()
+        (conv): Sequential(
+          (0): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+        )
+        (aux_conv): Sequential(
+          (0): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (3): Sequential(
+            (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+        )
+        (resize_conv): ConvTranspose2d(256, 128, kernel_size=(2, 2), stride=(2, 2))
+      )
+      (2): Decoder_block_2d(
+        (upsample): ConvTranspose2d(128, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1))
+        (norm): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU()
+        (conv): Sequential(
+          (0): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+        )
+        (aux_conv): Sequential(
+          (0): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+        )
+        (resize_conv): ConvTranspose2d(128, 64, kernel_size=(2, 2), stride=(2, 2))
+      )
+      (3): Interpolate_2d()
+      (4): ConvTranspose2d(64, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), output_padding=(1, 1))
+      (5): Conv2d(64, 1, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (sig): Sigmoid()
+  )
+)
+2025-06-20 04:19:03 - INFO - Epoch:0/25 iteration:0/38042 Loss is :0.2036 reconstruction loss :0.1021 perceptual loss :10.1453
+2025-06-20 04:19:06 - INFO - Epoch:0/25 iteration:5/38042 Loss is :0.1310 reconstruction loss :0.0477 perceptual loss :8.3314
+2025-06-20 04:19:08 - INFO - Epoch:0/25 iteration:10/38042 Loss is :0.1131 reconstruction loss :0.0243 perceptual loss :8.8774
+2025-06-20 04:19:10 - INFO - Epoch:0/25 iteration:15/38042 Loss is :0.1078 reconstruction loss :0.0220 perceptual loss :8.5764
+2025-06-20 04:19:12 - INFO - Epoch:0/25 iteration:20/38042 Loss is :0.1018 reconstruction loss :0.0202 perceptual loss :8.1648
+2025-06-20 04:19:14 - INFO - Epoch:0/25 iteration:25/38042 Loss is :0.0971 reconstruction loss :0.0157 perceptual loss :8.1372
+2025-06-20 04:19:16 - INFO - Epoch:0/25 iteration:30/38042 Loss is :0.0977 reconstruction loss :0.0183 perceptual loss :7.9436
+2025-06-20 04:19:18 - INFO - Epoch:0/25 iteration:35/38042 Loss is :0.0995 reconstruction loss :0.0156 perceptual loss :8.3931
+2025-06-20 04:19:21 - INFO - Epoch:0/25 iteration:40/38042 Loss is :0.0994 reconstruction loss :0.0159 perceptual loss :8.3501
+2025-06-20 04:19:23 - INFO - Epoch:0/25 iteration:45/38042 Loss is :0.0927 reconstruction loss :0.0157 perceptual loss :7.7044
+2025-06-20 04:19:25 - INFO - Epoch:0/25 iteration:50/38042 Loss is :0.0958 reconstruction loss :0.0174 perceptual loss :7.8365
+2025-06-20 04:19:27 - INFO - Epoch:0/25 iteration:55/38042 Loss is :0.0923 reconstruction loss :0.0158 perceptual loss :7.6503
+2025-06-20 04:19:30 - INFO - Epoch:0/25 iteration:60/38042 Loss is :0.0969 reconstruction loss :0.0164 perceptual loss :8.0424
+2025-06-20 04:19:32 - INFO - Epoch:0/25 iteration:65/38042 Loss is :0.0932 reconstruction loss :0.0151 perceptual loss :7.8090
+2025-06-20 04:19:34 - INFO - Epoch:0/25 iteration:70/38042 Loss is :0.0906 reconstruction loss :0.0150 perceptual loss :7.5570
+2025-06-20 04:19:36 - INFO - Epoch:0/25 iteration:75/38042 Loss is :0.0938 reconstruction loss :0.0151 perceptual loss :7.8756
+2025-06-20 04:19:38 - INFO - Epoch:0/25 iteration:80/38042 Loss is :0.0917 reconstruction loss :0.0154 perceptual loss :7.6218
+2025-06-20 04:19:41 - INFO - Epoch:0/25 iteration:85/38042 Loss is :0.0914 reconstruction loss :0.0150 perceptual loss :7.6407
+2025-06-20 04:19:43 - INFO - Epoch:0/25 iteration:90/38042 Loss is :0.0894 reconstruction loss :0.0143 perceptual loss :7.5085
+2025-06-20 04:19:45 - INFO - Epoch:0/25 iteration:95/38042 Loss is :0.0900 reconstruction loss :0.0148 perceptual loss :7.5242
+2025-06-20 04:19:47 - INFO - Epoch:0/25 iteration:100/38042 Loss is :0.0895 reconstruction loss :0.0141 perceptual loss :7.5408
+2025-06-20 04:19:49 - INFO - Epoch:0/25 iteration:105/38042 Loss is :0.0902 reconstruction loss :0.0144 perceptual loss :7.5752
+2025-06-20 04:19:52 - INFO - Epoch:0/25 iteration:110/38042 Loss is :0.0941 reconstruction loss :0.0144 perceptual loss :7.9735
+2025-06-20 04:19:54 - INFO - Epoch:0/25 iteration:115/38042 Loss is :0.0896 reconstruction loss :0.0147 perceptual loss :7.4899
+2025-06-20 04:19:56 - INFO - Epoch:0/25 iteration:120/38042 Loss is :0.0891 reconstruction loss :0.0140 perceptual loss :7.5060
+2025-06-20 04:19:58 - INFO - Epoch:0/25 iteration:125/38042 Loss is :0.0911 reconstruction loss :0.0140 perceptual loss :7.7059
+2025-06-20 04:20:00 - INFO - Epoch:0/25 iteration:130/38042 Loss is :0.0889 reconstruction loss :0.0133 perceptual loss :7.5594
+2025-06-20 04:20:03 - INFO - Epoch:0/25 iteration:135/38042 Loss is :0.0853 reconstruction loss :0.0112 perceptual loss :7.4110
+2025-06-20 04:20:05 - INFO - Epoch:0/25 iteration:140/38042 Loss is :0.0837 reconstruction loss :0.0104 perceptual loss :7.3281
+2025-06-20 04:20:07 - INFO - Epoch:0/25 iteration:145/38042 Loss is :0.0851 reconstruction loss :0.0119 perceptual loss :7.3211
+2025-06-20 04:20:09 - INFO - Epoch:0/25 iteration:150/38042 Loss is :0.0859 reconstruction loss :0.0113 perceptual loss :7.4630
+2025-06-20 04:20:12 - INFO - Epoch:0/25 iteration:155/38042 Loss is :0.0846 reconstruction loss :0.0105 perceptual loss :7.4065
+2025-06-20 04:20:14 - INFO - Epoch:0/25 iteration:160/38042 Loss is :0.0852 reconstruction loss :0.0103 perceptual loss :7.4858
+2025-06-20 04:20:16 - INFO - Epoch:0/25 iteration:165/38042 Loss is :0.0838 reconstruction loss :0.0095 perceptual loss :7.4318
+2025-06-20 04:20:18 - INFO - Epoch:0/25 iteration:170/38042 Loss is :0.0818 reconstruction loss :0.0094 perceptual loss :7.2352
+2025-06-20 04:20:20 - INFO - Epoch:0/25 iteration:175/38042 Loss is :0.0807 reconstruction loss :0.0095 perceptual loss :7.1213
+2025-06-20 04:20:23 - INFO - Epoch:0/25 iteration:180/38042 Loss is :0.0834 reconstruction loss :0.0099 perceptual loss :7.3494
+2025-06-20 04:20:25 - INFO - Epoch:0/25 iteration:185/38042 Loss is :0.0821 reconstruction loss :0.0093 perceptual loss :7.2775
+2025-06-20 04:20:27 - INFO - Epoch:0/25 iteration:190/38042 Loss is :0.0835 reconstruction loss :0.0097 perceptual loss :7.3808
+2025-06-20 04:20:29 - INFO - Epoch:0/25 iteration:195/38042 Loss is :0.0830 reconstruction loss :0.0093 perceptual loss :7.3675
+2025-06-20 04:20:32 - INFO - Epoch:0/25 iteration:200/38042 Loss is :0.0865 reconstruction loss :0.0116 perceptual loss :7.4955
+2025-06-20 04:20:34 - INFO - Epoch:0/25 iteration:205/38042 Loss is :0.0844 reconstruction loss :0.0096 perceptual loss :7.4856
+2025-06-20 04:20:36 - INFO - Epoch:0/25 iteration:210/38042 Loss is :0.0806 reconstruction loss :0.0089 perceptual loss :7.1742
+2025-06-20 04:20:38 - INFO - Epoch:0/25 iteration:215/38042 Loss is :0.0826 reconstruction loss :0.0101 perceptual loss :7.2435
+2025-06-20 04:20:41 - INFO - Epoch:0/25 iteration:220/38042 Loss is :0.0813 reconstruction loss :0.0103 perceptual loss :7.0992
+2025-06-20 04:20:43 - INFO - Epoch:0/25 iteration:225/38042 Loss is :0.0817 reconstruction loss :0.0089 perceptual loss :7.2804
+2025-06-20 04:20:45 - INFO - Epoch:0/25 iteration:230/38042 Loss is :0.0876 reconstruction loss :0.0095 perceptual loss :7.8148
+2025-06-20 04:20:48 - INFO - Epoch:0/25 iteration:235/38042 Loss is :0.0862 reconstruction loss :0.0107 perceptual loss :7.5428
+2025-06-20 04:20:50 - INFO - Epoch:0/25 iteration:240/38042 Loss is :0.0809 reconstruction loss :0.0095 perceptual loss :7.1392
+2025-06-20 04:20:52 - INFO - Epoch:0/25 iteration:245/38042 Loss is :0.0825 reconstruction loss :0.0094 perceptual loss :7.3122
+2025-06-20 04:20:54 - INFO - Epoch:0/25 iteration:250/38042 Loss is :0.0783 reconstruction loss :0.0089 perceptual loss :6.9411
+2025-06-20 04:20:57 - INFO - Epoch:0/25 iteration:255/38042 Loss is :0.0799 reconstruction loss :0.0097 perceptual loss :7.0251
+2025-06-20 04:20:59 - INFO - Epoch:0/25 iteration:260/38042 Loss is :0.0784 reconstruction loss :0.0090 perceptual loss :6.9427
+2025-06-20 04:21:01 - INFO - Epoch:0/25 iteration:265/38042 Loss is :0.0793 reconstruction loss :0.0093 perceptual loss :7.0056
+2025-06-20 04:21:03 - INFO - Epoch:0/25 iteration:270/38042 Loss is :0.0771 reconstruction loss :0.0092 perceptual loss :6.7828
+2025-06-20 04:21:05 - INFO - Epoch:0/25 iteration:275/38042 Loss is :0.0771 reconstruction loss :0.0091 perceptual loss :6.7929
+2025-06-20 04:21:08 - INFO - Epoch:0/25 iteration:280/38042 Loss is :0.0766 reconstruction loss :0.0098 perceptual loss :6.6785
+2025-06-20 04:21:10 - INFO - Epoch:0/25 iteration:285/38042 Loss is :0.0741 reconstruction loss :0.0097 perceptual loss :6.4421
+2025-06-20 04:21:12 - INFO - Epoch:0/25 iteration:290/38042 Loss is :0.0749 reconstruction loss :0.0099 perceptual loss :6.5010
+2025-06-20 04:21:14 - INFO - Epoch:0/25 iteration:295/38042 Loss is :0.0742 reconstruction loss :0.0096 perceptual loss :6.4613
+2025-06-20 04:21:16 - INFO - Epoch:0/25 iteration:300/38042 Loss is :0.0708 reconstruction loss :0.0089 perceptual loss :6.1879
+2025-06-20 04:21:19 - INFO - Epoch:0/25 iteration:305/38042 Loss is :0.0731 reconstruction loss :0.0094 perceptual loss :6.3755
+2025-06-20 04:21:21 - INFO - Epoch:0/25 iteration:310/38042 Loss is :0.0725 reconstruction loss :0.0095 perceptual loss :6.2950
+2025-06-20 04:21:23 - INFO - Epoch:0/25 iteration:315/38042 Loss is :0.0720 reconstruction loss :0.0088 perceptual loss :6.3253
+2025-06-20 04:21:26 - INFO - Epoch:0/25 iteration:320/38042 Loss is :0.0723 reconstruction loss :0.0093 perceptual loss :6.3027
+2025-06-20 04:21:28 - INFO - Epoch:0/25 iteration:325/38042 Loss is :0.0726 reconstruction loss :0.0090 perceptual loss :6.3576
+2025-06-20 04:21:30 - INFO - Epoch:0/25 iteration:330/38042 Loss is :0.0710 reconstruction loss :0.0088 perceptual loss :6.2189
+2025-06-20 04:21:32 - INFO - Epoch:0/25 iteration:335/38042 Loss is :0.0810 reconstruction loss :0.0147 perceptual loss :6.6279
+2025-06-20 04:21:34 - INFO - Epoch:0/25 iteration:340/38042 Loss is :0.0782 reconstruction loss :0.0139 perceptual loss :6.4297
+2025-06-20 04:21:37 - INFO - Epoch:0/25 iteration:345/38042 Loss is :0.0774 reconstruction loss :0.0142 perceptual loss :6.3255
+2025-06-20 04:21:39 - INFO - Epoch:0/25 iteration:350/38042 Loss is :0.0788 reconstruction loss :0.0143 perceptual loss :6.4584
+2025-06-20 04:21:41 - INFO - Epoch:0/25 iteration:355/38042 Loss is :0.0792 reconstruction loss :0.0138 perceptual loss :6.5377
+2025-06-20 04:21:44 - INFO - Epoch:0/25 iteration:360/38042 Loss is :0.0770 reconstruction loss :0.0141 perceptual loss :6.2912
+2025-06-20 04:21:46 - INFO - Epoch:0/25 iteration:365/38042 Loss is :0.0745 reconstruction loss :0.0121 perceptual loss :6.2448
+2025-06-20 04:21:48 - INFO - Epoch:0/25 iteration:370/38042 Loss is :0.0750 reconstruction loss :0.0116 perceptual loss :6.3362
+2025-06-20 04:21:50 - INFO - Epoch:0/25 iteration:375/38042 Loss is :0.0722 reconstruction loss :0.0111 perceptual loss :6.1075
+2025-06-20 04:21:53 - INFO - Epoch:0/25 iteration:380/38042 Loss is :0.0718 reconstruction loss :0.0103 perceptual loss :6.1506
+2025-06-20 04:21:55 - INFO - Epoch:0/25 iteration:385/38042 Loss is :0.0704 reconstruction loss :0.0095 perceptual loss :6.0865
+2025-06-20 04:21:57 - INFO - Epoch:0/25 iteration:390/38042 Loss is :0.0722 reconstruction loss :0.0101 perceptual loss :6.2128
+2025-06-20 04:21:59 - INFO - Epoch:0/25 iteration:395/38042 Loss is :0.0715 reconstruction loss :0.0100 perceptual loss :6.1431
+2025-06-20 04:22:01 - INFO - Epoch:0/25 iteration:400/38042 Loss is :0.0715 reconstruction loss :0.0098 perceptual loss :6.1693
+2025-06-20 04:22:04 - INFO - Epoch:0/25 iteration:405/38042 Loss is :0.0703 reconstruction loss :0.0089 perceptual loss :6.1365
+2025-06-20 04:22:06 - INFO - Epoch:0/25 iteration:410/38042 Loss is :0.0694 reconstruction loss :0.0087 perceptual loss :6.0775
+2025-06-20 04:22:08 - INFO - Epoch:0/25 iteration:415/38042 Loss is :0.0714 reconstruction loss :0.0090 perceptual loss :6.2432
+2025-06-20 04:22:10 - INFO - Epoch:0/25 iteration:420/38042 Loss is :0.0696 reconstruction loss :0.0087 perceptual loss :6.0926
+2025-06-20 04:22:12 - INFO - Epoch:0/25 iteration:425/38042 Loss is :0.0701 reconstruction loss :0.0092 perceptual loss :6.0910
+2025-06-20 04:22:15 - INFO - Epoch:0/25 iteration:430/38042 Loss is :0.0714 reconstruction loss :0.0093 perceptual loss :6.2129
+2025-06-20 04:22:17 - INFO - Epoch:0/25 iteration:435/38042 Loss is :0.0700 reconstruction loss :0.0092 perceptual loss :6.0889
+2025-06-20 04:22:20 - INFO - Epoch:0/25 iteration:440/38042 Loss is :0.0713 reconstruction loss :0.0093 perceptual loss :6.2022
+2025-06-20 04:22:22 - INFO - Epoch:0/25 iteration:445/38042 Loss is :0.0722 reconstruction loss :0.0092 perceptual loss :6.3035
+2025-06-20 04:22:24 - INFO - Epoch:0/25 iteration:450/38042 Loss is :0.0685 reconstruction loss :0.0088 perceptual loss :5.9737
+2025-06-20 04:22:26 - INFO - Epoch:0/25 iteration:455/38042 Loss is :0.0705 reconstruction loss :0.0096 perceptual loss :6.0835
+2025-06-20 04:22:28 - INFO - Epoch:0/25 iteration:460/38042 Loss is :0.0700 reconstruction loss :0.0092 perceptual loss :6.0746
+2025-06-20 04:22:31 - INFO - Epoch:0/25 iteration:465/38042 Loss is :0.0691 reconstruction loss :0.0088 perceptual loss :6.0319

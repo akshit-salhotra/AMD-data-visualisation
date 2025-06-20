@@ -28,10 +28,12 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     n_classes=6
     model=resnet34(num_classes=n_classes,shortcut_type='A').to(device)
     class_dict={'EarlyAMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
+    class_dict = dict(sorted(class_dict.items(), key=lambda item: item[1]))
+
     classes=[key for key in class_dict.keys()]
     multilabel=True
     
-    assert class_dict.values()==sorted(class_dict.values()),'the values of class dict keys must be sorted'
+    assert list(class_dict.values())==sorted(list(class_dict.values())),'the values of class dict keys must be sorted'
     
     if torch.cuda.device_count()>1:
         model=nn.DataParallel(model)
@@ -44,8 +46,8 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
                         ,'multiThread':False
                         ,'old_excel':False}
     
-    dataset=OCTDataset(paths[f'{data}_path'],excel_path,**dataset_config)
-
+    dataset=OCTDataset(paths[f'{data}_indices'],excel_path,**dataset_config)
+    # dataset=Subset(dataset,range(4))
     model.load_state_dict(torch.load(model_path,map_location=device))
     dataloader=DataLoader(dataset,batch_size,shuffle=False,num_workers=num_workers,timeout=timeout,collate_fn=collate_fn)
 
@@ -64,20 +66,30 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
             
             if multilabel:
                 logits=nn.functional.sigmoid(logits)
-                LOGITS.append(logits)
+                LOGITS.extend(logits.detach().cpu().numpy())
             else:
                 pred=torch.argmax(logits,dim=-1)
-                preds.extend(pred.detach().cpu().tolist())
+                preds.extend(pred.detach().cpu().numpy())
                 
-            labels.extend(label.detach().cpu().tolist())               
-            path_scans.extend(paths)
+            labels.extend(label.detach().cpu().numpy())     
+            if save_misclassified:          
+                path_scans.extend(paths)
 
     if multilabel:
-        save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
+        # print(LOGITS[0].device,label[0].device)
+        labels=np.array(labels)
 
-        optimalThresholds=rocPlotter(label,logits,n_classes,os.path.dirname(save_path)+os.sep+save_roc,classNames=classes)
-        thres=torch.tensor([optimalThresholds[key] for key in classes])
-        preds = (logits >= thres).int().tolist()
+        # print(labels.shape,LOGITS.shape)
+        # print([v.shape for v in LOGITS])
+        # print([])
+
+
+        LOGITS=np.array(LOGITS)
+        #save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_test_set_{(json_path.split(os.sep)[-1]).split(".")[0]}.png'
+        save_roc=save_path.replace("confusion_matrix","roc")
+        optimalThresholds=rocPlotter(LOGITS,labels,n_classes,save_roc,json_dir=os.path.basename(model_path),classNames=classes)
+        thres=np.array([optimalThresholds[key] for key in classes])
+        preds =(np.array(LOGITS) >= thres).int().tolist()
         conf_matrix_per_class = []
         for i in range(n_classes):
             cm = confusion_matrix(label[:, i], preds[:, i], labels=[0, 1])
@@ -136,14 +148,14 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     
 if __name__=="__main__":
     
-    model_path="model_parameter_Resnet_medicalnet\\7\\fold4_epoch14_val_0.3108_train_0.3457"
+    model_path="model_parameter_Resnet_medicalnet\\32\\fold2_epoch0_val_0.0846_train_0.0851"
     device='cuda' if torch.cuda.is_available() else 'cpu'
-    json_path="jsons\\train_test_val_split_without_scar_with_both_res.json"
-    excel_path=r"d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx"
+    json_path="jsons/patient_level/train_val_split_new_dataset.json"
+    excel_path="excel/vol_annotations_06_03_2025.xlsx"
     transform=transforms.Compose([transforms.ToTensor(),transforms.Resize((256,256))])
     save_excel_path="excel//misclassified_data.xlsx"
     batch_size=32
-    num_workers=1
+    num_workers=12
     timeout=600
     save_misclassified_data=False
     results_dir="results"

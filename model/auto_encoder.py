@@ -103,10 +103,19 @@ class AutoEncoder(nn.Module):
 
 class AutoEncoder_2d(nn.Module):
 
-    def __init__(self):
+    def __init__(self,encoder_type):
         super().__init__()
-        self.encoder=nn.Sequential(nn.Conv2d(1,64,7,2,3),*(list(models.resnet18().children())[1:-2]))
-        self.decoder=AutoEncoder_2d.get_decoder()
+        encoders={
+            'resnet18':models.resnet18
+            ,'resnet34':models.resnet34
+        }
+        aux_blocks={'resnet18':[0,0,0]
+                    ,'resnet34':[8,4,2]}
+        
+        assert encoder_type in list(encoders.keys()) ,f"invalid encoder type"
+
+        self.encoder=nn.Sequential(nn.Conv2d(1,64,7,2,3),*(list(encoders[encoder_type]().children())[1:-2]))
+        self.decoder=AutoEncoder_2d.get_decoder(aux_blocks[encoder_type])
         self.sig=nn.Sigmoid()
 
     def forward(self,x):
@@ -116,30 +125,34 @@ class AutoEncoder_2d(nn.Module):
         return self.sig(x)
 
     @staticmethod
-    def get_decoder(ch=[64,128,256,512]):
+    def get_decoder(aux_blocks:list,ch=[64,128,256,512]):
         ch.reverse()
         l=len(ch)
-        ch.append(ch[-1])
+        # ch.append(ch[-1])
         layers=[]
         # print('the number of upsample blocks are :',ch)
-        for i in range(l):
-            layers.append(Decoder_block_2d(ch[i],ch[i+1],3))
+        for i in range(l-1):
+            layers.append(Decoder_block_2d(ch[i],ch[i+1],3,aux_blocks[i]))
         
         layers.append(Interpolate_2d())
-        layers.append(nn.Conv2d(ch[-1],1,7,1,3))
+        layers.append(nn.ConvTranspose2d(ch[-1],ch[-1],7,2,3,1))
+        layers.append(nn.Conv2d(ch[-1],1,1,1,0))
 
         return nn.Sequential(*layers)
 
 class Decoder_block_2d(nn.Module):
     
-    def __init__(self,in_ch,out_ch,kernel):
+    def __init__(self,in_ch,out_ch,kernel,aux_blocks=0):
         super().__init__()
         self.upsample=nn.ConvTranspose2d(in_ch,out_ch,kernel,stride=2,padding=1,output_padding=1)
         self.norm=nn.BatchNorm2d(out_ch)
         self.relu=nn.ReLU()
 
         self.conv=nn.Sequential(*[Decoder_block_2d.create_conv(out_ch,out_ch,kernel,1,kernel//2) for _ in range(3)])
-        
+        # self.comv=nn.Sequential(*[Decoder_block_2d.create_conv(out_ch,out_ch,kernel,1,kernel//2) for _ in r])
+        if aux_blocks>0:
+            self.aux_conv=nn.Sequential(*[Decoder_block_2d.create_conv(out_ch,out_ch,kernel,1,kernel//2) for _ in range(aux_blocks)])
+        self.aux_blocks=aux_blocks
         self.resize_conv=nn.ConvTranspose2d(in_ch,out_ch,2,2)
 
     
@@ -151,6 +164,9 @@ class Decoder_block_2d(nn.Module):
 
         out=self.conv[1](out)
         out=self.conv[2](out)
+
+        if self.aux_blocks>0:
+            out=self.aux_conv(out)
 
         return out
     
@@ -165,7 +181,7 @@ if __name__=="__main__":
 
     device=torch.device('cpu' if torch.cuda.is_available() else 'cpu')
     
-    model=AutoEncoder_2d().to(device)
+    model=AutoEncoder_2d('resnet34').to(device)
     # this data is misleading due to repetitions
     summary(model,(1,256,256),2,device='cpu')
 

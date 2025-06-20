@@ -29,6 +29,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import wandb
 
+def add_noise(x):
+    return x + 0.001 * torch.randn_like(x)
+
 def save_reconstructions_3d(args,recons_scans,scans,idx=None):
     b_scans=[]
     for index in range(min(4,args.batch)):
@@ -63,25 +66,26 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
-        parser.add_argument('--batch',type=float,default=1,help='batch size')
-        parser.add_argument('--epoch',type=int,default=2,help='number of epoch')
+        parser.add_argument("--lr", type=float, default=0.0015, help="learning rate")
+        parser.add_argument('--batch',type=float,default=64,help='batch size')
+        parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
-        parser.add_argument('--excel-path',type=str,default='d:\\cleaning_GUI_annotated_data\\tab_data_annotated_pats.xlsx',help='path of excel containing labels')
-        parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_pretraining')
+        parser.add_argument('--excel-path',type=str,default='excel\\vol_annotations_06_03_2025.xlsx',help='path of excel containing labels')
+        parser.add_argument('--save-dir',type=str,default='model_parameter_2DAutoEncoder')
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
-        parser.add_argument('--log-dir',type=str,default='logs/Resnet_pretraining',help='the directory in which training logs are to be saved')
+        parser.add_argument('--log-dir',type=str,default='logs/2DAutoEncoder',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
         parser.add_argument('--model-path',type=str,default=None,help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--log-freq',type=int,default=5,help='after how many iterations losses are logged')
-        parser.add_argument('--lambda_percep',type=float,default=0.8,help="weighting factor for perceptual loss")
+        parser.add_argument('--lambda_percep',type=float,default=0.01,help="weighting factor for perceptual loss")
         parser.add_argument('--model_ch',type=list,default=[64,128,256,512],help="channels in different layers of resnet")
         parser.add_argument('--save_recons',type=bool,default=True,help="whether to save some reconstructions")
         parser.add_argument('--save_bscans',type=torch.Tensor,default=torch.tensor([36,48,60,72]),help="which reconstructed bscans to save")
         parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--is_2D',type=bool,default=True)
+        parser.add_argument('--encoder_type',type=str,default='resnet34',help='which encoder to use')
 
         args = parser.parse_args()
         
@@ -90,7 +94,7 @@ if __name__=="__main__":
         ,config=vars(args))
         
         # model=AutoEncoder(args.model_ch).to(args.device)
-        model=AutoEncoder_2d().to(args.device)
+        model=AutoEncoder_2d(encoder_type=args.encoder_type).to(args.device)
         model=nn.DataParallel(model)
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
@@ -112,9 +116,10 @@ if __name__=="__main__":
         
         transform=transforms.Compose([transforms.ToTensor(),
                                     #   transforms.RandomHorizontalFlip(),
-                                    transforms.Resize((256,256),
+                                    transforms.Resize((256,256)),
                                     transforms.RandomAffine(degrees=5, translate=(0.05, 0.05)),
-                                    transforms.Lambda(lambda x: x + 0.01 * torch.randn_like(x)))])
+                                    # transforms.Lambda(add_noise)
+                                    ])
         
         if not args.is_2D:
             dataset_config={'transforms':transform,
@@ -132,17 +137,20 @@ if __name__=="__main__":
             dataset_config={'transform':transform,
                             'denoise':denoise}
             dataset=B_ScanDataset(transform,args.excel_path,denoise)
-            val_percent = 0.10
+            val_percent = 0.02
             val_size = int(len(dataset) * val_percent)
             train_size = len(dataset) - val_size
 
             generator = torch.Generator().manual_seed(42)
 
             train_dataset, val_dataset = random_split(dataset, [train_size, val_size], generator=generator)
+            # train_dataset=Subset(dataset,range(10))
+            # val_dataset=Subset(dataset,range(10))
             print('number of scans in train set :',len(train_dataset))
             print('number of scans in val set',len(val_dataset))
 
-        run.config.update(dataset_config)
+        # run.config.update(dataset_config)
+        # print('hi',collate_fn)
         train_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True,num_workers=15,timeout=300,collate_fn=collate_fn)
         test_loader = DataLoader(train_dataset, batch_size=args.batch, shuffle=False,num_workers=15,timeout=300,collate_fn=collate_fn)
         
@@ -201,7 +209,7 @@ if __name__=="__main__":
                         optimizer.zero_grad()
                         return epoch_loss,percep_loss,recons_loss
 
-                for iter,(data,_,_) in tqdm(enumerate(train_loader)):
+                for iter,data in tqdm(enumerate(train_loader)):
 
                         epoch_loss,percep_loss,recons_loss=train(args,data,recons_loss,percep_loss,epoch_loss)
 
@@ -225,7 +233,7 @@ if __name__=="__main__":
                     model.eval()
                     
                     with torch.no_grad():
-                        for i,(data,_,_) in enumerate(test_loader):
+                        for i,data in enumerate(test_loader):
                             if not args.is_2D:
                                 scans=data[0].to(args.device)
                             else:

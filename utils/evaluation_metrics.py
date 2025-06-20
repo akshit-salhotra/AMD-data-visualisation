@@ -5,7 +5,8 @@ import json
 import os
 
 
-def rocPlotter(y_score,y_true,n_classes,save_dir,save_metrics=True,classNames=None):
+def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,classNames=None):
+    print("??")
     
     # Initialize metrics storage
     fpr = dict()
@@ -19,8 +20,8 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,save_metrics=True,classNames=No
     
     # Compute ROC and optimal thresholds
     for i in range(n_classes):
-        key=classNames[key] if classNames is not None else i
-        fpr[key], tpr[key], thresholds[key] = roc_curve(y_true[:, i], y_score[:, i])
+        key=classNames[i] if classNames is not None else i
+        fpr[key], tpr[key], thresholds[key] = roc_curve(y_true[:, i].squeeze(), y_score[:, i].squeeze())
         roc_auc[key] = auc(fpr[key], tpr[key])
         J_scores = tpr[key] - fpr[key]
         ix = np.argmax(J_scores)
@@ -29,6 +30,7 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,save_metrics=True,classNames=No
             print(f'Class {classNames[i]}: Optimal threshold = {optimal_thresholds[key]:.2f}, AUC = {roc_auc[key]:.2f}')
         else:
             print(f'Class {i}: Optimal threshold = {optimal_thresholds[key]:.2f}, AUC = {roc_auc[key]:.2f}')
+
 
     # Plotting ROC curves in 2x3 grid
     fig, axs = plt.subplots(2, 3, figsize=(15, 8))
@@ -54,8 +56,19 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,save_metrics=True,classNames=No
         axs[i].grid(True)
         plt.tight_layout()
 
+    for key in tpr.keys():
+        tpr[key]=tpr[key].tolist()
+        fpr[key]=fpr[key].tolist()
+        for i,val in enumerate(thresholds[key]):
+            if np.isnan(val):
+                thresholds[key][i]=1
+        thresholds[key]=thresholds[key].tolist()
+        roc_auc[key]=[roc_auc[key]]
+        optimal_thresholds[key]=[optimal_thresholds[key] if not np.isnan(optimal_thresholds[key]) else 1 ]
+
     if save_metrics:
-        with open(save_dir+os.sep+"eval_matrix.json",'a') as f:
+        with open(json_dir+os.sep+"eval_matrix.json",'a') as f:
+            print(tpr,fpr,thresholds,roc_auc,optimal_thresholds)
             json.dump({
                 'fpr':fpr,
                 'tpr':tpr,
@@ -68,5 +81,13 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,save_metrics=True,classNames=No
         
     else:
         plt.show()
-    
+    print('returing metrics!!!')
     return optimal_thresholds
+
+
+if __name__=="__main__":
+    import torch
+    a=torch.bernoulli(torch.full((305, 6), 0.5))
+    b=torch.bernoulli(torch.full((305, 6), 0.5))
+
+    rocPlotter(a,b,6,"D:/AMD-data-visualisation")

@@ -270,19 +270,22 @@ class OCTDataset(Dataset):
     
 class B_ScanDataset(Dataset):
     def __init__(self,transforms,excel_path,denoise,cliplimit=1.1):
+        super().__init__()
         self.transforms=transforms
+        self.cliplimit=cliplimit
         self.paths=pd.read_excel(excel_path,sheet_name='vol_annotations')['folder_path'].tolist()
         self.bscan_paths=[]
-        for vol in self.bscan_paths:
+        for vol in self.paths:
             self.bscan_paths.extend([vol+os.sep+bscan for bscan in os.listdir(vol)])
         self.denoise=denoise
-        self.clahe=cv2.createCLAHE(clipLimit=cliplimit)
 
     def __len__(self):
         return len(self.bscan_paths)
     
     def __getitem__(self,idx):
         path=self.bscan_paths[idx]
+        self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
+
         
         bscan=process_bscan(os.path.basename(path),os.path.dirname(path),self.denoise,self.clahe,False,self.transforms)
         
