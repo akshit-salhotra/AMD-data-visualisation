@@ -6,7 +6,7 @@ from utils.util import load_model
 import torch
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader,Subset,random_split,DistributedSampler
-from torch.nn import BCEWithLogitsLoss
+from torch.nn import BCEWithLogitsLoss,L1Loss
 from memory_profiler import profile
 from dataloader import OCTDataset,collate_fn,B_ScanDataset
 import torchvision.utils as vutils
@@ -35,7 +35,7 @@ import torch.multiprocessing as mp
 
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '12355'
+    os.environ['MASTER_PORT'] = '12375'
     torch.set_flush_denormal(True)
     
     dist.init_process_group("gloo", rank=rank, world_size=world_size)
@@ -45,7 +45,7 @@ def setup(rank, world_size):
 def log_train_config(args,param_dir):
     logging.info(args)
     logging.info(f'parameters are being saved at :{param_dir}')
-    model=AutoEncoder_2d(encoder_type=args.encoder_type)
+    model=AutoEncoder_2d(encoder_type=args.encoder_type,upsampling_method=args.upsample_type)
     logging.info(model)
     del model
 
@@ -103,7 +103,7 @@ def train(rank,world_size,args,param_dir,log_dir):
          run=wandb.init(project='Auto-encoder AMD'
         ,config=vars(args))
     setup(rank,world_size)
-    model=AutoEncoder_2d(encoder_type=args.encoder_type).to(args.device)
+    model=AutoEncoder_2d(encoder_type=args.encoder_type,upsampling_method=args.upsample_type).to(args.device)
     initialise_logger(log_dir,rank)
 
     
@@ -123,8 +123,12 @@ def train(rank,world_size,args,param_dir,log_dir):
 
 
     percep_criteron=SliceLevelPerceptualLoss()
-    recons_criteron=nn.MSELoss()
+    # recons_criteron=nn.MSELoss()
+    recons_criteron=L1Loss()
     adv_criteron=BCEWithLogitsLoss()
+
+    if rank==0:
+        run.config.update({'recons loss':'l1' if isinstance(recons_criteron,L1Loss) else 'l2'})
 
     optimizer_g=optim.Adam(model.parameters(),args.lr)
     optimizer_d=optim.Adam(disc.parameters(),args.lr*args.disc_lr_factor)
@@ -183,8 +187,8 @@ def train(rank,world_size,args,param_dir,log_dir):
     train_sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
     val_sampler=DistributedSampler(val_dataset,num_replicas=world_size, rank=rank)
 
-    train_loader = DataLoader(train_dataset, batch_size=args.batch,num_workers=0,timeout=0,sampler=train_sampler,collate_fn=collate_fn)
-    test_loader = DataLoader(train_dataset, batch_size=args.batch,num_workers=0,timeout=0,sampler=val_sampler,collate_fn=collate_fn)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch,num_workers=4,timeout=0,sampler=train_sampler,collate_fn=collate_fn)
+    test_loader = DataLoader(train_dataset, batch_size=args.batch,num_workers=4,timeout=0,sampler=val_sampler,collate_fn=collate_fn)
         
     if args.model_path and re.search(r'fold(\d+)',args.model_path):
 
@@ -205,12 +209,11 @@ def train(rank,world_size,args,param_dir,log_dir):
             adver_loss=0
             discrim_loss=0
             model.train()
-
+            torch.autograd.set_detect_anomaly(True)
 
             for iter,data in tqdm(enumerate(train_loader)):
 
-                torch.autograd.set_detect_anomaly(True)
-
+                
                 if not args.is_2D:
                     scans=data[0].to(args.device)
                 else:
@@ -227,57 +230,76 @@ def train(rank,world_size,args,param_dir,log_dir):
                     assert recons_scans.shape[-2]==(256,256),f' shape is not right , found the shape to be :{recons_scans.shape}'
                     p_loss=percep_criteron(recons_scans.reshape(-1,1,256,256),scans.reshape(-1,1,256,256))
                 else:
-                    print(recons_scans.shape,scans.shape)
+                    # print(recons_scans.shape,scans.shape)
                     p_loss=percep_criteron(recons_scans,scans)
 
-                logits=torch.mean(disc(recons_scans).reshape(args.batch,-1),dim=-1)
-                # print(logits.shape)
-                a_loss=adv_criteron(logits,label_real)
+                if args.start_disc<i*(len(train_dataset)//(world_size*args.batch))+iter:
+                    batch=scans.shape[0]
+                    logits=torch.mean(disc(recons_scans).reshape(batch,-1),dim=-1)
+                    # print(logits.shape)
+                    a_loss=adv_criteron(logits,label_real)
+                else:
+                    a_loss=0
 
                 loss=r_loss+args.lambda_percep*p_loss+args.lambda_adv*a_loss
                 # print(torch.cuda.memory_summary())
                 # print('....')
                 if iter% args.log_freq==0:
-                    logging.info(f'Epoch:{i}/{args.epoch} iteration:{iter}/{math.ceil(len(train_dataset)/args.batch)} Loss is :{loss:.4f} reconstruction loss :{r_loss:.4f} perceptual loss :{p_loss:.4f}')
+                    logging.info(f'Epoch:{i}/{args.epoch} iteration:{iter}/{math.ceil(len(train_dataset)/(world_size*args.batch))} Loss is :{loss:.4f} reconstruction loss :{r_loss:.4f} perceptual loss :{p_loss:.4f} adverserial loss :{a_loss:.4f}')
                 
+                
+                
+                if rank==0 and iter%(args.log_freq*400)==0:
+                        torch.save(model.state_dict(),f'{param_dir}/latest.pth')
+                                     
+                epoch_loss+=loss
+                recons_loss+=r_loss
+                percep_loss+=p_loss
+                adver_loss+=a_loss
+
+
+                loss.backward()
+                optimizer_g.step()
+                optimizer_g.zero_grad()
+
+
+                #discriminator
+                if args.start_disc<i*(len(train_dataset)//(world_size*args.batch))+iter:
+                    batch=scans.shape[0]
+                    logits=disc(torch.concat([scans.detach(),recons_scans.detach()],dim=0))
+                    logits=torch.mean(logits.reshape(2*batch,-1),dim=-1)
+
+                    disc_loss=adv_criteron(logits,torch.concat([label_real.detach(),label_fake.detach()],dim=0))
+                    #print(logits.shape)
+                    #print(torch.concat([label_real.detach(),label_fake.detach()],dim=0))
+                    # logits_fake=disc(recons_scans.detach())
+                    # logits_fake=torch.mean(logits_fake.reshape(args.batch,-1),dim=-1)
+                    # fake_loss=adv_criteron(logits_fake,label_fake)
+                    # fake_loss=0
+                    # disc_loss=real_loss+fake_loss
+
+                    
+                    disc_loss.backward()
+                    optimizer_d.step()
+                    optimizer_d.zero_grad()
+                
+                else:
+                    disc_loss=0
+
+                discrim_loss+=disc_loss
+
                 if rank==0 and iter%(args.log_freq*50)==0:
                     wandb.log({ "batch loss":loss
                                 , "batch recon loss":r_loss
                                 ,"batch percep loss":p_loss
+                                ,'batch adv loss':a_loss
+                                ,'batch disc loss':disc_loss
 
                     })
                     if args.is_2D:
                         save_reconstructions_2d(args,recons_scans,scans)
                     else:
                         save_reconstructions_3d(args,recons_scans,scans)
-                        
-                epoch_loss+=loss
-                recons_loss+=r_loss
-                percep_loss+=p_loss
-                adver_loss+=a_loss
-
-                loss.backward()
-                optimizer_g.step()
-                optimizer_g.zero_grad()
-
-                #discriminator
-
-                logits_real=disc(scans.detach())
-                logits_real=torch.mean(logits_real.reshape(args.batch,-1),dim=-1)
-
-                real_loss=adv_criteron(logits_real,label_real)
-                logits_fake=disc(recons_scans.detach())
-                logits_fake=torch.mean(logits_fake.reshape(args.batch,-1),dim=-1)
-                fake_loss=adv_criteron(logits_fake,label_fake)
-                disc_loss=(real_loss+fake_loss)/2
-
-                
-                disc_loss.backward()
-                optimizer_d.step()
-                optimizer_d.zero_grad()
-
-                discrim_loss+=disc_loss
-
 
 
             epoch_loss/=len(train_dataset//world_size)
@@ -373,7 +395,7 @@ if __name__=="__main__":
         parser = argparse.ArgumentParser(description="train arguments")
 
         parser.add_argument("--lr", type=float, default=0.0015, help="learning rate")
-        parser.add_argument('--batch',type=int,default=8,help='batch size')
+        parser.add_argument('--batch',type=int,default=32,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='jsons/train_test_val_split_without_scar.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='excel\\vol_annotations_06_03_2025.xlsx',help='path of excel containing labels')
@@ -386,14 +408,16 @@ if __name__=="__main__":
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--log-freq',type=int,default=5,help='after how many iterations losses are logged')
         parser.add_argument('--lambda_percep',type=float,default=0.01,help="weighting factor for perceptual loss")
-        parser.add_argument("--lambda_adv",type=float,default=0.8,help='adversial loss factor')
+        parser.add_argument("--lambda_adv",type=float,default=0.05,help='adversial loss factor')
+        parser.add_argument('-start-disc',type=int,default=0)
         parser.add_argument('--model_ch',type=list,default=[64,128,256,512],help="channels in different layers of resnet")
         parser.add_argument('--save_recons',type=bool,default=True,help="whether to save some reconstructions")
         parser.add_argument('--save_bscans',type=torch.Tensor,default=torch.tensor([36,48,60,72]),help="which reconstructed bscans to save")
         parser.add_argument('--class_dict',type=dict,default={'early':0,'inter':1,'ga':2,'wet':3,'notAMD':4})
         parser.add_argument('--is_2D',type=bool,default=True)
         parser.add_argument('--encoder_type',type=str,default='resnet34',help='which encoder to use')
-        parser.add_argument('--disc_lr_factor',type=float,default=0.25)
+        parser.add_argument("--upsample_type",default="interpolate",type=str)
+        parser.add_argument('--disc_lr_factor',type=float,default=0.025)
 
         args = parser.parse_args()
         

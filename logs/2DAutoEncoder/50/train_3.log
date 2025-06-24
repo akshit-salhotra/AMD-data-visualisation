@@ -1,0 +1,9 @@
+2025-06-21 02:56:01 - INFO - Epoch:0/25 iteration:0/9511 Loss is :0.3995 reconstruction loss :0.2904 perceptual loss :10.9048 adverserial loss :0.0000
+2025-06-21 02:56:07 - INFO - Epoch:0/25 iteration:5/9511 Loss is :0.3722 reconstruction loss :0.2832 perceptual loss :8.8914 adverserial loss :0.0000
+2025-06-21 02:56:11 - INFO - Epoch:0/25 iteration:10/9511 Loss is :0.3621 reconstruction loss :0.2722 perceptual loss :8.9845 adverserial loss :0.0000
+2025-06-21 02:56:16 - INFO - Epoch:0/25 iteration:15/9511 Loss is :0.3548 reconstruction loss :0.2699 perceptual loss :8.4971 adverserial loss :0.0000
+2025-06-21 02:56:21 - INFO - Epoch:0/25 iteration:20/9511 Loss is :0.3386 reconstruction loss :0.2519 perceptual loss :8.6712 adverserial loss :0.0000
+2025-06-21 02:56:25 - INFO - Epoch:0/25 iteration:25/9511 Loss is :0.3222 reconstruction loss :0.2358 perceptual loss :8.6344 adverserial loss :0.0000
+2025-06-21 02:56:30 - INFO - Epoch:0/25 iteration:30/9511 Loss is :0.3017 reconstruction loss :0.2026 perceptual loss :9.9007 adverserial loss :0.0000
+2025-06-21 02:56:34 - INFO - Epoch:0/25 iteration:35/9511 Loss is :0.2585 reconstruction loss :0.1586 perceptual loss :9.9912 adverserial loss :0.0000
+2025-06-21 02:56:39 - INFO - Epoch:0/25 iteration:40/9511 Loss is :0.2199 reconstruction loss :0.1191 perceptual loss :10.0729 adverserial loss :0.0000

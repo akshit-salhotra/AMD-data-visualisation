@@ -103,7 +103,7 @@ class AutoEncoder(nn.Module):
 
 class AutoEncoder_2d(nn.Module):
 
-    def __init__(self,encoder_type):
+    def __init__(self,encoder_type,upsampling_method='interpolate'):
         super().__init__()
         encoders={
             'resnet18':models.resnet18
@@ -115,7 +115,7 @@ class AutoEncoder_2d(nn.Module):
         assert encoder_type in list(encoders.keys()) ,f"invalid encoder type"
 
         self.encoder=nn.Sequential(nn.Conv2d(1,64,7,2,3),*(list(encoders[encoder_type]().children())[1:-2]))
-        self.decoder=AutoEncoder_2d.get_decoder(aux_blocks[encoder_type])
+        self.decoder=AutoEncoder_2d.get_decoder(aux_blocks[encoder_type],upsampling_method=upsampling_method)
         self.sig=nn.Sigmoid()
 
     def forward(self,x):
@@ -126,26 +126,46 @@ class AutoEncoder_2d(nn.Module):
         return self.sig(x)
 
     @staticmethod
-    def get_decoder(aux_blocks:list,ch=[64,128,256,512]):
+    def get_decoder(aux_blocks:list,upsampling_method:str,ch=[64,128,256,512]):
         ch.reverse()
         l=len(ch)
         # ch.append(ch[-1])
         layers=[]
         # print('the number of upsample blocks are :',ch)
         for i in range(l-1):
-            layers.append(Decoder_block_2d(ch[i],ch[i+1],3,aux_blocks[i]))
+            layers.append(Decoder_block_2d(ch[i],ch[i+1],3,upsample_method=upsampling_method,aux_blocks=aux_blocks[i]))
         
-        layers.append(Interpolate_2d())
-        layers.append(nn.ConvTranspose2d(ch[-1],ch[-1],7,2,3,1))
+        if upsampling_method=='interpolate':
+            layers.append(Interpolate_2d())
+            layers.append(Decoder_block_2d.create_conv(ch[-1],ch[-1],3,1,1))
+            layers.append(Interpolate_2d())
+            layers.append(Decoder_block_2d.create_conv(ch[-1],ch[-1],7,1,3))
+
+        elif upsampling_method=='conv':
+
+            layers.append(nn.ConvTranspose2d(ch[-1],ch[-1],7,2,3,1))
+
+        else:
+            raise ValueError("invalid upsample method")
+
         layers.append(nn.Conv2d(ch[-1],1,1,1,0))
 
         return nn.Sequential(*layers)
 
 class Decoder_block_2d(nn.Module):
     
-    def __init__(self,in_ch,out_ch,kernel,aux_blocks=0):
+    def __init__(self,in_ch,out_ch,kernel,upsample_method="interpolate",aux_blocks=0):
         super().__init__()
-        self.upsample=nn.ConvTranspose2d(in_ch,out_ch,kernel,stride=2,padding=1,output_padding=1)
+        if upsample_method=="interpolate":
+            self.upsample=nn.Sequential(Interpolate_2d(),nn.Conv2d(in_ch,out_ch,kernel,1,kernel//2))
+            self.resize_conv=nn.Sequential(Interpolate_2d(),nn.Conv2d(in_ch,out_ch,1))
+        elif upsample_method=="conv":
+            self.upsample=nn.ConvTranspose2d(in_ch,out_ch,kernel,stride=2,padding=1,output_padding=1)
+            self.resize_conv=nn.ConvTranspose2d(in_ch,out_ch,2,2)
+
+        else:
+            raise ValueError("invalid upsample_method")
+        
         self.norm=nn.BatchNorm2d(out_ch)
         self.relu=nn.ReLU()
 
@@ -154,7 +174,6 @@ class Decoder_block_2d(nn.Module):
         if aux_blocks>0:
             self.aux_conv=nn.Sequential(*[Decoder_block_2d.create_conv(out_ch,out_ch,kernel,1,kernel//2) for _ in range(aux_blocks)])
         self.aux_blocks=aux_blocks
-        self.resize_conv=nn.ConvTranspose2d(in_ch,out_ch,2,2)
 
     
     def forward(self,x):
