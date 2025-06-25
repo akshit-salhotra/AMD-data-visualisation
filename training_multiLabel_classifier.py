@@ -11,7 +11,7 @@ from dataloader import OCTDataset,collate_fn
 import torch.optim as optim
 from model.resnet_3d import Resnet18_3D
 # from model.sequence_model import Seq_Model
-from model.resnet_medicalnet import resnet10,resnet34
+from model.resnet_medicalnet import resnet10,resnet34,resnet50
 from utils.make_plots import get_batch_stats_plot
 import os
 from tqdm import tqdm
@@ -77,10 +77,10 @@ if __name__=="__main__":
         parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
-        parser.add_argument('--model-path',type=str,default="model_parameter_Resnet_medicalnet/30/fold0_epoch10_val_0.0943_train_0.1080",help='path of model parameters to be loaded')
+        parser.add_argument('--model-path',type=str,default="pretrained\\resnet_34_23dataset.pth",help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.27,0.208,0.074,0.038,0.136,1]),help='weights for weighted cross entropy')
-        parser.add_argument('--class_dict',type=dict,default={'EarlyAMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5})
+        parser.add_argument('--class_dict',type=dict,default={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5})
         parser.add_argument('--num_classes',type=int,default=6,help="number of classes of the classifier")
         # parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
 

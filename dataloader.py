@@ -148,6 +148,7 @@ class OCTDataset(Dataset):
     def __getitem__(self, index):
         self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
         scans_dir=self.image_paths[index]
+        # print(scans_dir)
         volume=[]
         if self.raw_scans:
             raw_volume=[] 
@@ -159,15 +160,20 @@ class OCTDataset(Dataset):
 
         else:
             amdtype=self.df['stage'].iloc[self.indices_map[index]]
+            # print(amdtype)
             if amdtype[0]=='[':
                 amdtype= ast.literal_eval(amdtype)
             else:
                 amdtype=[amdtype]
-
+            # print(amdtype)
             label=torch.zeros(len(self.classes))
 
             for c in amdtype:
+                if self.classes.get(c) is None:
+                    print(c)
+                    
                 label[self.classes.get(c)]=1
+            # print(label)
 
         scan_list=sorted(os.listdir(scans_dir),key=lambda x:int(x.split("_")[-1].split(".")[0]))
         if self.undersample and len(scan_list)!=self.volume_shape[0][0]:
