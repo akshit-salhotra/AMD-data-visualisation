@@ -141,3 +141,21 @@
 []
 2025-06-25 03:17:22 - INFO - loaded model parameters from pretrained\resnet_34_23dataset.pth
 2025-06-25 03:17:23 - INFO - fold number:0
+2025-06-25 03:20:47 - ERROR - Caught RuntimeError in replica 0 on device 0.
+Original Traceback (most recent call last):
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\parallel\parallel_apply.py", line 83, in _worker
+    output = module(*input, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1582, in _call_impl
+    result = forward_call(*args, **kwargs)
+  File "D:\AMD-data-visualisation\model\resnet_medicalnet.py", line 187, in forward
+    x=self.linear(torch.flatten(self.GAP(x),start_dim=1))
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\AKS396\.conda\envs\amd\lib\site-packages\torch\nn\modules\linear.py", line 116, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (3x4096 and 16384x6)
+

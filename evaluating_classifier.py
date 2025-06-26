@@ -27,7 +27,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     
     n_classes=6
     model=resnet34(num_classes=n_classes,shortcut_type='A').to(device)
-    class_dict={'EarlyAMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
+    class_dict={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
     class_dict = dict(sorted(class_dict.items(), key=lambda item: item[1]))
 
     classes=[key for key in class_dict.keys()]

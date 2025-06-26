@@ -140,7 +140,7 @@ class ResNet(nn.Module):
             block, 512, layers[3], shortcut_type, stride=1, dilation=4)
 
         self.GAP=nn.AdaptiveAvgPool3d((2,2,2))
-        self.linear=nn.Linear(4096*4,num_classes)
+        self.linear=nn.Linear(4096,num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
