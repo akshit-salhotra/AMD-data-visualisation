@@ -149,7 +149,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     
 if __name__=="__main__":
     
-    model_path="model_parameter_Resnet_medicalnet\\32\\fold2_epoch0_val_0.0846_train_0.0851"
+    model_path="model_parameter_Resnet_medicalnet\\39\\fold1_epoch15_val_0.0323_train_0.0340"
     device='cuda' if torch.cuda.is_available() else 'cpu'
     json_path="jsons\\patient_level\\train_val_split_new_dataset.json"
     excel_path="excel/vol_annotations_06_03_2025.xlsx"
