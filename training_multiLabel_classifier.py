@@ -19,7 +19,7 @@ import logging
 import json
 from sklearn.model_selection import KFold
 import torch.nn as nn
-import sys
+from utils.evaluation_metrics import rocPlotter
 import re
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
@@ -29,7 +29,7 @@ from hooks.batch_hook import create_hook,batchnorm_stats
 import wandb
 
 
-def train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds):
+def train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_criteron,dataset,num_folds):
     data=[d.to(args.device) for d in data]
     label=label.to(args.device)
     # print(image.shape)
@@ -37,11 +37,21 @@ def train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,
 
     logits=model(*data)
         # print(logits.device,label.device)
-    loss=criteron(logits,label)
+    ce_logits=torch.cat([logits[:,0:2],torch.max(logits[2:5],dim=-1,keepdim=True),logits[:,5:]],dim=-1)
+    ce_label=torch.cat([label[:,0:2],torch.max(label[2:5],dim=-1,keepdim=True),label[:,5:]],dim=-1)
+    bce_logits=logits[:,2:5]
+    bce_label=logits[:,2:5]
+    bce_loss=bce_criteron(bce_logits,bce_label)
+    ce_loss=ce_criteron(ce_logits,ce_label)
+    
+    loss=ce_loss+args.lambda_bce*bce_loss
+    
     epoch_loss+=loss
     if iter%5==0:
                 # print(logits,label)
-                wandb.log({'batch loss':loss
+                wandb.log({'batch loss':loss,
+                           "batch ce loss":ce_loss,
+                           'batch bce loss':bce_loss
                                })
                 logging.info(f'epoch:{i}/{args.epoch} iteration:{iter}/{(len(dataset)*(num_folds-1))//(num_folds*args.batch)+1} batch loss is :{loss:.4f}')
                 # logging.info(f'the acc is :{torch.mean((torch.argmax(logits,dim=-1)==label).to(torch.float32)).detach().cpu()}')
@@ -50,16 +60,25 @@ def train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,
     optimizer.zero_grad()
     return epoch_loss
 
-def val_step(args,data,label,val_loss,model,criteron):
+def val_step(args,data,label,val_loss,model,bce_criteron,ce_criteron):
     data=[d.to(args.device) for d in data]
     label=label.to(args.device)
     logits=model(*data)
-    loss=criteron(logits,label)
+    
+    ce_logits=torch.cat([logits[:,0:2],torch.max(logits[2:5],dim=-1,keepdim=True),logits[:,5:]],dim=-1)
+    ce_label=torch.cat([label[:,0:2],torch.max(label[2:5],dim=-1,keepdim=True),label[:,5:]],dim=-1)
+    bce_logits=logits[:,2:5]
+    bce_label=logits[:,2:5]
+    bce_loss=bce_criteron(bce_logits,bce_label)
+    ce_loss=ce_criteron(ce_logits,ce_label)
+    
+    loss=ce_loss+args.lambda_bce*bce_loss
     val_loss+=loss
+    
     wandb.log({'batch val loss':loss})
     # preds=torch.argmax(logits,dim=-1)
     # assert label.shape==preds.shape, 'the number of labels and images do not match'
-    return val_loss
+    return val_loss,logits,label
 
 
 if __name__=="__main__":
@@ -67,7 +86,7 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.0015, help="learning rate")
+        parser.add_argument("--lr", type=float, default=0.009, help="learning rate")
         parser.add_argument('--batch',type=float,default=12,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json',help="path of json file containing path of volumes")
@@ -79,9 +98,12 @@ if __name__=="__main__":
         parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
         parser.add_argument('--model-path',type=str,default="pretrained\\resnet_34_23dataset.pth",help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
-        parser.add_argument('--weight_matrix',type=torch.tensor,default=torch.tensor([0.27,0.208,0.074,0.038,0.136,1]),help='weights for weighted cross entropy')
+        parser.add_argument('--weight_ce',type=torch.tensor,default=torch.tensor([0.27,0.208,0.022,1]),help='weights for weighted cross entropy')
+        parser.add_argument('--weight_bce',type=torch.tensor,default=torch.tensor([0.5,0.25,1]),help='weights for weighted cross entropy')
         parser.add_argument('--class_dict',type=dict,default={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5})
         parser.add_argument('--num_classes',type=int,default=6,help="number of classes of the classifier")
+        parser.add_argument('--lambda_bce',type=float,default=1.0,help='weighting factor for the bce loss')
+        
         # parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
 
         args = parser.parse_args()
@@ -112,7 +134,8 @@ if __name__=="__main__":
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
         # criteron=CrossEntropyLoss(weight=args.weight_matrix.to(args.device))##make sure to add weight factor
-        criteron=BCEWithLogitsLoss(pos_weight=args.weight_matrix.to(args.device))
+        bce_criteron=BCEWithLogitsLoss(pos_weight=args.weight_bce.to(args.device))
+        ce_criteron=CrossEntropyLoss(weight=args.weight_ce.to(args.device))
         #early,inter,ga,wet,scar,notamd
         optimizer=optim.Adam(model.parameters(),args.lr)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
@@ -137,6 +160,7 @@ if __name__=="__main__":
         
         run.config.update(dataset_config)
         dataset=OCTDataset(train_paths,args.excel_path,**dataset_config)
+        dataset=Subset(dataset,range(20))
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
@@ -177,7 +201,7 @@ if __name__=="__main__":
                     for iter,(data,_,label) in tqdm(enumerate(train_loader)):
                         # print(image.shape)
                         # print(label)
-                        epoch_loss=train_step(args,iter,data,label,epoch_loss,optimizer,model,criteron,dataset,num_folds)
+                        epoch_loss=train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_criteron,dataset,num_folds)
                         # preds.extend(pred.detach().cpu().tolist())
                         # labels.extend(label.detach().cpu().tolist())
                         
@@ -207,10 +231,11 @@ if __name__=="__main__":
                         with torch.no_grad():
                             for (data,_,label) in test_loader:
                                 # print(data,label)
-                                val_loss=val_step(args,data,label,val_loss,model,criteron)
+                                val_loss,val_logit,val_label=val_step(args,data,label,val_loss,model,bce_criteron,ce_criteron)
+                                # val_preds=nn.functional.sigmoid(val)
                                 # print(preds.device,label.device)
                                 # correct_pred+=(label==preds).sum().item()
-                                # val_labels.extend(label.detach().cpu().tolist())
+                                # val_labels.extend(val_labels.detach().cpu().tolist())
                                 # val_preds.extend(preds.detach().cpu().tolist())
 
                             # logging.info(f'val accuarcy is : {correct_pred/(len(dataset)/num_folds):.4f}')
@@ -223,6 +248,7 @@ if __name__=="__main__":
                             # plt.ylabel('Actual')
                             wandb.log({'val loss':val_loss
                                        })
+                            # rocPlotter()
                             # plt.savefig(f'{param_dir+os.sep}confusion_matrix_val_fold_{fold}_epoch_{i}.png')
                             # plt.close()
                             torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')
