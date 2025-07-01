@@ -1,12 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc,confusion_matrix
 import json
 import os
-
+from itertools import combinations
 
 def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,classNames=None):
-    print("??")
     
     # Initialize metrics storage
     fpr = dict()
@@ -86,10 +85,73 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,clas
     print('returing metrics!!!')
     return optimal_thresholds
 
-
+def multilabel_confusionMatrixSoftmax(logits:np.ndarray,labels:np.ndarray,classes:dict,multiLabel:list):
+    
+    '''
+    Requires:
+    
+    logits:(n,n_classes)
+    labels:(n,n_classes)
+    multiLabel:(n_classes,)
+    
+    returns:
+    
+    cm :sklearn.mertics.confusion_matirix
+    
+    make sure the order of classes is sorted in multiLabel list !!!!
+     
+    '''
+    
+    preds=np.argmax(logits,axis=-1)
+    
+    labels_classes=[[key] for key in sorted(classes,key=lambda i:i[1])[0]]
+    
+    comb=[]
+    
+    multiLabel_classes=[labels[i] for i in range(len(multiLabel)) if multiLabel[i]==1]
+    
+    multiLabel_encoded=[]
+    
+    for c in multiLabel_classes:
+        encoded=np.zeros(len(multiLabel))
+        for i in c:
+            encoded[i]=1
+        multiLabel_encoded.append(encoded)
+    
+    
+    for i in range(2,len(multiLabel)+1):
+        comb.extend(combinations(multiLabel_classes,i))
+    
+    labels_classes=labels_classes+comb
+    
+    y_true=[]
+    
+    for label in labels:
+        for i,ls in enumerate(multiLabel_encoded):
+            if (ls==label).all():
+                y_true.append(i)
+                break
+    
+    y_true=np.array(y_true)
+    
+    print(y_true.shape,preds.shape)
+    cm=confusion_matrix(y_true,preds,labels=labels_classes)
+    
+    return cm
+        
+    
+    
+    
 if __name__=="__main__":
-    import torch
-    a=torch.bernoulli(torch.full((305, 6), 0.5))
-    b=torch.bernoulli(torch.full((305, 6), 0.5))
+    # import torch
+    # a=torch.bernoulli(torch.full((305, 6), 0.5))
+    # b=torch.bernoulli(torch.full((305, 6), 0.5))
 
-    rocPlotter(a,b,6,"D:/AMD-data-visualisation")
+    # rocPlotter(a,b,6,"D:/AMD-data-visualisation")
+    # logits=np.random.randint(-100,100,(100,6))
+    # y_true=np.random.randint(0,2,(100,6))
+    # print(np.unique(y_true))
+    # d={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
+    # m=[0,0,1,1,1,0]
+
+    # print(multilabel_confusionMatrixSoftmax(logits,y_true,d,m))
