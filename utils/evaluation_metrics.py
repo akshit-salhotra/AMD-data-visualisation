@@ -104,28 +104,38 @@ def multilabel_confusionMatrixSoftmax(logits:np.ndarray,labels:np.ndarray,classe
     
     preds=np.argmax(logits,axis=-1)
     
-    labels_classes=[[key] for key in sorted(classes,key=lambda i:i[1])[0]]
-    
+    labels_classes=[[key[0]] for key in sorted(classes.items(),key=lambda i:i[1])]
+    print(labels_classes)
     comb=[]
     
-    multiLabel_classes=[labels[i] for i in range(len(multiLabel)) if multiLabel[i]==1]
+    multiLabel_classes=[labels_classes[i] for i in range(len(multiLabel)) if multiLabel[i]==1]
     
     multiLabel_encoded=[]
     
-    for c in multiLabel_classes:
-        encoded=np.zeros(len(multiLabel))
-        for i in c:
-            encoded[i]=1
-        multiLabel_encoded.append(encoded)
+    print(multiLabel_classes)
+
+
     
     
     for i in range(2,len(multiLabel)+1):
         comb.extend(combinations(multiLabel_classes,i))
     
+    print(comb)
+    for c in comb:
+        encoded=np.zeros(len(multiLabel))
+        for i in c:
+            encoded[classes[i[0]]]=1
+        multiLabel_encoded.append(encoded)
+
     labels_classes=labels_classes+comb
     
     y_true=[]
-    
+    one_hot_encoded=[]
+    for i in range(len(multiLabel)):
+        one_hot_encoded.append([1 if idx==i else 0 for idx in range(len(multiLabel))])
+    multiLabel_encoded.extend(one_hot_encoded)
+    print(multiLabel_encoded)
+    print(labels)
     for label in labels:
         for i,ls in enumerate(multiLabel_encoded):
             if (ls==label).all():
@@ -135,9 +145,10 @@ def multilabel_confusionMatrixSoftmax(logits:np.ndarray,labels:np.ndarray,classe
     y_true=np.array(y_true)
     
     print(y_true.shape,preds.shape)
-    cm=confusion_matrix(y_true,preds,labels=labels_classes)
+    labels_classes=[str(v) for v in labels_classes]
+    cm=confusion_matrix(y_true,preds,labels=[i for i in range(len(labels_classes))])
     
-    return cm
+    return cm,labels_classes
         
     
     
@@ -152,6 +163,6 @@ if __name__=="__main__":
     # y_true=np.random.randint(0,2,(100,6))
     # print(np.unique(y_true))
     # d={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
-    # m=[0,0,1,1,1,0]
+    m=[0,0,1,1,1,0]
 
     # print(multilabel_confusionMatrixSoftmax(logits,y_true,d,m))

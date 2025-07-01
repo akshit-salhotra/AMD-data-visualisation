@@ -19,7 +19,7 @@ from sklearn.model_selection import KFold
 from hooks.batch_hook import create_hook,batchnorm_stats
 from utils.make_plots import get_batch_stats_plot
 import pandas as pd
-from utils.evaluation_metrics import rocPlotter
+from utils.evaluation_metrics import rocPlotter,multilabel_confusionMatrixSoftmax
 
 def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path:str,transform,batch_size:int,num_workers:int,timeout:int,save_path:str,data:str,save_misclassified:bool,excel_save_path:str)->None:
     with open(json_path,'r') as file:
@@ -124,8 +124,21 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
 
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.savefig(save_path, dpi=300)
+    plt.clf()
+
+    cm,class_labels=multilabel_confusionMatrixSoftmax(LOGITS,labels,class_dict,[0,0,1,1,1,0])
+    # print(cm)
+    sns.heatmap(cm,
+                        annot=True,
+                        fmt='d',
+                        cmap='Blues',
+                        cbar=False,
+                        xticklabels=class_labels[:n_classes],
+                        yticklabels=class_labels)
+    plt.savefig("multilabel_conf.png")
+
     # plt.show()
     
     if save_misclassified:
@@ -164,6 +177,6 @@ if __name__=="__main__":
     assert data=='train' or data=='test',"the only permitted values of data are train or test"
     os.makedirs(results_dir,exist_ok=True)
     save_file= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'confusion_matrix_{data}_set_{json_path.split(os.sep)[-1].split(".")[0]}.png'
-    print(save_file)
+    # print(save_file)
 
     evaluate_dataset(json_path,device,model_path,excel_path,transform,batch_size,num_workers,timeout,results_dir+os.sep+save_file,data,save_misclassified_data,save_excel_path)
