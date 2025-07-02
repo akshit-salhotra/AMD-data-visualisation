@@ -87,33 +87,40 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         LOGITS=np.array(LOGITS)
         #save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_test_set_{(json_path.split(os.sep)[-1]).split(".")[0]}.png'
         save_roc=save_path.replace("confusion_matrix","roc")
-        optimalThresholds=rocPlotter(LOGITS,labels,n_classes,save_roc,json_dir=os.path.dirname(model_path),classNames=classes)
-        thres=np.array([float(optimalThresholds[key]) for key in classes])
-        print(thres.shape,LOGITS.shape)
-        preds =(LOGITS >= thres).astype(int)
-        conf_matrix_per_class = []
-        for i in range(n_classes):
-            cm = confusion_matrix(labels[:, i], preds[:, i], labels=[0, 1])
-            conf_matrix_per_class.append(cm)
+        optimalThresholds=rocPlotter(LOGITS[:,2:5],labels[:,2:5],3,save_roc,json_dir=os.path.dirname(model_path),classNames=classes[2:5])
+        # thres=np.array([float(optimalThresholds[key]) for key in classes])
+        # print(thres.shape,LOGITS.shape)
+        # preds =(LOGITS >= thres).astype(int)
+        # conf_matrix_per_class = []
+        # for i in range(n_classes):
+        #     cm = confusion_matrix(labels[:, i], preds[:, i], labels=[0, 1])
+        #     conf_matrix_per_class.append(cm)
             
 
         # Plot confusion matrix per class in a grid
-        fig, axes = plt.subplots(2, 3, figsize=(15, 8))
-        axes = axes.ravel()
+        # fig, axes = plt.subplots(2, 3, figsize=(15, 8))
+        # axes = axes.ravel()
 
-        for i in range(n_classes):
-            sns.heatmap(conf_matrix_per_class[i],
+        # for i in range(n_classes):
+        #     sns.heatmap(conf_matrix_per_class[i],
+        #                 annot=True,
+        #                 fmt='d',
+        #                 cmap='Blues',
+        #                 cbar=False,
+        #                 ax=axes[i],
+        #                 xticklabels=["Pred 0", "Pred 1"],
+        #                 yticklabels=["True 0", "True 1"])
+        #     axes[i].set_title(f'Class {classes[i]}')
+        #     axes[i].set_xlabel('Predicted')
+        #     axes[i].set_ylabel('Actual')
+        cm,class_labels=multilabel_confusionMatrixSoftmax(LOGITS,labels,class_dict,[0,0,1,1,1,0])
+        sns.heatmap(cm,
                         annot=True,
                         fmt='d',
                         cmap='Blues',
                         cbar=False,
-                        ax=axes[i],
-                        xticklabels=["Pred 0", "Pred 1"],
-                        yticklabels=["True 0", "True 1"])
-            axes[i].set_title(f'Class {classes[i]}')
-            axes[i].set_xlabel('Predicted')
-            axes[i].set_ylabel('Actual')
-
+                        xticklabels=class_labels[:n_classes],
+                        yticklabels=class_labels)
             
     
     else:       
@@ -125,19 +132,12 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         plt.ylabel('Actual')
 
     # plt.tight_layout()
-    plt.savefig(save_path, dpi=300)
+    plt.savefig(save_path, dpi=300,bbox_inches='tight')
     plt.clf()
 
-    cm,class_labels=multilabel_confusionMatrixSoftmax(LOGITS,labels,class_dict,[0,0,1,1,1,0])
     # print(cm)
-    sns.heatmap(cm,
-                        annot=True,
-                        fmt='d',
-                        cmap='Blues',
-                        cbar=False,
-                        xticklabels=class_labels[:n_classes],
-                        yticklabels=class_labels)
-    plt.savefig("multilabel_conf.png")
+
+    # plt.savefig("multilabel_conf.png")
 
     # plt.show()
     
@@ -162,7 +162,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     
 if __name__=="__main__":
     
-    model_path="model_parameter_Resnet_medicalnet\\39\\fold1_epoch15_val_0.0323_train_0.0340"
+    model_path="model_parameter_Resnet_medicalnet\\51\\fold1_epoch5_val_0.1039_train_0.1103"
     device='cuda' if torch.cuda.is_available() else 'cpu'
     json_path="jsons\\patient_level\\train_val_split_new_dataset.json"
     excel_path="excel/vol_annotations_06_03_2025.xlsx"

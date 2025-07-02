@@ -82,6 +82,7 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,clas
         
     else:
         plt.show()
+    plt.clf()
     print('returing metrics!!!')
     return optimal_thresholds
 

@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hooks.batch_hook import create_hook,batchnorm_stats
 import wandb
-
+import traceback
 
 def train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_criteron,dataset,num_folds):
     data=[d.to(args.device) for d in data]
@@ -37,15 +37,18 @@ def train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_c
 
     logits=model(*data)
         # print(logits.device,label.device)
-    ce_logits=torch.cat([logits[:,0:2],torch.max(logits[2:5],dim=-1,keepdim=True),logits[:,5:]],dim=-1)
-    ce_label=torch.cat([label[:,0:2],torch.max(label[2:5],dim=-1,keepdim=True),label[:,5:]],dim=-1)
+    ce_logits=torch.cat([logits[:,0:2],torch.max(logits[:,2:5],dim=-1,keepdim=True)[0],logits[:,5:]],dim=-1)
+    ce_label=torch.cat([label[:,0:2],torch.max(label[:,2:5],dim=-1,keepdim=True)[0],label[:,5:]],dim=-1)
     bce_logits=logits[:,2:5]
-    bce_label=logits[:,2:5]
+    bce_label=label[:,2:5]
+    # print(bce_logits,ce_logits,labels)
     bce_loss=bce_criteron(bce_logits,bce_label)
     ce_loss=ce_criteron(ce_logits,ce_label)
     
     loss=ce_loss+args.lambda_bce*bce_loss
-    
+    # print(loss,"loss")
+    # print(epoch_loss)
+
     epoch_loss+=loss
     if iter%5==0:
                 # print(logits,label)
@@ -65,10 +68,10 @@ def val_step(args,data,label,val_loss,model,bce_criteron,ce_criteron):
     label=label.to(args.device)
     logits=model(*data)
     
-    ce_logits=torch.cat([logits[:,0:2],torch.max(logits[2:5],dim=-1,keepdim=True),logits[:,5:]],dim=-1)
-    ce_label=torch.cat([label[:,0:2],torch.max(label[2:5],dim=-1,keepdim=True),label[:,5:]],dim=-1)
+    ce_logits=torch.cat([logits[:,0:2],torch.max(logits[:,2:5],dim=-1,keepdim=True)[0],logits[:,5:]],dim=-1)
+    ce_label=torch.cat([label[:,0:2],torch.max(label[:,2:5],dim=-1,keepdim=True)[0],label[:,5:]],dim=-1)
     bce_logits=logits[:,2:5]
-    bce_label=logits[:,2:5]
+    bce_label=label[:,2:5]
     bce_loss=bce_criteron(bce_logits,bce_label)
     ce_loss=ce_criteron(ce_logits,ce_label)
     
@@ -86,7 +89,7 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.009, help="learning rate")
+        parser.add_argument("--lr", type=float, default=0.002, help="learning rate")
         parser.add_argument('--batch',type=float,default=12,help='batch size')
         parser.add_argument('--epoch',type=int,default=25,help='number of epoch')
         parser.add_argument('--json',type=str,default='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json',help="path of json file containing path of volumes")
@@ -160,7 +163,7 @@ if __name__=="__main__":
         
         run.config.update(dataset_config)
         dataset=OCTDataset(train_paths,args.excel_path,**dataset_config)
-        dataset=Subset(dataset,range(20))
+        # dataset=Subset(dataset,range(20))
         num_folds=5
         kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
@@ -204,7 +207,8 @@ if __name__=="__main__":
                         epoch_loss=train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_criteron,dataset,num_folds)
                         # preds.extend(pred.detach().cpu().tolist())
                         # labels.extend(label.detach().cpu().tolist())
-                        
+                    # print(epoch_loss)
+                    # print(((len(dataset)*(num_folds-1))//(num_folds*args.batch)+1))
                     epoch_loss/=((len(dataset)*(num_folds-1))//(num_folds*args.batch)+1)
                     # cm=confusion_matrix(labels,preds)
                     # classes=["early","inter","ga","wet","notamd"]
@@ -263,4 +267,5 @@ if __name__=="__main__":
     except Exception as e:
         print(e)
         logging.error(str(e))
+        traceback.print_exc()
     
