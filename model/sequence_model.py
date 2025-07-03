@@ -18,6 +18,10 @@ class Seq_Model(nn.Module):
         self.classification_head=nn.Linear(embed_dim,num_classes)
     
     def forward(self,x:torch.Tensor,src_key_padding_mask:torch.Tensor)->torch.Tensor:
+        '''
+        x:OCT volume (batch,channels,n_scans,height,width)
+        src_key_padding_mask:bool tensor (batch,n_scans), with True positions indicating padding token [these are ignored in the attention mechanism]
+        '''
         # x.shape=(batch,n_scans,channels,height,width)
         x=torch.permute(x,(0,2,1,3,4))
         b,num_scan,c,h,w=x.shape
@@ -80,7 +84,7 @@ if __name__=="__main__":
     
     model=Seq_Model(5,device='cpu')
     # model(torch.ones(2,200,1,256,256))
-    summary(model,(200,1,256,256),2)
+    summary(model,[[1,200,256,256],[200+1]],2)
     
     '''
     torch summary actually does not work due to a nuance
