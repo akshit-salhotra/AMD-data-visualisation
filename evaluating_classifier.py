@@ -77,14 +77,18 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
 
     if multilabel:
         # print(LOGITS[0].device,label[0].device)
-        labels=np.array(labels)
+        labels=torch.tensor(labels)
 
         # print(labels.shape,LOGITS.shape)
         # print([v.shape for v in LOGITS])
         # print([])
 
 
-        LOGITS=np.array(LOGITS)
+        LOGITS=torch.tensor(LOGITS)
+        ce_logits=torch.cat([LOGITS[:,0:2],torch.max(LOGITS[:,2:5],dim=-1,keepdim=True)[0],LOGITS[:,5:]],dim=-1)
+        ce_label=torch.cat([labels[:,0:2],torch.max(labels[:,2:5],dim=-1,keepdim=True)[0],labels[:,5:]],dim=-1)
+        ce_label=torch.argmax(ce_label,dim=-1)
+        ce_pred=torch.argmax(ce_logits,dim=-1)
         #save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_test_set_{(json_path.split(os.sep)[-1]).split(".")[0]}.png'
         save_roc=save_path.replace("confusion_matrix","roc")
         optimalThresholds=rocPlotter(LOGITS[:,2:5],labels[:,2:5],3,save_roc,json_dir=os.path.dirname(model_path),classNames=classes[2:5])
@@ -113,14 +117,15 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         #     axes[i].set_title(f'Class {classes[i]}')
         #     axes[i].set_xlabel('Predicted')
         #     axes[i].set_ylabel('Actual')
-        cm,class_labels=multilabel_confusionMatrixSoftmax(LOGITS,labels,class_dict,[0,0,1,1,1,0])
+        # cm,class_labels=multilabel_confusionMatrixSoftmax(LOGITS,labels,class_dict,[0,0,1,1,1,0])
+        cm=confusion_matrix(ce_label.detach().cpu().numpy(),ce_pred.detach().cpu().numpy(),labels=[0,1,2,3])
         sns.heatmap(cm,
                         annot=True,
                         fmt='d',
                         cmap='Blues',
                         cbar=False,
-                        xticklabels=class_labels[:n_classes],
-                        yticklabels=class_labels)
+                        xticklabels=['early','inter','advanced','not'],
+                        yticklabels=['early','inter','advanced','not'])
             
     
     else:       

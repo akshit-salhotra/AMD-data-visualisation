@@ -25,10 +25,10 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,clas
         J_scores = tpr[key] - fpr[key]
         ix = np.argmax(J_scores)
         optimal_thresholds[key] = thresholds[key][ix]
-        if classNames is not None:
-            print(f'Class {classNames[i]}: Optimal threshold = {optimal_thresholds[key]:.2f}, AUC = {roc_auc[key]:.2f}')
-        else:
-            print(f'Class {i}: Optimal threshold = {optimal_thresholds[key]:.2f}, AUC = {roc_auc[key]:.2f}')
+        # if classNames is not None:
+        #     print(f'Class {classNames[i]}: Optimal threshold = {optimal_thresholds[key]:.2f}, AUC = {roc_auc[key]:.2f}')
+        # else:
+        #     print(f'Class {i}: Optimal threshold = {optimal_thresholds[key]:.2f}, AUC = {roc_auc[key]:.2f}')
 
 
     # Plotting ROC curves in 2x3 grid
@@ -68,22 +68,22 @@ def rocPlotter(y_score,y_true,n_classes,save_dir,json_dir,save_metrics=True,clas
         optimal_thresholds[key]=str(optimal_thresholds[key]) if not np.isnan(optimal_thresholds[key]) else "1" 
 
     if save_metrics:
-        with open(json_dir+os.sep+"eval_matrix.json",'w') as f:
-            print(roc_auc,optimal_thresholds)
-            json.dump({
-                # 'fpr':fpr,
-                # 'tpr':tpr,
-                # 'threshold':thresholds,
-                'roc_auc':roc_auc,
-                'optimal threshold':optimal_thresholds,
-            },f,indent=4)
+        # with open(json_dir+os.sep+"eval_matrix.json",'w') as f:
+        #     print(roc_auc,optimal_thresholds)
+        #     json.dump({
+        #         # 'fpr':fpr,
+        #         # 'tpr':tpr,
+        #         # 'threshold':thresholds,
+        #         'roc_auc':roc_auc,
+        #         'optimal threshold':optimal_thresholds,
+        #     },f,indent=4)
 
         plt.savefig(save_dir)
         
     else:
         plt.show()
     plt.clf()
-    print('returing metrics!!!')
+    # print('returing metrics!!!')
     return optimal_thresholds
 
 def multilabel_confusionMatrixSoftmax(logits:np.ndarray,labels:np.ndarray,classes:dict,multiLabel:list):
