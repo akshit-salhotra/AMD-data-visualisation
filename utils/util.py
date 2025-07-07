@@ -171,13 +171,17 @@ class CrossEntropyHybrid(nn.Module):
         probs[mask] = 1 - probs[mask]
         log_preds = torch.log(probs)
 
-        forced_target=torch.stack(forced_target,dim=0)
-        forced_preds=torch.log_softmax(torch.tensor(forced_preds,device=self.dummy.device),dim=-1)
+        if len(forced_target):
+            forced_target=torch.stack(forced_target,dim=0)
+            forced_preds=torch.log_softmax(torch.tensor(forced_preds,device=self.dummy.device),dim=-1)
 
 
-        combined_targets=torch.concat([targets,forced_target],dim=0)
-        combined_preds=torch.concat([log_preds,forced_preds],dim=0)
-        weights=torch.concat([weights,torch.tensor(forced_weights,device=self.dummy.device)],dim=0)
+            combined_targets=torch.concat([targets,forced_target],dim=0)
+            combined_preds=torch.concat([log_preds,forced_preds],dim=0)
+            weights=torch.concat([weights,torch.tensor(forced_weights,device=self.dummy.device)],dim=0)
+        else:
+            combined_targets=targets
+            combined_preds=log_preds
 
         mapping_target=torch.tensor([0,0,1,1,1,2]).to(self.dummy.device)
 
@@ -235,7 +239,9 @@ if __name__ == "__main__":
 
     preds=torch.randint(-100,100,(12,6)).float().to(device)
 
+
     target=torch.randint(0,2,(12,6)).to(device)
+    # target=torch
 
     print(ce(preds,target))
 

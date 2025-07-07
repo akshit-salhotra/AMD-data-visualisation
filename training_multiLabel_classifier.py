@@ -50,7 +50,7 @@ def train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_c
     ce_loss=ce_criteron(ce_logits,ce_label)
     hyce_loss=hybCe_criteron(logits,label)
 
-    loss=hyce_loss+args.lambda_ce*ce_loss+args.lambda_bce*bce_loss
+    loss=args.lambda_hy*hyce_loss+args.lambda_ce*ce_loss+args.lambda_bce*bce_loss
     # print(loss,"loss")
     # print(epoch_loss)
 
@@ -82,10 +82,13 @@ def val_step(args,data,label,val_loss,model,bce_criteron,ce_criteron,hybCe_crite
     ce_loss=ce_criteron(ce_logits,ce_label)
     hyce_loss=hybCe_criteron(logits,label).to(args.device)
    
-    loss=hyce_loss + args.lambda_ce*ce_loss+args.lambda_bce*bce_loss
+    loss=args.lambda_hy*hyce_loss + args.lambda_ce*ce_loss+args.lambda_bce*bce_loss
     val_loss+=loss
     
-    wandb.log({'batch val loss':loss})
+    wandb.log({'batch val loss':loss,
+               'batch val hy loss':hyce_loss,
+               'batch val ce loss':ce_loss,
+               'batch val bce loss':bce_loss})
     # preds=torch.argmax(logits,dim=-1)
     # assert label.shape==preds.shape, 'the number of labels and images do not match'
     return val_loss,logits,label
@@ -101,27 +104,28 @@ if __name__=="__main__":
     
         parser = argparse.ArgumentParser(description="train arguments")
 
-        parser.add_argument("--lr", type=float, default=0.002, help="learning rate")
+        parser.add_argument("--lr", type=float, default=0.000025, help="learning rate")
         parser.add_argument('--batch',type=float,default=12,help='batch size')
-        parser.add_argument('--epoch',type=int,default=100,help='number of epoch')
+        parser.add_argument('--epoch',type=int,default=50,help='number of epoch')
         parser.add_argument('--json',type=str,default='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='excel/vol_annotations_06_03_2025.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_medicalnet')
-        parser.add_argument('--save-freq',type=int,default=40,help='after how many epochs are the parameters saved')
+        parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
         parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
-        parser.add_argument('--step-size',type=int,default=40,help='number of epochs after which learning rate is to be decayed')
+        parser.add_argument('--step-size',type=int,default=25,help='number of epochs after which learning rate is to be decayed')
         parser.add_argument('--model-path',type=str,default="pretrained\\resnet_34_23dataset.pth",help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
         parser.add_argument('--weight_ce',type=torch.tensor,default=torch.tensor([1,0.8]),help='weights for weighted cross entropy')
         parser.add_argument('--weight_bce',type=torch.tensor,default=torch.tensor([3.96,4.95,0.59]),help='weights for weighted cross entropy')
         parser.add_argument('--weight_broad',type=torch.tensor,default=torch.tensor([0.5,0.4,0.4,0.33,1.25,1]))
         parser.add_argument('--sampling_prob',type=dict,default={0:0.25,1:0.05,2:0.5})
-        parser.add_argument('--num_samples_per_epoch',type=int,default=500)
+        parser.add_argument('--num_samples_per_epoch',type=int,default=1000)
         parser.add_argument('--class_dict',type=dict,default={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5})
         parser.add_argument('--num_classes',type=int,default=6,help="number of classes of the classifier")
         parser.add_argument('--lambda_bce',type=float,default=1.0,help='weighting factor for the bce loss')
         parser.add_argument('--lambda_ce',type=float,default=1.0)
+        parser.add_argument("--lambda_hy",type=float,default=1.25)
         parser.add_argument('--targets_path',type=str,default="targets.npy")
         
         # parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
@@ -225,8 +229,8 @@ if __name__=="__main__":
             weights=[args.sampling_prob.get(targets[i].item()) for i in train_idx]
             # print(weights)
             train_sampler=WeightedRandomSampler(weights,args.num_samples_per_epoch,replacement=False)
-            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, sampler=train_sampler,num_workers=15,timeout=600,collate_fn=collate_fn)
-            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=15,timeout=600,collate_fn=collate_fn)
+            train_loader = DataLoader(Subset(dataset,train_idx), batch_size=args.batch, sampler=train_sampler,num_workers=15,persistent_workers=True,timeout=600,collate_fn=collate_fn)
+            test_loader = DataLoader(Subset(dataset, val_idx), batch_size=args.batch, shuffle=False,num_workers=15,persistent_workers=True,timeout=600,collate_fn=collate_fn)
             if args.model_path and re.search(r'fold(\d+)',args.model_path):
                 if fold<int(re.search(r'fold(\d+)',args.model_path).group(1)):
                     continue
@@ -292,13 +296,13 @@ if __name__=="__main__":
                             val_labels=np.array(val_labels)
                             val_preds=np.array(val_preds)
 
-                            broad_preds=np.argmax(np.concatenate([np.argmax(val_preds[:,0:2],axis=-1,keepdims=True),np.argmax(val_preds[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_preds[:,5],axis=-1)],axis=-1),axis=-1)
-                            broad_labels=np.concatenate([np.argmax(val_labels[:,0:2],axis=-1,keepdims=True),np.argmax(val_labels[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_labels[:,5],axis=-1)],axis=-1)
+                            broad_preds=np.argmax(np.concatenate([np.max(val_preds[:,0:2],axis=-1,keepdims=True),np.max(val_preds[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_preds[:,5],axis=-1)],axis=-1),axis=-1)
+                            broad_labels=np.concatenate([np.max(val_labels[:,0:2],axis=-1,keepdims=True),np.max(val_labels[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_labels[:,5],axis=-1)],axis=-1)
                             
-                            print(broad_labels)
+                            # print(broad_labels)
                             broad_labels=np.argmax(broad_labels,axis=-1)
 
-                            late_preds=val_preds[:,2:5]
+                            late_preds=nn.functional.sigmoid(torch.from_numpy(val_preds[:,2:5])).cpu().detach().numpy()
                             late_labels=val_labels[:,2:5]
 
                             # rocPlotter(broad_preds,)
