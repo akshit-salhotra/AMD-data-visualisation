@@ -119,7 +119,7 @@ class CrossEntropyHybrid(nn.Module):
 
         # weights=torch.tensor([self.weights[i].item() for i in targets]).to(self.dummy.device)#(batch)
 
-        weights=torch.tensor([self.weights[torch.argmax(t)].item() if torch.sum(t)==1 else self.weights[2+late_idx[i]]  for i,t in enumerate(targets)]).to(self.dummy.device)#(batch)
+        # weights=torch.tensor([self.weights[torch.argmax(t)].item() if torch.sum(t)==1 else self.weights[2+late_idx[i]]  for i,t in enumerate(targets)]).to(self.dummy.device)#(batch)
 
         forced_preds=[]
         forced_target=[]
@@ -127,69 +127,96 @@ class CrossEntropyHybrid(nn.Module):
 
         for p,t,e,l,pe,pl in zip(preds,targets,early_idx,late_idx,preds_early,preds_late):
             # if torch.sum(t)>1:
-            ls=[[pe,p[i],p[-1]] for i in range(2,5) if (t[i]==1 and i!=l)]
+            # ls=[[pe,p[i],p[-1]] for i in range(2,5) if (t[i]==1 and i!=l)]
+            ls=[[pe,p[i],p[-1]] for i in range(2,5) if (t[i]==1)]
 
             if len(ls):
                 forced_preds.extend(ls)
                 forced_target.extend([t]*len(ls))
-                forced_weights.extend([self.weights[i] for i in range(2,5) if (t[i]==1 and i!=l)])
-
-            if t[e]==0:
-                forced_preds.append([p[1 if e==0 else 0].item(),pl.item(),p[-1].item()])
-                forced_target.append(t)
-                forced_weights.append(self.weights[1 if e==0 else 0])
+                # forced_weights.extend([self.weights[i] for i in range(2,5) if (t[i]==1 and i!=l)])
+                forced_weights.extend([self.weights[i] for i in range(2,5) if (t[i]==1)])
 
 
-        preds=torch.concat([preds_early,preds_late,preds[:,5].unsqueeze(dim=-1)],dim=-1)
+            # if t[e]==0:
+            forced_preds.append([p[e if e==1 else 1-e].item(),pl.item(),p[-1].item()])
+            forced_target.append(t)
+            forced_weights.append(self.weights[e if e==1 else 1-e])
 
+
+        # preds=torch.concat([preds_early,preds_late,preds[:,5].unsqueeze(dim=-1)],dim=-1)
+
+        # print("preds")
+        # print(preds)
         # print(weights.shape)
 
         # weights=torch.concat([torch.tensor([[self.weights[i]]for i in idx_early]),torch.tensor([[self.weights[i+2]]for i in idx_late]),torch.ones(preds.shape[0],1)*weights[5]],dim=-1)
 
         # log_preds=f.log_softmax(preds,dim=-1) #(batch,3)
         # print(log_preds.shape)
-        probs=f.softmax(preds,dim=-1)
+        # probs=f.softmax(preds,dim=-1)
         # print(probs.shape,'probs')
-
+        # print('softmaxed preds')
+        # print(probs)
+        
         '''
         invert the prob of wrong scans &then append the forces ones and then we should be good to go
         '''
 
-        batch_size = targets.shape[0]
-        rows = torch.arange(batch_size).to(self.dummy.device)
+        # batch_size = targets.shape[0]
+        # rows = torch.arange(batch_size).to(self.dummy.device)
 
-        mask = torch.zeros_like(probs, dtype=torch.bool).to(self.dummy.device)
+        # mask = torch.zeros_like(probs, dtype=torch.bool).to(self.dummy.device)
 
-        cond_early = targets[rows, early_idx] != 1
-        cond_late = targets[rows, late_idx] != 1
+        # cond_early = targets[rows, early_idx] != 1
+        # cond_late = targets[rows, late_idx] != 1
 
         # print(mask.device,rows.device,early_idx.device,cond_early.device)
-        mask[rows[cond_early], early_idx[cond_early]] = True
-        mask[rows[cond_late], late_idx[cond_late]] = True
+        # mask[rows[cond_early], early_idx[cond_early]] = True
+        # mask[rows[cond_late], late_idx[cond_late]] = True
 
-        probs = probs.clone()
-        probs[mask] = 1 - probs[mask]
-        log_preds = torch.log(probs)
+        # probs = probs.clone()
+        # probs[mask] = 1 - probs[mask]
+        # log_preds = torch.log(probs)
 
-        if len(forced_target):
-            forced_target=torch.stack(forced_target,dim=0)
-            forced_preds=torch.log_softmax(torch.tensor(forced_preds,device=self.dummy.device),dim=-1)
+        # if len(forced_target):
+            # forced_target=torch.stack(forced_target,dim=0)
+            # forced_preds=torch.log_softmax(torch.tensor(forced_preds,device=self.dummy.device),dim=-1)
 
 
-            combined_targets=torch.concat([targets,forced_target],dim=0)
-            combined_preds=torch.concat([log_preds,forced_preds],dim=0)
-            weights=torch.concat([weights,torch.tensor(forced_weights,device=self.dummy.device)],dim=0)
-        else:
-            combined_targets=targets
-            combined_preds=log_preds
+            # combined_targets=torch.concat([targets,forced_target],dim=0)
+            # combined_preds=torch.concat([log_preds,forced_preds],dim=0)
+            # weights=torch.concat([weights,torch.tensor(forced_weights,device=self.dummy.device)],dim=0)
+        # else:
+        #     combined_targets=targets
+        #     combined_preds=log_preds
+        
 
+        forced_target=torch.stack(forced_target,dim=0)
+        forced_preds=torch.log_softmax(torch.tensor(forced_preds,device=self.dummy.device),dim=-1)
+
+
+        combined_targets=forced_target
+        combined_preds=forced_preds
+        weights=torch.tensor(forced_weights,device=self.dummy.device)
+        
+        # print('forced preds')
+        # print(combined_preds)
+        # print("forced target")
+        # print(combined_targets)
+        # print('forced weights')
+        # print(weights)
+        
         mapping_target=torch.tensor([0,0,1,1,1,2]).to(self.dummy.device)
 
         combined_targets=mapping_target[torch.argmax(combined_targets,dim=-1)]
+        # print('combined_targets')
+        # print(combined_targets)
         # print(targets,weights)
         unweighted_loss=f.nll_loss(combined_preds,combined_targets,reduction='none')#(batch,1)
 
-
+        if torch.isnan(unweighted_loss).any():
+            print('Warning : nans found in the loss!!!!!')
+        
         assert unweighted_loss.shape[0]==combined_targets.shape[0] ,f'{unweighted_loss.shape}'
         assert unweighted_loss.shape[0]==weights.shape[0],f'weights :{weights.shape} unweighted loss :{unweighted_loss.shape}'
 
@@ -233,17 +260,30 @@ def inferMultiLabelHybrid(logits:torch.Tensor,thres:torch.Tensor):
 
 
 if __name__ == "__main__":
+    import random
+    from tqdm import tqdm
+    
     device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    ce=CrossEntropyHybrid(torch.tensor([0.3,0.5,0.2,0.56,0.1,0.4],device='cuda')).to(device)
+    ce=CrossEntropyHybrid(torch.tensor([0.3,0.5,0.2,0.56,0.1,0.4],device='cpu')).to(device)
 
-    preds=torch.randint(-100,100,(12,6)).float().to(device)
+    for i in tqdm(range(10000)):
+        preds=torch.randint(-100,100,(5,6)).float().to(device)
+        print(preds)
 
+        # target=torch.randint(0,2,(12,6)).to(device)
+        
+        possible_targets=torch.tensor([[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1],[0,0,1,1,0,0],[0,0,0,1,1,0],[0,0,1,0,1,0],[0,0,1,1,1,0]])
+        
+        assert len(possible_targets)==10, f'{len(possible_targets)}'
+        
+        
+        sampled_indices = torch.randint(0, len(possible_targets), (5,))
+        target = possible_targets[sampled_indices]
+        # target=torch
+        print(target)
 
-    target=torch.randint(0,2,(12,6)).to(device)
-    # target=torch
-
-    print(ce(preds,target))
+        print(ce(preds,target))
 
 
 
