@@ -146,7 +146,7 @@ class OCTDataset(Dataset):
             self.denoise=False
 
     def __getitem__(self, index):
-        self.clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
+        clahe=cv2.createCLAHE(clipLimit=self.cliplimit)
         scans_dir=self.image_paths[index]
         # print(scans_dir)
         volume=[]
@@ -188,7 +188,7 @@ class OCTDataset(Dataset):
         if self.multiThread:
             with ThreadPoolExecutor(max_workers=8) as executor:
                 futures = [
-        executor.submit(process_bscan, bscan, scans_dir,self.denoise, self.clahe, self.raw_scans, self.transforms)
+        executor.submit(process_bscan, bscan, scans_dir,self.denoise, clahe, self.raw_scans, self.transforms)
         for bscan in scan_list
     ]
                 for future in as_completed(futures):
@@ -215,7 +215,7 @@ class OCTDataset(Dataset):
                     img= cv2.fastNlMeansDenoising(img, h=10, templateWindowSize=7, searchWindowSize=21)
 
                 # Histogram Equalization
-                img = self.clahe.apply(img)
+                img = clahe.apply(img)
                 
                 assert img.shape in [(1024, 512), (1024, 200)], \
                     f'The shape of bscan must be [1024,512] or [1024,200] but was {img.shape}. Path: {img_path}'

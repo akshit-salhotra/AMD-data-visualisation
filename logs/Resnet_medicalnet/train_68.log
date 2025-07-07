@@ -1,0 +1,288 @@
+2025-07-06 14:45:09 - INFO - ------------------------------------------------------------------------------------------------
+2025-07-06 14:45:09 - INFO - starting new training !!!!
+2025-07-06 14:45:09 - INFO - ------------------------------------------------------------------------------------------------
+2025-07-06 14:45:09 - INFO - Namespace(batch=12, class_dict={'Early AMD': 0, 'Int AMD': 1, 'GA': 2, 'Wet': 3, 'Scar': 4, 'Not AMD': 5}, device=device(type='cuda'), epoch=100, excel_path='excel/vol_annotations_06_03_2025.xlsx', gamma=0.1, json='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json', lambda_bce=1.0, lambda_ce=1.0, lambda_hy=1, log_dir='logs/Resnet_medicalnet', lr=0.0001, model_path='pretrained\\resnet_34_23dataset.pth', num_classes=6, num_samples_per_epoch=1000, sampling_prob={0: 0.25, 1: 0.05, 2: 0.5}, save_dir='model_parameter_Resnet_medicalnet', save_freq=10, step_size=40, targets_path='targets.npy', weight_bce=tensor([3.9600, 4.9500, 0.5900]), weight_broad=tensor([0.5000, 0.4000, 0.4000, 0.3300, 1.2500, 1.0000]), weight_ce=tensor([1.0000, 0.8000]))
+2025-07-06 14:45:09 - INFO - parameters are being saved at :model_parameter_Resnet_medicalnet\68
+2025-07-06 14:45:10 - INFO - the wandb run name is : major-deluge-89
+2025-07-06 14:45:10 - INFO - found 4 gpus!
+2025-07-06 14:45:10 - INFO - DataParallel(
+  (module): ResNet(
+    (conv1): Conv3d(1, 64, kernel_size=(7, 7, 7), stride=(2, 2, 2), padding=(3, 3, 3), bias=False)
+    (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (relu): ReLU(inplace=True)
+    (maxpool): MaxPool3d(kernel_size=(3, 3, 3), stride=2, padding=1, dilation=1, ceil_mode=False)
+    (layer1): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer2): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(2, 2, 2), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): BasicBlock(
+        (conv1): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), bias=False)
+        (bn2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer3): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (4): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (5): BasicBlock(
+        (conv1): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(2, 2, 2), dilation=(2, 2, 2), bias=False)
+        (bn2): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer4): Sequential(
+      (0): BasicBlock(
+        (conv1): Conv3d(256, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): BasicBlock(
+        (conv1): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicBlock(
+        (conv1): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn1): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (conv2): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(4, 4, 4), dilation=(4, 4, 4), bias=False)
+        (bn2): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (GAP): AdaptiveAvgPool3d(output_size=(2, 2, 2))
+    (linear): Linear(in_features=4096, out_features=6, bias=True)
+  )
+)
+2025-07-06 14:45:11 - INFO - the missing keys are : 
+['module.linear.weight', 'module.linear.bias']
+2025-07-06 14:45:11 - INFO - the unexpected keys are :
+[]
+2025-07-06 14:45:11 - INFO - loaded model parameters from pretrained\resnet_34_23dataset.pth
+2025-07-06 14:45:12 - INFO - fold number:0
+2025-07-06 14:47:53 - INFO - epoch:0/100 iteration:0/459 batch loss is :1.8952
+2025-07-06 14:48:13 - INFO - epoch:0/100 iteration:5/459 batch loss is :3.3661
+2025-07-06 14:48:33 - INFO - epoch:0/100 iteration:10/459 batch loss is :1.7486
+2025-07-06 14:48:53 - INFO - epoch:0/100 iteration:15/459 batch loss is :2.7787
+2025-07-06 14:49:13 - INFO - epoch:0/100 iteration:20/459 batch loss is :2.4011
+2025-07-06 14:49:32 - INFO - epoch:0/100 iteration:25/459 batch loss is :3.2908
+2025-07-06 14:49:53 - INFO - epoch:0/100 iteration:30/459 batch loss is :2.1824
+2025-07-06 14:50:12 - INFO - epoch:0/100 iteration:35/459 batch loss is :2.6048
+2025-07-06 14:50:31 - INFO - epoch:0/100 iteration:40/459 batch loss is :1.8662
+2025-07-06 14:50:50 - INFO - epoch:0/100 iteration:45/459 batch loss is :2.8946
+2025-07-06 14:51:09 - INFO - epoch:0/100 iteration:50/459 batch loss is :2.1093
+2025-07-06 14:51:27 - INFO - epoch:0/100 iteration:55/459 batch loss is :3.2735
+2025-07-06 14:51:45 - INFO - epoch:0/100 iteration:60/459 batch loss is :2.2855
+2025-07-06 14:52:03 - INFO - epoch:0/100 iteration:65/459 batch loss is :1.4983
+2025-07-06 14:52:21 - INFO - epoch:0/100 iteration:70/459 batch loss is :2.4223
+2025-07-06 14:52:39 - INFO - epoch:0/100 iteration:75/459 batch loss is :3.2555
+2025-07-06 14:52:57 - INFO - epoch:0/100 iteration:80/459 batch loss is :2.1569
+2025-07-06 14:53:07 - INFO - Epoch:0/100 Loss is :0.4975
+2025-07-06 15:02:19 - INFO - VAL loss :2.7278
+2025-07-06 15:03:03 - INFO - epoch:1/100 iteration:0/459 batch loss is :2.7476
+2025-07-06 15:03:23 - INFO - epoch:1/100 iteration:5/459 batch loss is :3.4257
+2025-07-06 15:03:43 - INFO - epoch:1/100 iteration:10/459 batch loss is :2.2793
+2025-07-06 15:04:03 - INFO - epoch:1/100 iteration:15/459 batch loss is :2.2482
+2025-07-06 15:04:23 - INFO - epoch:1/100 iteration:20/459 batch loss is :3.0039
+2025-07-06 15:04:42 - INFO - epoch:1/100 iteration:25/459 batch loss is :2.6046
+2025-07-06 15:05:03 - INFO - epoch:1/100 iteration:30/459 batch loss is :2.2470
+2025-07-06 15:05:22 - INFO - epoch:1/100 iteration:35/459 batch loss is :2.1411
+2025-07-06 15:05:42 - INFO - epoch:1/100 iteration:40/459 batch loss is :2.9726
+2025-07-06 15:06:01 - INFO - epoch:1/100 iteration:45/459 batch loss is :1.6921
+2025-07-06 15:06:20 - INFO - epoch:1/100 iteration:50/459 batch loss is :2.3652
+2025-07-06 15:06:39 - INFO - epoch:1/100 iteration:55/459 batch loss is :2.5981
+2025-07-06 15:06:57 - INFO - epoch:1/100 iteration:60/459 batch loss is :2.1550
+2025-07-06 15:07:15 - INFO - epoch:1/100 iteration:65/459 batch loss is :3.7062
+2025-07-06 15:07:33 - INFO - epoch:1/100 iteration:70/459 batch loss is :1.8847
+2025-07-06 15:07:51 - INFO - epoch:1/100 iteration:75/459 batch loss is :1.9821
+2025-07-06 15:08:09 - INFO - epoch:1/100 iteration:80/459 batch loss is :3.1617
+2025-07-06 15:08:19 - INFO - Epoch:1/100 Loss is :0.4783
+2025-07-06 15:08:58 - INFO - epoch:2/100 iteration:0/459 batch loss is :2.0329
+2025-07-06 15:09:18 - INFO - epoch:2/100 iteration:5/459 batch loss is :2.7113
+2025-07-06 15:09:37 - INFO - epoch:2/100 iteration:10/459 batch loss is :2.3456
+2025-07-06 15:09:58 - INFO - epoch:2/100 iteration:15/459 batch loss is :3.4404
+2025-07-06 15:10:17 - INFO - epoch:2/100 iteration:20/459 batch loss is :2.8595
+2025-07-06 15:10:38 - INFO - epoch:2/100 iteration:25/459 batch loss is :2.7366
+2025-07-06 15:10:58 - INFO - epoch:2/100 iteration:30/459 batch loss is :1.8661
+2025-07-06 15:11:17 - INFO - epoch:2/100 iteration:35/459 batch loss is :2.3640
+2025-07-06 15:11:36 - INFO - epoch:2/100 iteration:40/459 batch loss is :2.8534
+2025-07-06 15:11:56 - INFO - epoch:2/100 iteration:45/459 batch loss is :2.4410
+2025-07-06 15:12:15 - INFO - epoch:2/100 iteration:50/459 batch loss is :2.0343
+2025-07-06 15:12:35 - INFO - epoch:2/100 iteration:55/459 batch loss is :2.3553
+2025-07-06 15:12:52 - INFO - epoch:2/100 iteration:60/459 batch loss is :3.3788
+2025-07-06 15:13:10 - INFO - epoch:2/100 iteration:65/459 batch loss is :2.2659
+2025-07-06 15:13:28 - INFO - epoch:2/100 iteration:70/459 batch loss is :2.6680
+2025-07-06 15:13:46 - INFO - epoch:2/100 iteration:75/459 batch loss is :2.2436
+2025-07-06 15:14:04 - INFO - epoch:2/100 iteration:80/459 batch loss is :2.2529
+2025-07-06 15:14:15 - INFO - Epoch:2/100 Loss is :0.4637
+2025-07-06 15:14:54 - INFO - epoch:3/100 iteration:0/459 batch loss is :3.4868
+2025-07-06 15:15:14 - INFO - epoch:3/100 iteration:5/459 batch loss is :1.2463
+2025-07-06 15:15:34 - INFO - epoch:3/100 iteration:10/459 batch loss is :1.8593
+2025-07-06 15:15:54 - INFO - epoch:3/100 iteration:15/459 batch loss is :1.9907
+2025-07-06 15:16:14 - INFO - epoch:3/100 iteration:20/459 batch loss is :2.1891
+2025-07-06 15:16:33 - INFO - epoch:3/100 iteration:25/459 batch loss is :2.4401
+2025-07-06 15:16:54 - INFO - epoch:3/100 iteration:30/459 batch loss is :2.4009
+2025-07-06 15:17:14 - INFO - epoch:3/100 iteration:35/459 batch loss is :1.8160
+2025-07-06 15:17:33 - INFO - epoch:3/100 iteration:40/459 batch loss is :1.4530
+2025-07-06 15:17:53 - INFO - epoch:3/100 iteration:45/459 batch loss is :4.1095
+2025-07-06 15:18:12 - INFO - epoch:3/100 iteration:50/459 batch loss is :3.0433
+2025-07-06 15:18:31 - INFO - epoch:3/100 iteration:55/459 batch loss is :2.7296
+2025-07-06 15:18:49 - INFO - epoch:3/100 iteration:60/459 batch loss is :2.0117
+2025-07-06 15:19:07 - INFO - epoch:3/100 iteration:65/459 batch loss is :2.9536
+2025-07-06 15:19:25 - INFO - epoch:3/100 iteration:70/459 batch loss is :1.9834
+2025-07-06 15:19:43 - INFO - epoch:3/100 iteration:75/459 batch loss is :2.0610
+2025-07-06 15:20:01 - INFO - epoch:3/100 iteration:80/459 batch loss is :3.0862
+2025-07-06 15:20:11 - INFO - Epoch:3/100 Loss is :nan
+2025-07-06 15:20:51 - INFO - epoch:4/100 iteration:0/459 batch loss is :2.7241
+2025-07-06 15:21:13 - INFO - epoch:4/100 iteration:5/459 batch loss is :2.3819
+2025-07-06 15:21:33 - INFO - epoch:4/100 iteration:10/459 batch loss is :1.8801
+2025-07-06 15:21:54 - INFO - epoch:4/100 iteration:15/459 batch loss is :2.5851
+2025-07-06 15:22:13 - INFO - epoch:4/100 iteration:20/459 batch loss is :2.0341
+2025-07-06 15:22:33 - INFO - epoch:4/100 iteration:25/459 batch loss is :1.6076
+2025-07-06 15:22:51 - INFO - epoch:4/100 iteration:30/459 batch loss is :2.1643
+2025-07-06 15:23:11 - INFO - epoch:4/100 iteration:35/459 batch loss is :1.5052
+2025-07-06 15:23:29 - INFO - epoch:4/100 iteration:40/459 batch loss is :2.5625
+2025-07-06 15:23:49 - INFO - epoch:4/100 iteration:45/459 batch loss is :2.9037
+2025-07-06 15:24:07 - INFO - epoch:4/100 iteration:50/459 batch loss is :3.0661
+2025-07-06 15:24:26 - INFO - epoch:4/100 iteration:55/459 batch loss is :3.4284
+2025-07-06 15:24:44 - INFO - epoch:4/100 iteration:60/459 batch loss is :2.1785
+2025-07-06 15:25:02 - INFO - epoch:4/100 iteration:65/459 batch loss is :2.5199
+2025-07-06 15:25:20 - INFO - epoch:4/100 iteration:70/459 batch loss is :2.3904
+2025-07-06 15:25:38 - INFO - epoch:4/100 iteration:75/459 batch loss is :2.9695
+2025-07-06 15:25:56 - INFO - epoch:4/100 iteration:80/459 batch loss is :2.5207
+2025-07-06 15:26:07 - INFO - Epoch:4/100 Loss is :nan
+2025-07-06 15:26:48 - INFO - epoch:5/100 iteration:0/459 batch loss is :1.8884
+2025-07-06 15:27:08 - INFO - epoch:5/100 iteration:5/459 batch loss is :2.7119
+2025-07-06 15:27:28 - INFO - epoch:5/100 iteration:10/459 batch loss is :3.0137
+2025-07-06 15:27:49 - INFO - epoch:5/100 iteration:15/459 batch loss is :2.6623
+2025-07-06 15:28:09 - INFO - epoch:5/100 iteration:20/459 batch loss is :2.6014
+2025-07-06 15:28:29 - INFO - epoch:5/100 iteration:25/459 batch loss is :2.7854
+2025-07-06 15:28:49 - INFO - epoch:5/100 iteration:30/459 batch loss is :3.3102
+2025-07-06 15:29:08 - INFO - epoch:5/100 iteration:35/459 batch loss is :1.8857
+2025-07-06 15:29:28 - INFO - epoch:5/100 iteration:40/459 batch loss is :1.6960
+2025-07-06 15:29:47 - INFO - epoch:5/100 iteration:45/459 batch loss is :2.4337
+2025-07-06 15:30:06 - INFO - epoch:5/100 iteration:50/459 batch loss is :3.1806
+2025-07-06 15:30:25 - INFO - epoch:5/100 iteration:55/459 batch loss is :3.3537
+2025-07-06 15:30:43 - INFO - epoch:5/100 iteration:60/459 batch loss is :1.4887
+2025-07-06 15:31:01 - INFO - epoch:5/100 iteration:65/459 batch loss is :3.4252
+2025-07-06 15:31:19 - INFO - epoch:5/100 iteration:70/459 batch loss is :1.9298
+2025-07-06 15:31:37 - INFO - epoch:5/100 iteration:75/459 batch loss is :1.1095
+2025-07-06 15:31:55 - INFO - epoch:5/100 iteration:80/459 batch loss is :3.6740
+2025-07-06 15:32:05 - INFO - Epoch:5/100 Loss is :0.3961
+2025-07-06 15:32:44 - INFO - epoch:6/100 iteration:0/459 batch loss is :1.6537
+2025-07-06 15:33:04 - INFO - epoch:6/100 iteration:5/459 batch loss is :2.1869
+2025-07-06 15:33:23 - INFO - epoch:6/100 iteration:10/459 batch loss is :3.3552
+2025-07-06 15:33:43 - INFO - epoch:6/100 iteration:15/459 batch loss is :1.6133
+2025-07-06 15:34:03 - INFO - epoch:6/100 iteration:20/459 batch loss is :2.4985
+2025-07-06 15:34:22 - INFO - epoch:6/100 iteration:25/459 batch loss is :2.2752
+2025-07-06 15:34:42 - INFO - epoch:6/100 iteration:30/459 batch loss is :1.6503
+2025-07-06 15:35:01 - INFO - epoch:6/100 iteration:35/459 batch loss is :2.4749
+2025-07-06 15:35:20 - INFO - epoch:6/100 iteration:40/459 batch loss is :1.6676
+2025-07-06 15:35:39 - INFO - epoch:6/100 iteration:45/459 batch loss is :1.6061
+2025-07-06 15:35:58 - INFO - epoch:6/100 iteration:50/459 batch loss is :3.9847
+2025-07-06 15:36:16 - INFO - epoch:6/100 iteration:55/459 batch loss is :3.2569
+2025-07-06 15:36:34 - INFO - epoch:6/100 iteration:60/459 batch loss is :2.0357
+2025-07-06 15:36:52 - INFO - epoch:6/100 iteration:65/459 batch loss is :3.0280
+2025-07-06 15:37:10 - INFO - epoch:6/100 iteration:70/459 batch loss is :2.6483
+2025-07-06 15:37:28 - INFO - epoch:6/100 iteration:75/459 batch loss is :2.4430
+2025-07-06 15:37:46 - INFO - epoch:6/100 iteration:80/459 batch loss is :2.6139
+2025-07-06 15:37:56 - INFO - Epoch:6/100 Loss is :0.4311
+2025-07-06 15:38:36 - INFO - epoch:7/100 iteration:0/459 batch loss is :1.5822
+2025-07-06 15:38:56 - INFO - epoch:7/100 iteration:5/459 batch loss is :2.7572
+2025-07-06 15:39:15 - INFO - epoch:7/100 iteration:10/459 batch loss is :2.9071
+2025-07-06 15:39:36 - INFO - epoch:7/100 iteration:15/459 batch loss is :1.4825
+2025-07-06 15:39:55 - INFO - epoch:7/100 iteration:20/459 batch loss is :1.4113
+2025-07-06 15:40:15 - INFO - epoch:7/100 iteration:25/459 batch loss is :2.3383
+2025-07-06 15:40:33 - INFO - epoch:7/100 iteration:30/459 batch loss is :3.0959
+2025-07-06 15:40:53 - INFO - epoch:7/100 iteration:35/459 batch loss is :2.5300
+2025-07-06 15:41:11 - INFO - epoch:7/100 iteration:40/459 batch loss is :2.2490
+2025-07-06 15:41:31 - INFO - epoch:7/100 iteration:45/459 batch loss is :1.8933
+2025-07-06 15:41:50 - INFO - epoch:7/100 iteration:50/459 batch loss is :1.9934
+2025-07-06 15:42:09 - INFO - epoch:7/100 iteration:55/459 batch loss is :1.9956
+2025-07-06 15:42:27 - INFO - epoch:7/100 iteration:60/459 batch loss is :1.6726
+2025-07-06 15:42:45 - INFO - epoch:7/100 iteration:65/459 batch loss is :2.4624
+2025-07-06 15:43:03 - INFO - epoch:7/100 iteration:70/459 batch loss is :3.2349
+2025-07-06 15:43:21 - INFO - epoch:7/100 iteration:75/459 batch loss is :2.1277
+2025-07-06 15:43:39 - INFO - epoch:7/100 iteration:80/459 batch loss is :3.5235
+2025-07-06 15:43:49 - ERROR - stack expects a non-empty TensorList

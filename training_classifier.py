@@ -17,7 +17,7 @@ import os
 from tqdm import tqdm
 import logging
 import json
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 import torch.nn as nn
 import sys
 import re
@@ -129,7 +129,7 @@ if __name__=="__main__":
         run.config.update(dataset_config)
         dataset=OCTDataset(train_paths,args.excel_path,**dataset_config)
         num_folds=5
-        kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+        kf = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=42)
 
         #registering hooks
 
