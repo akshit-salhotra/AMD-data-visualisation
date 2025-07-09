@@ -69,6 +69,37 @@ def train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_c
     optimizer.zero_grad()
     return epoch_loss
 
+
+def train_step_broad_only(args,iter,data,label,epoch_loss,optimizer,model,ce_criteron,dataset,num_folds):
+    data=[d.to(args.device) for d in data]
+    label=label.to(args.device)
+    # print(image.shape)
+    # with torch.no_grad():
+
+    logits=model(*data)
+        # print(logits.device,label.device)
+    mapping_target=torch.tensor([0,0,1,1,1,2]).to(label.device)
+
+    label=mapping_target[torch.argmax(label,dim=-1)]
+    loss=ce_criteron(logits,label)
+
+    # loss=args.lambda_hy*hyce_loss+args.lambda_ce*ce_loss+args.lambda_bce*bce_loss
+    # print(loss,"loss")
+    # print(epoch_loss)
+
+    epoch_loss+=loss
+    if iter%5==0:
+                # print(logits,label)
+                wandb.log({'batch loss':loss,
+
+                               })
+                logging.info(f'epoch:{i}/{args.epoch} iteration:{iter}/{(len(dataset)*(num_folds-1))//(num_folds*args.batch)+1} batch loss is :{loss:.4f}')
+                # logging.info(f'the acc is :{torch.mean((torch.argmax(logits,dim=-1)==label).to(torch.float32)).detach().cpu()}')
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()
+    return epoch_loss
+
 def val_step(args,data,label,val_loss,model,bce_criteron,ce_criteron,hybCe_criteron):
     data=[d.to(args.device) for d in data]
     label=label.to(args.device)
@@ -93,6 +124,25 @@ def val_step(args,data,label,val_loss,model,bce_criteron,ce_criteron,hybCe_crite
     # assert label.shape==preds.shape, 'the number of labels and images do not match'
     return val_loss,logits,label
 
+def val_step_broad_only(args,data,label,val_loss,model,ce_criteron):
+    data=[d.to(args.device) for d in data]
+    label=label.to(args.device)
+    logits=model(*data)
+
+    mapping_target=torch.tensor([0,0,1,1,1,2]).to(label.device)
+
+    label=mapping_target[torch.argmax(label,dim=-1)]   
+
+    ce_loss=ce_criteron(logits,label)
+   
+    # loss=args.lambda_hy*hyce_loss + args.lambda_ce*ce_loss+args.lambda_bce*bce_loss
+    val_loss+=ce_loss
+    
+    wandb.log({'batch val loss':ce_loss,
+  })
+    # preds=torch.argmax(logits,dim=-1)
+    # assert label.shape==preds.shape, 'the number of labels and images do not match'
+    return val_loss,logits,label
 
 
 
@@ -106,26 +156,27 @@ if __name__=="__main__":
 
         parser.add_argument("--lr", type=float, default=0.000025, help="learning rate")
         parser.add_argument('--batch',type=float,default=12,help='batch size')
-        parser.add_argument('--epoch',type=int,default=50,help='number of epoch')
+        parser.add_argument('--epoch',type=int,default=10,help='number of epoch')
         parser.add_argument('--json',type=str,default='D:\\AMD-data-visualisation\\jsons\\patient_level\\train_val_split_new_dataset.json',help="path of json file containing path of volumes")
         parser.add_argument('--excel-path',type=str,default='excel/vol_annotations_06_03_2025.xlsx',help='path of excel containing labels')
         parser.add_argument('--save-dir',type=str,default='model_parameter_Resnet_medicalnet')
+        parser.add_argument("--eval_freq",type=int,default=10,help="eval freq")
         parser.add_argument('--save-freq',type=int,default=5,help='after how many epochs are the parameters saved')
         parser.add_argument('--log-dir',type=str,default='logs/Resnet_medicalnet',help='the directory in which training logs are to be saved')
         parser.add_argument('--gamma',type=float,default=0.1,help='gamma for learning rate decay')
-        parser.add_argument('--step-size',type=int,default=25,help='number of epochs after which learning rate is to be decayed')
+        parser.add_argument('--step-size',type=int,default=10,help='number of epochs after which learning rate is to be decayed')
         parser.add_argument('--model-path',type=str,default="pretrained\\resnet_34_23dataset.pth",help='path of model parameters to be loaded')
         parser.add_argument('--device',type=torch.device,default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),help='computation device')
-        parser.add_argument('--weight_ce',type=torch.tensor,default=torch.tensor([1,0.8]),help='weights for weighted cross entropy')
+        parser.add_argument('--weight_ce',type=torch.tensor,default=torch.tensor([0.2,0.2,1]),help='weights for weighted cross entropy')
         parser.add_argument('--weight_bce',type=torch.tensor,default=torch.tensor([3.96,4.95,0.59]),help='weights for weighted cross entropy')
         parser.add_argument('--weight_broad',type=torch.tensor,default=torch.tensor([0.5,0.4,0.4,0.33,1.25,1]))
         parser.add_argument('--sampling_prob',type=dict,default={0:0.25,1:0.05,2:0.5})
         parser.add_argument('--num_samples_per_epoch',type=int,default=1000)
         parser.add_argument('--class_dict',type=dict,default={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5})
-        parser.add_argument('--num_classes',type=int,default=6,help="number of classes of the classifier")
+        parser.add_argument('--num_classes',type=int,default=3,help="number of classes of the classifier")
         parser.add_argument('--lambda_bce',type=float,default=1.0,help='weighting factor for the bce loss')
         parser.add_argument('--lambda_ce',type=float,default=1.0)
-        parser.add_argument("--lambda_hy",type=float,default=1.25)
+        parser.add_argument("--lambda_hy",type=float,default=4)
         parser.add_argument('--targets_path',type=str,default="targets.npy")
         
         # parser.add_argument('--model_ch',type=list,default=[16,32,64,128],help="channels in different layers of resnet")
@@ -158,9 +209,10 @@ if __name__=="__main__":
         logging.info(f'found {torch.cuda.device_count()} gpus!')
         logging.info(model)
         # criteron=CrossEntropyLoss(weight=args.weight_matrix.to(args.device))##make sure to add weight factor
-        bce_criteron=BCEWithLogitsLoss(pos_weight=args.weight_bce.to(args.device))
+        # bce_criteron=BCEWithLogitsLoss(pos_weight=args.weight_bce.to(args.device))
+        # ce_criteron=CrossEntropyLoss(weight=args.weight_ce.to(args.device))
+        # hybCe_criteron=CrossEntropyHybrid(weights=args.weight_broad.to(args.device)).to(args.device)
         ce_criteron=CrossEntropyLoss(weight=args.weight_ce.to(args.device))
-        hybCe_criteron=CrossEntropyHybrid(weights=args.weight_broad.to(args.device)).to(args.device)
         #early,inter,ga,wet,scar,notamd
         optimizer=optim.Adam(model.parameters(),args.lr)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
@@ -252,7 +304,7 @@ if __name__=="__main__":
                     for iter,(data,_,label) in tqdm(enumerate(train_loader)):
                         # print(image.shape)
                         # print(label)
-                        epoch_loss=train_step(args,iter,data,label,epoch_loss,optimizer,model,bce_criteron,ce_criteron,hybCe_criteron,dataset,num_folds)
+                        epoch_loss=train_step_broad_only(args,iter,data,label,epoch_loss,optimizer,model,ce_criteron,dataset,num_folds)
                         # preds.extend(pred.detach().cpu().tolist())
                         # labels.extend(label.detach().cpu().tolist())
                     # print(epoch_loss)
@@ -274,7 +326,7 @@ if __name__=="__main__":
                     pbar.set_postfix({'average epoch loss':f'{epoch_loss:.4f}'})
                     scheduler.step()
                     
-                    if i%args.save_freq==0 or args.epoch==i+1:
+                    if i%args.eval_freq==0 or args.epoch==i+1:
                         val_loss=0
                         correct_pred=0
                         model.eval()
@@ -283,7 +335,7 @@ if __name__=="__main__":
                         with torch.no_grad():
                             for (data,_,label) in test_loader:
                                 # print(data,label)
-                                val_loss,val_logit,val_label=val_step(args,data,label,val_loss,model,bce_criteron,ce_criteron,hybCe_criteron)
+                                val_loss,val_logit,val_label=val_step_broad_only(args,data,label,val_loss,model,ce_criteron)
                                 # val_preds=nn.functional.sigmoid(val)
                                 # print(preds.device,label.device)
                                 # correct_pred+=(label==preds).sum().item()
@@ -296,14 +348,17 @@ if __name__=="__main__":
                             val_labels=np.array(val_labels)
                             val_preds=np.array(val_preds)
 
-                            broad_preds=np.argmax(np.concatenate([np.max(val_preds[:,0:2],axis=-1,keepdims=True),np.max(val_preds[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_preds[:,5],axis=-1)],axis=-1),axis=-1)
-                            broad_labels=np.concatenate([np.max(val_labels[:,0:2],axis=-1,keepdims=True),np.max(val_labels[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_labels[:,5],axis=-1)],axis=-1)
+                            broad_preds=np.argmax(val_preds,axis=-1)
+
+                            # broad_preds=np.argmax(np.concatenate([np.max(val_preds[:,0:2],axis=-1,keepdims=True),np.max(val_preds[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_preds[:,5],axis=-1)],axis=-1),axis=-1)
+                            # broad_labels=np.concatenate([np.max(val_labels[:,0:2],axis=-1,keepdims=True),np.max(val_labels[:,2:5],axis=-1,keepdims=True),np.expand_dims(val_labels[:,5],axis=-1)],axis=-1)
                             
                             # print(broad_labels)
-                            broad_labels=np.argmax(broad_labels,axis=-1)
+                            # broad_labels=np.argmax(broad_labels,axis=-1)
+                            broad_labels=val_labels
 
-                            late_preds=nn.functional.sigmoid(torch.from_numpy(val_preds[:,2:5])).cpu().detach().numpy()
-                            late_labels=val_labels[:,2:5]
+                            # late_preds=nn.functional.sigmoid(torch.from_numpy(val_preds[:,2:5])).cpu().detach().numpy()
+                            # late_labels=val_labels[:,2:5]
 
                             # rocPlotter(broad_preds,)
                             cm=confusion_matrix(broad_labels,broad_preds)
@@ -315,12 +370,17 @@ if __name__=="__main__":
                                        })
                             # rocPlotter()
                             plt.savefig(f'{param_dir+os.sep}confusion_matrix_val_fold_{fold}_epoch_{i}.png')
-                            rocPlotter(late_preds,late_labels,3,f'{param_dir+os.sep}roc_val_fold_{fold}_epoch_{i}.png',None,classNames=['GA','Wet','Scar'] )
+                            # rocPlotter(late_preds,late_labels,3,f'{param_dir+os.sep}roc_val_fold_{fold}_epoch_{i}.png',None,classNames=['GA','Wet','Scar'] )
                             # plt.close()
+                            plt.clf()
                             torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_val_{val_loss:.4f}_train_{epoch_loss:.4f}')
                             # batch_save="images//plots//batch_statistics"
                             # os.makedirs(batch_save,exist_ok=True)
                             # get_batch_stats_plot(batchnorm_stats,f'{batch_save+os.sep}fold_{fold}_epoch_{i}')
+                    elif i% args.save_freq==0:
+                            torch.save(model.state_dict(),f'{param_dir}/fold{fold}_epoch{i}_train_{epoch_loss:.4f}')
+
+                         
                 
         print('training completed !!')
         logging.info('training complete!!!')

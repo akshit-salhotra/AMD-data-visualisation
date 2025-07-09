@@ -25,7 +25,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
     with open(json_path,'r') as file:
         paths=json.load(file)
     
-    n_classes=6
+    n_classes=3
     model=resnet34(num_classes=n_classes,shortcut_type='A').to(device)
     class_dict={'Early AMD':0,'Int AMD':1,'GA':2,'Wet':3,'Scar':4,"Not AMD":5}
     class_dict = dict(sorted(class_dict.items(), key=lambda item: item[1]))
@@ -65,7 +65,7 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
             logits=model(*data)
             
             if multilabel:
-                logits=nn.functional.sigmoid(logits)
+                logits=logits
                 LOGITS.extend(logits.detach().cpu().numpy())
             else:
                 pred=torch.argmax(logits,dim=-1)
@@ -85,13 +85,18 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
 
 
         LOGITS=torch.tensor(LOGITS)
-        ce_logits=torch.cat([LOGITS[:,0:2],torch.max(LOGITS[:,2:5],dim=-1,keepdim=True)[0],LOGITS[:,5:]],dim=-1)
-        ce_label=torch.cat([labels[:,0:2],torch.max(labels[:,2:5],dim=-1,keepdim=True)[0],labels[:,5:]],dim=-1)
-        ce_label=torch.argmax(ce_label,dim=-1)
-        ce_pred=torch.argmax(ce_logits,dim=-1)
+        preds=torch.argmax(LOGITS,dim=-1)
+
+        mapping_target=torch.tensor([0,0,1,1,1,2]).to(label.device)
+
+        labels=mapping_target[torch.argmax(labels,dim=-1)]
+        # ce_logits=torch.cat([LOGITS[:,0:2],torch.max(LOGITS[:,2:5],dim=-1,keepdim=True)[0],LOGITS[:,5:]],dim=-1)
+        # ce_label=torch.cat([labels[:,0:2],torch.max(labels[:,2:5],dim=-1,keepdim=True)[0],labels[:,5:]],dim=-1)
+        # ce_label=torch.argmax(ce_label,dim=-1)
+        # ce_pred=torch.argmax(ce_logits,dim=-1)
         #save_roc= model_path.split(os.sep)[0]+"_"+model_path.split(os.sep)[-2]+"_"+model_path.split(os.sep)[-1]+f'roc_test_set_{(json_path.split(os.sep)[-1]).split(".")[0]}.png'
-        save_roc=save_path.replace("confusion_matrix","roc")
-        optimalThresholds=rocPlotter(LOGITS[:,2:5],labels[:,2:5],3,save_roc,json_dir=os.path.dirname(model_path),classNames=classes[2:5])
+        # save_roc=save_path.replace("confusion_matrix","roc")
+        # optimalThresholds=rocPlotter(LOGITS[:,2:5],labels[:,2:5],3,save_roc,json_dir=os.path.dirname(model_path),classNames=classes[2:5])
         # thres=np.array([float(optimalThresholds[key]) for key in classes])
         # print(thres.shape,LOGITS.shape)
         # preds =(LOGITS >= thres).astype(int)
@@ -118,23 +123,25 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
         #     axes[i].set_xlabel('Predicted')
         #     axes[i].set_ylabel('Actual')
         # cm,class_labels=multilabel_confusionMatrixSoftmax(LOGITS,labels,class_dict,[0,0,1,1,1,0])
-        cm=confusion_matrix(ce_label.detach().cpu().numpy(),ce_pred.detach().cpu().numpy(),labels=[0,1,2,3])
+        labels=labels.detach().cpu().numpy()
+        preds=preds.detach().cpu().numpy()
+        cm=confusion_matrix(labels,preds,labels=[0,1,2])
         sns.heatmap(cm,
                         annot=True,
                         fmt='d',
                         cmap='Blues',
                         cbar=False,
-                        xticklabels=['early','inter','advanced','not'],
-                        yticklabels=['early','inter','advanced','not'])
+                        xticklabels=['early','advanced','not'],
+                        yticklabels=['early','advanced','not'])
             
     
     else:       
         c_matrix=confusion_matrix(labels,preds)
         plt.figure(figsize=(6, 4))
         sns.heatmap(c_matrix, annot=True, fmt='d', cmap='Blues',xticklabels=classes,yticklabels=classes)
-        plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
+    plt.title(f'Confusion Matrix,acc:{np.mean(np.array(labels)==np.array(preds)):.4f}')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
 
     # plt.tight_layout()
     plt.savefig(save_path, dpi=300,bbox_inches='tight')
@@ -162,12 +169,13 @@ def evaluate_dataset(json_path:str,device:torch.device,model_path:str,excel_path
 
 
     # get_batch_stats_plot(batchnorm_stats,save_path)
-    print('the accuarcy of model is:',np.mean(np.array(labels)==np.array(preds)))
+    # print('the accuarcy of model is:',np.mean(np.array(labels)==np.array(preds)))
         
     
 if __name__=="__main__":
+
     
-    model_path="model_parameter_Resnet_medicalnet\\51\\fold1_epoch5_val_0.1039_train_0.1103"
+    model_path="model_parameter_Resnet_medicalnet\\78\\fold4_epoch9_val_0.3094_train_0.0658"
     device='cuda' if torch.cuda.is_available() else 'cpu'
     json_path="jsons\\patient_level\\train_val_split_new_dataset.json"
     excel_path="excel/vol_annotations_06_03_2025.xlsx"
